@@ -1,0 +1,26 @@
+#!/bin/sh
+
+if [ -z "$ZF_HOME" ]; then
+    if [ -f library/Zend/Version.php ]; then
+		if [ ! -f .zf.ini ]; then
+			echo 123
+		fi
+	fi
+    #export ZF_HOME="$(pwd)"
+fi
+
+#"$PHP_BIN" -d safe_mode=Off -f "$PHP_DIR/zf.php" -- "$@"
+
+
+
+
+# указываю свой путь к конфигурационному файлу
+#ZF_CONFIG_FILE="./../.zf.ini"
+#export ZF_CONFIG_FILE
+
+# добавляю директорию к опции include_path
+#ZEND_TOOL_INCLUDE_PATH_PREPEND="./../library"
+#export ZEND_TOOL_INCLUDE_PATH_PREPEND
+ 
+# вызываю zf.sh с всеми входящими параметрами
+#./zf.sh $@
