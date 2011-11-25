@@ -1,26 +1,26 @@
 #!/bin/sh
 
-if [ -z "$ZF_HOME" ]; then
-    if [ -f library/Zend/Version.php ]; then
+if [ -z $ZF_HOME ]; then
+    if [ -f library/GeometriaLab/Tool/Project/Provider/Manifest.php ]; then
 		if [ ! -f .zf.ini ]; then
-			echo 123
+			echo "basicloader.classes.0 = \"GeometriaLab_Tool_Project_Provider_Manifest\"" >> .zf.ini
+			echo "" >> .zf.ini
+			echo ";env.APPLICATION_PATH = \"$(pwd)/application\"" >> .zf.ini
+			echo ";env.APPLICATION_CONFIG_PATH = \"$(pwd)/application/configs/application.ini\"" >> .zf.ini
+			echo ";env.APPLICATION_BOOTSTRAP_PATH = \"$(pwd)/application/\"" >> .zf.ini
+			echo ";env.APPLICATION_BOOTSTRAP_CLASS = \"$(pwd)/application\"" >> .zf.ini
 		fi
+
+		ZF_CONFIG_FILE=".zf.ini"
+		export ZF_CONFIG_FILE
+
+		ZEND_TOOL_INCLUDE_PATH_PREPEND="./library"
+		export ZEND_TOOL_INCLUDE_PATH_PREPEND
 	fi
-    #export ZF_HOME="$(pwd)"
 fi
 
-#"$PHP_BIN" -d safe_mode=Off -f "$PHP_DIR/zf.php" -- "$@"
+if [ -z $ZF_BIN ]; then
+	ZF_BIN="zf.sh"
+fi
 
-
-
-
-# указываю свой путь к конфигурационному файлу
-#ZF_CONFIG_FILE="./../.zf.ini"
-#export ZF_CONFIG_FILE
-
-# добавляю директорию к опции include_path
-#ZEND_TOOL_INCLUDE_PATH_PREPEND="./../library"
-#export ZEND_TOOL_INCLUDE_PATH_PREPEND
- 
-# вызываю zf.sh с всеми входящими параметрами
-#./zf.sh $@
+$ZF_BIN $@
