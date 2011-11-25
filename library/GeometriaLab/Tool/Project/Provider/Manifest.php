@@ -50,21 +50,11 @@ class GeometriaLab_Tool_Project_Provider_Manifest implements Zend_Tool_Framework
         // todo: Move to YAML
         $config = new Zend_Config_Ini($configPath, APPLICATION_ENV, true);
         $config->merge(new Zend_Config(array(
-            'phpSettings' => array(
-                'display_errors' => 1
-            ),
             'bootstrap' => array(
                 'path'  => $bootstrapPath,
                 'class' => $bootstrapClass
             )
         )));
-
-        if (isset ($config->resources->frontcontroller->plugins)) {
-            unset($config->resources->frontcontroller->plugins);
-        }
-        if (isset ($config->resources->layout)) {
-            unset($config->resources->layout);
-        }
 
         return $config;
     }
