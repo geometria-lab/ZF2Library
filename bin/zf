@@ -2,16 +2,22 @@
 
 if [ -z $ZF_HOME ]; then
     if [ -f library/GeometriaLab/Tool/Project/Provider/Manifest.php ]; then
-		if [ ! -f .zf.ini ]; then
-			echo "basicloader.classes.0 = \"GeometriaLab_Tool_Project_Provider_Manifest\"" >> .zf.ini
-			echo "" >> .zf.ini
-			echo ";env.APPLICATION_PATH = \"$(pwd)/application\"" >> .zf.ini
-			echo ";env.APPLICATION_CONFIG_PATH = \"$(pwd)/application/configs/application.ini\"" >> .zf.ini
-			echo ";env.APPLICATION_BOOTSTRAP_PATH = \"$(pwd)/application/\"" >> .zf.ini
-			echo ";env.APPLICATION_BOOTSTRAP_CLASS = \"$(pwd)/application\"" >> .zf.ini
+		if [ ! -f .zf/config.ini ]; then
+			mkdir .zf
+			echo "basicloader.classes.0 = \"GeometriaLab_Tool_Project_Provider_Manifest\"" >> .zf/config.ini
+			echo "" >> .zf/config.ini
+			echo "env.APPLICATION_PATH = \"$(pwd)/application\"" >> .zf/config.ini
+			echo ";env.APPLICATION_CONFIG_PATH = \"$(pwd)/application/configs/application.ini\"" >> .zf/config.ini
+			echo ";env.APPLICATION_BOOTSTRAP_PATH = \"$(pwd)/application/\"" >> .zf/config.ini
+			echo ";env.APPLICATION_BOOTSTRAP_CLASS = \"Bootstrap_Cli\"" >> .zf/config.ini
+
+			if [ -d .git ]; then
+				echo "" >> .gitignore
+				echo ".zf" >> .gitignore
+			fi
 		fi
 
-		ZF_CONFIG_FILE=".zf.ini"
+		ZF_CONFIG_FILE=".zf/config.ini"
 		export ZF_CONFIG_FILE
 
 		ZEND_TOOL_INCLUDE_PATH_PREPEND="./library"
