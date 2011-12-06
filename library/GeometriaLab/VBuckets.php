@@ -27,9 +27,13 @@ class GeometriaLab_VBuckets
         $this->_hash = $hash;
     }
 
+    /**
+     * @param  $id
+     * @return
+     */
     protected function getById($id)
     {
-        return $this->_getMap()->getVBucket($id);
+        return $this->_getMap()->getBucket($id);
     }
 
     protected function getByKey($key)
