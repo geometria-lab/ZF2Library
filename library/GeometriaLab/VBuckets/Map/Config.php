@@ -1,87 +1,92 @@
 <?php
 
-class GeometriaLab_VBucket_Mapping_Config implements GeometriaLab_VBuckets_Map_Interface
+class GeometriaLab_VBucket_Map_Config implements GeometriaLab_VBuckets_Map_Interface
 {
+    /**
+     * Config
+     *
+     * @var \Zend_Config
+     */
+    protected $_config;
+
+    /**
+     * Constructor
+     *
+     * @param Zend_Config $config
+     */
     public function __construct(Zend_Config $config)
     {
-        $this->_fillRanges($config);
+        $this->_config = $this->_validate($config);
     }
 
-    public function getBucket($id)
+    /**
+     * Get vBucket
+     *
+     * @param  $id
+     * @return GeometriaLab_VBuckets_Bucket
+     */
+    public function getVBucket($id)
     {
-        $storageRanges = $this->getByPath("range", '.')->exportAssoc();
-        return $this->_calculateDSN($storageRanges, $id);
+        foreach($this->_getConfig()->ranges as $maxId => $range) {
+            if ($maxId <= $id) {
+                return new GeometriaLab_VBuckets_Bucket($id, $range);
+            }
+        }
+
+        throw new GeometriaLab_VBucket_Map_Exception('Can\'t get vBucket from ranges');
     }
 
-    public function getShardCount()
+    /**
+     * Get vBuckets count
+     *
+     * @return integer
+     */
+    public function getVBucketsCount()
     {
-        return $this->shardCount;
+        return $this->_getConfig()->count;
     }
 
-    protected function _fillRanges(Zend_Config $Config) {
-        foreach($Config as $storage => $storageConfig) {
-            $this->_ensureStorageConfigIsWellFormatted($storage, $storageConfig);
-            $this->setByPath(
-            	"{$storage}.shardCount",
-                (int)$storageConfig->shardCount,
-                '.');
-            $rangesMax = 0;
-            foreach($storageConfig->range as $key => $range) {
-                $this->_ensureRangeIsWellFormatted($storage, $key, $range);
-                $this->setByPath(
-                    "{$storage}.range.{$range->max}",
-                    $range->dsn,
-                    '.');
-                if($range->max > $rangesMax) {
-                    $rangesMax = $range->max;
-                }
-            }
-            if($storageConfig->shardCount !== $rangesMax) {
-                throw new GeometriaLabOld_LogicException(
-                    "Shards are not covered by ranges; rengesMax: {$rangesMax}");
-            }
+    /**
+     * Validate config
+     *
+     * @throws GeometriaLab_VBuckets_Map_Exception
+     * @param Zend_Config $config
+     * @return Zend_Config
+     */
+    protected function _validate(Zend_Config $config)
+    {
+        if (!isset($config->count) ||
+            (integer)$config->count != $config->count ||
+            (integer)$config->count < 1) {
+            throw new GeometriaLab_VBuckets_Map_Exception('Undefined vBuckets count');
         }
-    }
 
-    protected function _calculateDSN(array $ranges, $shardId) {
-        $calculatedDsn = null;
-        $calculatedMax = PHP_INT_MAX;
-        foreach($ranges as $rangeMax => $dsn) {
-            if($rangeMax >= $shardId && $rangeMax < $calculatedMax) {
-                $calculatedMax = $rangeMax;
-                $calculatedDsn = $dsn;
+        $config->count = (integer)$config->count;
+
+        if (!isset($config->ranges) || count($config->ranges) == 0) {
+            throw new GeometriaLab_VBuckets_Map_Exception('Ranges not present');
+        }
+
+        foreach($config->ranges as $maxId => $range) {
+            if (!is_int($maxId) || $maxId < 1 || $maxId > $config->count) {
+                throw new GeometriaLab_VBuckets_Map_Exception('Invalid range');
             }
         }
-        if(null === $calculatedDsn) {
-            throw new GeometriaLabOld_LogicException(
-                "Cannot calculate DSN for shard#{$shardId}");
+
+        if (!isset($config->ranges[$config->count])) {
+            throw new GeometriaLab_VBuckets_Map_Exception('vBuckets count are not covered by ranges');
         }
-        return $calculatedDsn . $shardId;
+
+        return $config;
     }
 
-    protected function _ensureStorageConfigIsWellFormatted($storage, $storageConfig) {
-        $shardCountIsset = isset($storageConfig->shardCount);
-        $rangeIsset = isset($storageConfig->range);
-        if(false === $shardCountIsset) {
-            throw new GeometriaLabOld_LogicException(
-                "{$storage}.shardCount is undefined");
-        }
-        if(false === $rangeIsset) {
-            throw new GeometriaLabOld_LogicException(
-                "{$storage}.range is undefined");
-        }
-    }
-
-    protected function _ensureRangeIsWellFormatted($storage, $key, $range) {
-        $maxIsset = isset($range->max);
-        $dsnIsset = isset($range->dsn);
-        if(false === $maxIsset) {
-            throw new GeometriaLabOld_LogicException(
-                "{$storage}.range.{$key}.max is undefined");
-        }
-        if(false === $dsnIsset) {
-            throw new GeometriaLabOld_LogicException(
-                "{$storage}.range.{$key}.dsn is undefined");
-        }
+    /**
+     * Get config
+     *
+     * @return Zend_Config
+     */
+    protected function _getConfig()
+    {
+        return $this->_config;
     }
 }
