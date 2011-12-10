@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @author Ivan Shumkov, munkie, vin
+ */
 abstract class GeometriaLab_Model implements Iterator
 {
     /**
@@ -23,7 +26,11 @@ abstract class GeometriaLab_Model implements Iterator
      */
     protected $_propertyValues = array();
 
-
+    /**
+     * Constructor
+     *
+     * @param mixed $data Model data (must be array or iterable object)
+     */
     public function __construct($data = null)
     {
         $this->_setup();
@@ -35,7 +42,15 @@ abstract class GeometriaLab_Model implements Iterator
         $this->init();
     }
 
-    public function populate($data, $throwExceptions = false)
+    /**
+     * Populate model from array or iterable object
+     *
+     * @param mixed $data                      Model data (must be array or iterable object)
+     * @param bool  $ignoreUndefinedProperties
+     * @return GeometriaLab_Model
+     * @throws GeometriaLab_Model_Exception
+     */
+    public function populate($data, $ignoreUndefinedProperties = true)
     {
         if ((is_object($data) && !($data instanceof Traversable)) || !is_array($data)) {
             throw new GeometriaLab_Model_Exception("Can't populate data. Must be array or iterated object.");
@@ -44,7 +59,7 @@ abstract class GeometriaLab_Model implements Iterator
         foreach ($data as $key => $value) {
             if ($this->hasProperty($key)) {
                 $this->setProperty($key, $value);
-            } else if ($throwExceptions) {
+            } else if (!$ignoreUndefinedProperties) {
                 throw new GeometriaLab_Model_Exception("Trying to set property $key, that not exists in object $this->_className");
             }
         }
@@ -71,8 +86,9 @@ abstract class GeometriaLab_Model implements Iterator
             throw new GeometriaLab_Model_Exception("Property '$name' does not exists");
         }
 
-        if ($property->hasGetter()) {
-            return call_user_func(array($this, "get{$name}"));
+        $method = "get{$name}";
+        if (method_exists($this, $method)) {
+            return call_user_func(array($this, $method));
         }
 
         return $this->_propertyValues[$name];
@@ -108,8 +124,9 @@ abstract class GeometriaLab_Model implements Iterator
             throw new GeometriaLab_Model_Exception("Invalid value for property '$name'");
         }
 
-        if ($property->hasSetter()) {
-            return call_user_func(array($this, "set{$name}"), $value);
+        $method = "set{$name}";
+        if (method_exists($this, $method)) {
+            return call_user_func(array($this, $method), $value);
         }
 
         $this->_propertyValues[$name] = $value;
@@ -152,6 +169,11 @@ abstract class GeometriaLab_Model implements Iterator
         return $this->hasProperty($name);
     }
 
+    /**
+     * Get class name
+     *
+     * @return string
+     */
     protected function _getClassName()
     {
         return get_class($this);

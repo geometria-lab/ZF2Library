@@ -150,7 +150,6 @@ class GeometriaLab_Model_Definition
         $className = "GeometriaLab_Model_Definition_Property_" . ucfirst($type);
 
         $property = new $className;
-        $property->setModelDefinition($this);
         $property->setName($name);
 
         if (isset($params->defaultValue)) {
