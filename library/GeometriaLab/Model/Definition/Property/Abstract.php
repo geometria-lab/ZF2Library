@@ -3,7 +3,7 @@
 /**
  * @author Ivan Shumkov
  */
-abstract class GeometriaLab_Model_Definition_Property_Abstract
+abstract class GeometriaLab_Model_Definition_Property_Abstract implements GeometriaLab_Model_Definition_Property_Interface
 {
     /**
      * Name

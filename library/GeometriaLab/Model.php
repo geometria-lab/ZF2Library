@@ -27,6 +27,13 @@ abstract class GeometriaLab_Model implements Iterator
     protected $_propertyValues = array();
 
     /**
+     * Class name
+     *
+     * @var string
+     */
+    protected $_className;
+
+    /**
      * Constructor
      *
      * @param mixed $data Model data (must be array or iterable object)
@@ -65,11 +72,6 @@ abstract class GeometriaLab_Model implements Iterator
         }
 
         return $this;
-    }
-
-    public function init()
-    {
-
     }
 
     /**
@@ -170,15 +172,49 @@ abstract class GeometriaLab_Model implements Iterator
     }
 
     /**
+     * Convert model to array
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $array = array();
+
+        foreach ($this->_getProperties() as $name => $property) {
+            $array[$name] = $this->getProperty($name);
+        }
+
+        return $array;
+    }
+
+    /**
      * Get class name
      *
      * @return string
      */
     protected function _getClassName()
     {
-        return get_class($this);
+        if ($this->_className === null) {
+            $this->_className = get_class($this);
+        }
+
+        return $this->_className;
     }
 
+    /**
+     * Get properties
+     *
+     * @return array
+     */
+    protected function _getProperties()
+    {
+        $className = $this->_getClassName();
+        return self::$_definitions->get($className)->getProperties();
+    }
+
+    /**
+     * Setup model
+     */
     protected function _setup()
     {
         $className = $this->_getClassName();
@@ -186,14 +222,20 @@ abstract class GeometriaLab_Model implements Iterator
         self::$_definitions = GeometriaLab_Model_Definition_Manager::getInstance();
 
         if (!self::$_definitions->has($className)) {
-            self::$_definitions->add($className);
+            self::$_definitions->define($className);
         }
 
-        foreach(self::$_definitions->get($className)->getProperties() as $name => $property) {
-            $this->_propertyValues[$name] = $property->getDefaultValue();
+        foreach($this->_getProperties() as $name => $property) {
+            $this->setProperty($name, $property->getDefaultValue());
         }
     }
 
+    /**
+     * Get property definition
+     *
+     * @param string $name
+     * @return GeometriaLab_Model_Definition_Property|null
+     */
     protected function _getPropertyDefinition($name)
     {
         $className = $this->_getClassName();
@@ -234,11 +276,18 @@ abstract class GeometriaLab_Model implements Iterator
     public function rewind()
     {
         if ($this->_propertyIterator === null) {
-            $className = $this->_getClassName();
-            $this->_propertyIterator = array_keys(self::$_definitions->get($className)
-                                                                     ->getProperties());
+            $this->_propertyIterator = array_keys($this->_getProperties());
         }
 
         return reset($this->_propertyIterator);
+    }
+
+    /**
+     * Callbacks
+     */
+
+    public function init()
+    {
+
     }
 }

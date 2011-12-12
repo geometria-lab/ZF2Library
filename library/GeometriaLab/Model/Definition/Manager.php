@@ -41,7 +41,7 @@ class GeometriaLab_Model_Definition_Manager
      * @return GeometriaLab_Model_Definition
      * @throws GeometriaLab_Model_Exception
      */
-    public function add($modelClass)
+    public function define($modelClass)
     {
         if ($this->has($modelClass)) {
             throw new GeometriaLab_Model_Exception("Model '$modelClass' already defined");
@@ -66,6 +66,12 @@ class GeometriaLab_Model_Definition_Manager
         return $this->_definitions[$modelClass];
     }
 
+    /**
+     * Has model definition?
+     *
+     * @param string $modelClass
+     * @return bool
+     */
     public function has($modelClass)
     {
         return isset($this->_definitions[$modelClass]);
