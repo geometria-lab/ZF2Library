@@ -17,7 +17,7 @@ abstract class GeometriaLab_Model implements Iterator
       *
       * @var array
       */
-    protected $_propertyIterator = null;
+    protected $_propertyIteratorPosition = null;
 
     /**
      * Property values
@@ -52,14 +52,16 @@ abstract class GeometriaLab_Model implements Iterator
     /**
      * Populate model from array or iterable object
      *
-     * @param mixed $data                      Model data (must be array or iterable object)
-     * @param bool  $ignoreUndefinedProperties
+     * @param array|Traversable $data                      Model data (must be array or iterable object)
+     * @param bool              $ignoreUndefinedProperties
      * @return GeometriaLab_Model
      * @throws GeometriaLab_Model_Exception
      */
     public function populate($data, $ignoreUndefinedProperties = true)
     {
-        if ((is_object($data) && !($data instanceof Traversable)) || !is_array($data)) {
+        $iterable = new GeometriaLab_Validate_IsIterable();
+
+        if (!$iterable->isValid($data)) {
             throw new GeometriaLab_Model_Exception("Can't populate data. Must be array or iterated object.");
         }
 
@@ -248,7 +250,7 @@ abstract class GeometriaLab_Model implements Iterator
     }
 
     /*
-     * Implements Iterator
+     * Methods implements Iterator
      */
 
     public function current()
@@ -260,26 +262,26 @@ abstract class GeometriaLab_Model implements Iterator
 
     public function next()
     {
-        return next($this->_propertyIterator);
+        return next($this->_propertyIteratorPosition);
     }
 
     public function key()
     {
-        return current($this->_propertyIterator);
+        return current($this->_propertyIteratorPosition);
     }
 
     public function valid()
     {
-        return key($this->_propertyIterator) !== null;
+        return key($this->_propertyIteratorPosition) !== null;
     }
 
     public function rewind()
     {
-        if ($this->_propertyIterator === null) {
-            $this->_propertyIterator = array_keys($this->_getProperties());
+        if ($this->_propertyIteratorPosition === null) {
+            $this->_propertyIteratorPosition = array_keys($this->_getProperties());
         }
 
-        return reset($this->_propertyIterator);
+        return reset($this->_propertyIteratorPosition);
     }
 
     /**
