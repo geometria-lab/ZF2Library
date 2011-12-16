@@ -17,6 +17,13 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     protected $_iteratorPosition = 0;
 
     /**
+     * Iterable validator
+     *
+     * @var GeometriaLab_Validate_IsIterable
+     */
+    static protected $_isIterableValidator;
+
+    /**
      * Constructor
      *
      * @param null|array|Traversable $data
