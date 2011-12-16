@@ -34,6 +34,13 @@ abstract class GeometriaLab_Model implements Iterator
     protected $_className;
 
     /**
+     * Is iterable validator
+     *
+     * @var GeometriaLab_Validate_IsIterable
+     */
+    static protected $_isIterableValidator;
+
+    /**
      * Constructor
      *
      * @param mixed $data Model data (must be array or iterable object)
@@ -59,9 +66,7 @@ abstract class GeometriaLab_Model implements Iterator
      */
     public function populate($data, $ignoreUndefinedProperties = true)
     {
-        $iterable = new GeometriaLab_Validate_IsIterable();
-
-        if (!$iterable->isValid($data)) {
+        if (!self::_isIterable($data)) {
             throw new GeometriaLab_Model_Exception("Can't populate data. Must be array or iterated object.");
         }
 
@@ -247,6 +252,22 @@ abstract class GeometriaLab_Model implements Iterator
         } else {
             return null;
         }
+    }
+
+    /**
+     * Is iterable
+     *
+     * @static
+     * @param $data
+     * @return bool
+     */
+    static protected function _isIterable($data)
+    {
+        if (self::$_isIterableValidator === null) {
+            self::$_isIterableValidator = new GeometriaLab_Validate_IsIterable();
+        }
+
+        return self::$_isIterableValidator->isValid($data);
     }
 
     /*
