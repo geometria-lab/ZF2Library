@@ -33,7 +33,7 @@ class GeometriaLab_VBuckets
      * @param  $id
      * @return
      */
-    protected function getById($id)
+    public function getById($id)
     {
         return $this->_getMap()->getVBucket($id);
     }
@@ -44,7 +44,7 @@ class GeometriaLab_VBuckets
      * @param  $key
      * @return
      */
-    protected function getByKey($key)
+    public function getByKey($key)
     {
         $id = $this->_getHashMethod()->getHash($key, $this->_getMap());
 
