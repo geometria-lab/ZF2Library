@@ -31,9 +31,9 @@ class GeometriaLab_VBuckets
      * Get vBucket by id
      *
      * @param  $id
-     * @return
+     * @return GeometriaLab_VBuckets_Bucket
      */
-    protected function getById($id)
+    public function getById($id)
     {
         return $this->_getMap()->getVBucket($id);
     }
@@ -42,9 +42,9 @@ class GeometriaLab_VBuckets
      * Get vBucket by key
      *
      * @param  $key
-     * @return
+     * @return GeometriaLab_VBuckets_Bucket
      */
-    protected function getByKey($key)
+    public function getByKey($key)
     {
         $id = $this->_getHashMethod()->getHash($key, $this->_getMap());
 

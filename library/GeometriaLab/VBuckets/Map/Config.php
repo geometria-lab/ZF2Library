@@ -37,7 +37,7 @@ class GeometriaLab_VBucket_Map_Config implements GeometriaLab_VBuckets_Map_Inter
     }
 
     /**
-     * Get vBuckets count
+     * Get sharding count
      *
      * @return integer
      */
