@@ -1,11 +1,11 @@
 <?php
 
-class GeometriaLab_VBucket_Map_Config implements GeometriaLab_VBuckets_Map_Interface
+class GeometriaLab_VBuckets_Map_Config implements GeometriaLab_VBuckets_Map_Interface
 {
     /**
      * Config
      *
-     * @var \Zend_Config
+     * @var arra
      */
     protected $_config;
 
@@ -28,12 +28,12 @@ class GeometriaLab_VBucket_Map_Config implements GeometriaLab_VBuckets_Map_Inter
     public function getVBucket($id)
     {
         foreach($this->_getConfig()->ranges as $maxId => $range) {
-            if ($maxId <= $id) {
-                return new GeometriaLab_VBuckets_Bucket($id, $range);
+            if ($maxId >= $id) {
+                return new GeometriaLab_VBuckets_Bucket($id, $range->toArray());
             }
         }
 
-        throw new GeometriaLab_VBucket_Map_Exception('Can\'t get vBucket from ranges');
+        throw new GeometriaLab_VBuckets_Map_Exception('Can\'t get vBucket from ranges');
     }
 
     /**
@@ -43,7 +43,7 @@ class GeometriaLab_VBucket_Map_Config implements GeometriaLab_VBuckets_Map_Inter
      */
     public function getVBucketsCount()
     {
-        return $this->_getConfig()->count;
+        return (integer)$this->_getConfig()->count;
     }
 
     /**
@@ -61,19 +61,19 @@ class GeometriaLab_VBucket_Map_Config implements GeometriaLab_VBuckets_Map_Inter
             throw new GeometriaLab_VBuckets_Map_Exception('Undefined vBuckets count');
         }
 
-        $config->count = (integer)$config->count;
-
         if (!isset($config->ranges) || count($config->ranges) == 0) {
             throw new GeometriaLab_VBuckets_Map_Exception('Ranges not present');
         }
 
+        $lastRangeMaxId = 0;
         foreach($config->ranges as $maxId => $range) {
-            if (!is_int($maxId) || $maxId < 1 || $maxId > $config->count) {
+            if (!is_int($maxId) || $maxId < 1 || $maxId > (integer)$config->count) {
                 throw new GeometriaLab_VBuckets_Map_Exception('Invalid range');
             }
+            $lastRangeMaxId = $maxId;
         }
 
-        if (!isset($config->ranges[$config->count])) {
+        if ($lastRangeMaxId != (integer)$config->count) {
             throw new GeometriaLab_VBuckets_Map_Exception('vBuckets count are not covered by ranges');
         }
 
