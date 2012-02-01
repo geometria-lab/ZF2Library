@@ -20,23 +20,5 @@ $hash = new GeometriaLab_VBuckets_HashMethod_Modulo();
 
 $vBuckets = new GeometriaLab_VBuckets($map, $hash);
 
-$bucket = $vBuckets->getByKey(1231);
-print_r($bucket);
-
-$bucket = $vBuckets->getByKey(32131);
-print_r($bucket);
-
-$bucket = $vBuckets->getByKey(534);
-print_r($bucket);
-
-$bucket = $vBuckets->getByKey(1235);
-print_r($bucket);
-
-$bucket = $vBuckets->getByKey('adasda');
-print_r($bucket);
-
-$bucket = $vBuckets->getByKey('fdsfs');
-print_r($bucket);
-
-$bucket = $vBuckets->getByKey('fsdf2234');
+$bucket = $vBuckets->getByKey(40000);
 print_r($bucket);
