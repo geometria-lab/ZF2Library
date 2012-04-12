@@ -6,7 +6,7 @@ class GeometriaLab_Application_Bootstrap_Bootstrap extends Zend_Application_Boot
     {
         if (null === $this->_resourceLoader) {
             $this->setResourceLoader(new GeometriaLab_Application_Module_Autoloader(array(
-                'namespace' => '',
+                'namespace' => $this->getAppNamespace(),
                 'basePath'  => APPLICATION_PATH,
             )));
         }

@@ -7,9 +7,10 @@ if [ -z $ZF_HOME ]; then
 			echo "basicloader.classes.0 = \"GeometriaLab_Tool_Project_Provider_Manifest\"" >> .zf/config.ini
 			echo "" >> .zf/config.ini
 			echo "env.APPLICATION_PATH = \"$(pwd)/application\"" >> .zf/config.ini
-			echo ";env.APPLICATION_CONFIG_PATH = \"$(pwd)/application/configs/application.ini\"" >> .zf/config.ini
-			echo ";env.APPLICATION_BOOTSTRAP_PATH = \"$(pwd)/application/\"" >> .zf/config.ini
-			echo ";env.APPLICATION_BOOTSTRAP_CLASS = \"Bootstrap_Cli\"" >> .zf/config.ini
+			echo "env.APPLICATION_CONFIG_PATH = \"$(pwd)/application/configs/application.yml\"" >> .zf/config.ini
+			echo "env.APPLICATION_CONFIG_CLASS = \"Zend_Config_Yaml\"" >> .zf/config.ini
+			echo "env.APPLICATION_BOOTSTRAP_PATH = \"$(pwd)/application/\"" >> .zf/config.ini
+			echo "env.APPLICATION_BOOTSTRAP_CLASS = \"Bootstrap_Cli\"" >> .zf/config.ini
 
 			if [ -d .git ]; then
 				echo "" >> .gitignore
