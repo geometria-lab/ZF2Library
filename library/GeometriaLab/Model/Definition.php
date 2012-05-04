@@ -114,31 +114,28 @@ class GeometriaLab_Model_Definition
      */
     protected function _parsePropertyTag(Zend_Reflection_Docblock_Tag $tag)
     {
-        $parts = preg_split('/(string|integer|float|boolean)?(\[\]) +/', trim($tag->getDescription()), 3);
+        $parts = preg_split("/[\W]+/", $tag->getDescription(), 3);
 
-        // Validate type
-        if (!isset($parts[0])) {
-            throw new GeometriaLab_Model_Definition_Exception('Property type not defined');
+        if (count($parts) < 2 || 0 !== strpos($parts[1], '$')) {
+            throw new GeometriaLab_Model_Definition_Exception('Invalid property definition');
         }
 
-        if (!preg_match('//', $parts[0], $match)) {
-            throw new GeometriaLab_Model_Definition_Exception('Invalid property type. Allowed: ' . json_encode($allowedProperties));
+        // Instance property by type
+        if (substr($parts[0], -2) === '[]') {
+            $itemPropertyName = substr($parts[0], 0, strlen($parts[1]) - 2);
+            $itemProperty = $this->_createPropertyObject($itemPropertyName);
+
+            $property = new GeometriaLab_Model_Definition_Property_Array();
+            $property->setItemProperty($itemProperty);
+        } else {
+            $property = $this->_createPropertyObject($parts[0]);
         }
 
-        $type = $match[1];
+        // Set property name
+        $name = substr($parts[1], 1);
+        $property->setName($name);
 
-
-        // Validate name
-        if (!isset($parts[1])) {
-            throw new GeometriaLab_Model_Definition_Exception('Property name not defined');
-        }
-        $name = $parts[1];
-        if (0 !== strpos($name, '$')) {
-            throw new GeometriaLab_Model_Definition_Exception('Property name must be start with $');
-        }
-        $name = substr($name, 1);
-
-        // Parse params
+        // Set property params
         if (isset($parts[2])) {
             $params = json_decode($parts[2]);
 
@@ -149,11 +146,6 @@ class GeometriaLab_Model_Definition
             $params = new stdClass();
         }
 
-        $className = "GeometriaLab_Model_Definition_Property_" . ucfirst($type);
-
-        $property = new $className;
-        $property->setName($name);
-
         if (isset($params->defaultValue)) {
             $property->setDefaultValue($params->defaultValue);
         }
@@ -161,5 +153,26 @@ class GeometriaLab_Model_Definition
         $this->_properties[$property->getName()] = $property;
 
         return $property;
+    }
+
+    /**
+     * Create property object by type
+     *
+     * @param string $type
+     * @return GeometriaLab_Model_Definition_Property_Interface
+     * @throws GeometriaLab_Model_Definition_Exception
+     */
+    protected function _createPropertyObject($type)
+    {
+        $defaultProperties = array('string', 'boolean', 'float', 'integer');
+        if (in_array($type, $defaultProperties)) {
+            $className = "GeometriaLab_Model_Definition_Property_" . ucfirst($type);
+        } else if (class_exists($type)) {
+            $className = $type;
+        } else {
+            throw new GeometriaLab_Model_Definition_Exception("Invalid property type '$type'");
+        }
+
+        return new $className;
     }
 }
