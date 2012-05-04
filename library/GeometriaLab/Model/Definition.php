@@ -165,14 +165,26 @@ class GeometriaLab_Model_Definition
     protected function _createPropertyObject($type)
     {
         $defaultProperties = array('string', 'boolean', 'float', 'integer');
+        $definitions = GeometriaLab_Model_Definition_Manager::getInstance();
         if (in_array($type, $defaultProperties)) {
             $className = "GeometriaLab_Model_Definition_Property_" . ucfirst($type);
-        } else if (class_exists($type)) {
-            $className = $type;
+
+            return new $className;
         } else {
-            throw new GeometriaLab_Model_Definition_Exception("Invalid property type '$type'");
+            if (!$definitions->has($type) && class_exists($type)) {
+                $reflection = new Zend_Reflection_Class($type);
+                if ($reflection->isSubclassOf('GeometriaLab_Model')) {
+                    $model = new $type;
+                }
+            }
+
+            if ($definitions->has($type)) {
+                $modelDefinition = $definitions->get($type);
+
+                return new GeometriaLab_Model_Definition_Property_Model($modelDefinition);
+            }
         }
 
-        return new $className;
+        throw new GeometriaLab_Model_Definition_Exception("Invalid property type '$type'");
     }
 }
