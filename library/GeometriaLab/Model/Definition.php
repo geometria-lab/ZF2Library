@@ -114,17 +114,19 @@ class GeometriaLab_Model_Definition
      */
     protected function _parsePropertyTag(Zend_Reflection_Docblock_Tag $tag)
     {
-        $parts = preg_split('/ +/', trim($tag->getDescription()), 3);
+        $parts = preg_split('/(string|integer|float|boolean)?(\[\]) +/', trim($tag->getDescription()), 3);
 
         // Validate type
         if (!isset($parts[0])) {
             throw new GeometriaLab_Model_Definition_Exception('Property type not defined');
         }
-        $type = $parts[0];
-        $allowedProperties = array('string', 'integer', 'float', 'boolean', 'array');
-        if (!in_array($type, $allowedProperties)) {
+
+        if (!preg_match('//', $parts[0], $match)) {
             throw new GeometriaLab_Model_Definition_Exception('Invalid property type. Allowed: ' . json_encode($allowedProperties));
         }
+
+        $type = $match[1];
+
 
         // Validate name
         if (!isset($parts[1])) {
