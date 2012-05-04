@@ -12,10 +12,14 @@ class GeometriaLab_Validate_IsIterable extends Zend_Validate_Abstract
     );
 
     /**
+     * @var GeometriaLab_Validate_IsIterable
+     */
+    static $_validator;
+
+    /**
      * Defined by Zend_Validate_Interface
      *
-     * Returns true if and only if $value is contained in the haystack option. If the strict
-     * option is true, then the type of $value is also checked.
+     * Returns true if and only if $value is array or iterable object
      *
      * @param  mixed $value
      * @return boolean
@@ -31,5 +35,22 @@ class GeometriaLab_Validate_IsIterable extends Zend_Validate_Abstract
         $this->_error(self::NOT_ITERABLE);
 
         return false;
+    }
+
+    /**
+     * Static isValid version.
+     * Returns true if and only if $value is array or iterable object
+     *
+     * @static
+     * @param $value
+     * @return bool
+     */
+    static public function staticIsValid($value)
+    {
+        if (self::$_validator === null) {
+            self::$_validator = new self;
+        }
+
+        return self::$_validator->isValid($value);
     }
 }

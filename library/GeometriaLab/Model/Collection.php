@@ -17,13 +17,6 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     protected $_iteratorPosition = 0;
 
     /**
-     * Iterable validator
-     *
-     * @var GeometriaLab_Validate_IsIterable
-     */
-    static protected $_isIterableValidator;
-
-    /**
      * Constructor
      *
      * @param null|array|Traversable $data
@@ -64,7 +57,7 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     {
         if ($data instanceof GeometriaLab_Model) {
             $this->_models[] = $data;
-        } else if (self::_isIterable($data)) {
+        } else if (GeometriaLab_Validate_IsIterable::staticIsValid($data)) {
             foreach ($data as $model) {
                 $this->_models[] = $model;
             }
@@ -203,22 +196,6 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     public function toArray()
     {
         return $this->_models;
-    }
-
-    /**
-     * Is iterable
-     *
-     * @static
-     * @param $data
-     * @return bool
-     */
-    static protected function _isIterable($data)
-    {
-        if (self::$_isIterableValidator === null) {
-            self::$_isIterableValidator = new GeometriaLab_Validate_IsIterable();
-        }
-
-        return self::$_isIterableValidator->isValid($data);
     }
 
     /*
