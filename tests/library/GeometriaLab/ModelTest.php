@@ -1,9 +1,7 @@
 <?php
 
-/**
- * @author Ivan Shumkov
- */
-abstract class GeometriaLab_Model extends GeometriaLab_Model_Schemaless
+
+class GeometriaLab_ModelTest extends GeometriaLab_Model_Schemaless
 {
     /**
      * Class name

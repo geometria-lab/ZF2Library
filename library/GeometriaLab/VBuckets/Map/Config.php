@@ -26,8 +26,9 @@ class GeometriaLab_VBuckets_Map_Config implements GeometriaLab_VBuckets_Map_Inte
     /**
      * Get vBucket
      *
-     * @param  $id
+     * @param $id
      * @return GeometriaLab_VBuckets_Bucket
+     * @throws GeometriaLab_VBuckets_Map_Exception
      */
     public function getVBucket($id)
     {
@@ -37,7 +38,7 @@ class GeometriaLab_VBuckets_Map_Config implements GeometriaLab_VBuckets_Map_Inte
             }
         }
 
-        throw new GeometriaLab_VBuckets_Map_Exception('Can\'t get vBucket from ranges');
+        throw new GeometriaLab_VBuckets_Map_Exception("Invalid vBucket id $id");
     }
 
     /**
