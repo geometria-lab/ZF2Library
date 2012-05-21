@@ -1,112 +1,140 @@
 <?php
 
-class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
+namespace GeometriaLab\Model;
+
+class Collection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * Models
      *
      * @var array
      */
-    protected $_models = array();
+    protected $models = array();
 
     /**
      * Iterator position
      *
      * @var integer
      */
-    protected $_iteratorPosition = 0;
+    protected $iteratorPosition = 0;
 
     /**
      * Constructor
      *
-     * @param null|array|Traversable $data
+     * @param mixed $data
      */
     public function __construct($data = null)
     {
-        $this->populate($data);
-    }
-
-    /**
-     * Populate collection from array or iterable object
-     *
-     * @param mixed $data Data must be array or iterable object
-     *
-     * @return GeometriaLab_Model_Collection
-     * @throws GeometriaLab_Model_Exception
-     */
-    public function populate($data)
-    {
-        $this->clear();
-
-        try {
-            $this->append($data);
-        } catch (GeometriaLab_Model_Collection_Exception $e) {
-            throw new GeometriaLab_Model_Collection_Exception('Populated data must be array or iterated object.');
+        if ($data !== null) {
+            $this->psuh($data);
         }
-
-        return $this;
     }
 
     /**
-     * Append to collection from model or other collection
+     * Add model or models to the end of a collection
      *
      * @param mixed $data
-     * @return GeometriaLab_Model_Collection
+     * @return Collection
+     * @throws \InvalidArgumentException
      */
-    public function append($data)
+    public function push($data)
     {
-        if ($data instanceof GeometriaLab_Model) {
-            $this->_models[] = $data;
-        } else if (GeometriaLab_Validate_IsIterable::staticIsValid($data)) {
+        if ($data instanceof ModelInterface) {
+            array_push($this->models, $data);
+        } else if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $model) {
-                $this->_models[] = $model;
+                $this->push($model);
             }
         } else {
-            throw new GeometriaLab_Model_Collection_Exception('Append data must be model, array or iterated object.');
+            throw new \InvalidArgumentException('Data must be model, array or iterated object.');
         }
 
         return $this;
     }
 
     /**
-     * Prepend to collection from model or other collection
+     * Remove and return last model
      *
-     * @param GeometriaLab_Model|GeometriaLab_Model_Collection $modelOrCollection
-     * @return GeometriaLab_Model_Collection
+     * @return ModelInterface|null
      */
-    public function prepend($modelOrCollection)
+    public function pop()
     {
-        $this->reverse();
-        $this->append($modelOrCollection);
-        $this->reverse();
+        return array_pop($this->models);
+    }
+
+    /**
+     * Add model or models at the beginning of a collection
+     *
+     * @param mixed $data
+     * @return Collection
+     * @throws \InvalidArgumentException
+     */
+    public function unshift($data)
+    {
+        if ($data instanceof ModelInterface) {
+            array_unshift($this->models, $data);
+        } else if (is_array($data) || $data instanceof \Traversable) {
+            foreach ($data as $model) {
+                $this->unshift($model);
+            }
+        } else {
+            throw new \InvalidArgumentException('Data must be model, array or iterated object.');
+        }
 
         return $this;
     }
 
     /**
-     * Set to collection
+     * Remove and return first model
      *
-     * @param $offset
-     * @param GeometriaLab_Model $model
-     * @return GeometriaLab_Model_Collection
+     * @return ModelInterface|null
      */
-    public function set($offset, GeometriaLab_Model $model)
+    public function shift()
     {
-        $this->_models[$offset] = $model;
+        return array_shift($this->models);
+    }
+
+    /**
+     * Set model to collection by offset
+     *
+     * @param integer $offset
+     * @param ModelInterface $model
+     * @return Collection
+     */
+    public function set($offset, ModelInterface $model)
+    {
+        $this->models[$offset] = $model;
 
         return $this;
     }
 
     /**
-     * Get from collection
+     * Remove model from collection
      *
-     * @param $offset
-     * @return GeometriaLab_Model|null
+     * @param ModelInterface $model
+     * @return Collection
+     */
+    public function remove(ModelInterface $model)
+    {
+        $offset = array_search($model, $this->models, true);
+
+        if ($offset) {
+            unset($this->models[$offset]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get model from collection by offset
+     *
+     * @param integer $offset
+     * @return ModelInterface|null
      */
     public function get($offset)
     {
-        if (isset($this->_models[$offset])) {
-            return $this->_models[$offset];
+        if (isset($this->models[$offset])) {
+            return $this->models[$offset];
         } else {
             return null;
         }
@@ -115,12 +143,12 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     /**
      * Get first model
      *
-     * @return GeometriaLab_Model|null
+     * @return ModelInterface|null
      */
     public function getFirst()
     {
-        if (isset($this->_models[0])) {
-            return $this->_models[0];
+        if (isset($this->models[0])) {
+            return $this->models[0];
         } else {
             return null;
         }
@@ -129,21 +157,21 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     /**
      * Get last model
      *
-     * @return GeometriaLab_Model|null
+     * @return ModelInterface|null
      */
     public function getLast()
     {
-        return end($this->_models);
+        return end($this->models);
     }
 
     /**
      * Shuffle collection
      *
-     * @return GeometriaLab_Model_Collection
+     * @return Collection
      */
     public function shuffle()
     {
-        shuffle($this->_models);
+        shuffle($this->models);
 
         $this->rewind();
 
@@ -153,11 +181,11 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     /**
      * Reverse collection
      *
-     * @return GeometriaLab_Model_Collection
+     * @return Collection
      */
     public function reverse()
     {
-        $this->_models = array_reverse($this->_models);
+        $this->models = array_reverse($this->models);
 
         $this->rewind();
 
@@ -167,11 +195,11 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     /**
      * Clear collection
      *
-     * @return GeometriaLab_Model_Collection
+     * @return Collection
      */
     public function clear()
     {
-        $this->_models = array();
+        $this->models = array();
 
         $this->rewind();
 
@@ -195,7 +223,71 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
      */
     public function toArray()
     {
-        return $this->_models;
+        return $this->models;
+    }
+
+    /**
+     * Get models by condition or callback
+     *
+     * @param mixed $condition
+     * @return Collection
+     */
+    public function getByCondition($condition)
+    {
+        $collection = new $this;
+
+        if (count($this)) {
+            if (!is_callable($condition)) {
+                $callback = function($model) use ($condition) {
+                    foreach ($condition as $name => $value) {
+                        if ($model->get($name) != $value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+            } else {
+                $callback = $condition;
+            }
+
+            $data = array_filter($this->models, $callback);
+            $collection->push($data);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Get slice of collection
+     *
+     * @param integer      $offset
+     * @param integer|null $length
+     * @return Collection
+     */
+    public function getSlice($offset, $length = null)
+    {
+        $collection = new $this;
+
+        if (count($this)) {
+            $models = array_slice($this->models, $offset, $length);
+            $collection->push($models);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Sort collection by callback
+     *
+     * @param mixed $callback
+     * @return Collection
+     */
+    public function sort($callback)
+    {
+        usort($this->models, $callback);
+        $this->rewind();
+
+        return $this;
     }
 
     /*
@@ -203,12 +295,12 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     */
 
     /**
-     * @return GeometriaLab_Model|null
+     * @return ModelInterface|null
      */
     public function current()
     {
-        if (isset($this->_models[$this->_iteratorPosition])) {
-            return $this->_models[$this->_iteratorPosition];
+        if (isset($this->models[$this->iteratorPosition])) {
+            return $this->models[$this->iteratorPosition];
         } else {
             return null;
         }
@@ -216,44 +308,54 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
 
     public function next()
     {
-        $this->_iteratorPosition++;
+        $this->iteratorPosition++;
     }
 
     public function key()
     {
-        return $this->_iteratorPosition;
+        return $this->iteratorPosition;
     }
 
     public function valid()
     {
-        return $this->_iteratorPosition < $this->count();
+        return $this->iteratorPosition < $this->count();
     }
 
     public function rewind()
     {
-        $this->_iteratorPosition = 0;
+        $this->iteratorPosition = 0;
     }
 
     /**
      * Methods implements Countable
      */
 
+    /**
+     * Models count
+     *
+     * @return integer
+     */
     public function count()
     {
-        return count($this->_models);
+        return count($this->models);
     }
 
     /**
      * Methods implements ArrayAccess
      */
 
+    /**
+     * @param integer $offset
+     * @return bool
+     */
     public function offsetExists($offset)
     {
-        return isset($this->_models[$offset]);
+        return isset($this->models[$offset]);
     }
 
     /**
-     * @return GeometriaLab_Model|null
+     * @param integer $offset
+     * @return ModelInterface|null
      */
     public function offsetGet($offset)
     {
@@ -263,7 +365,7 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
     public function offsetSet($offset, $value)
     {
         if ($offset === null) {
-            $this->append($value);
+            $this->push($value);
         } else {
             $this->set($offset, $value);
         }
@@ -273,6 +375,6 @@ class GeometriaLab_Model_Collection implements Iterator, Countable, ArrayAccess
 
     public function offsetUnset($offset)
     {
-        unset($this->_models[$offset]);
+        unset($this->models[$offset]);
     }
 }

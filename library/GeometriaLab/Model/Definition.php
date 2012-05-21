@@ -1,23 +1,49 @@
 <?php
 
+namespace GeometriaLab\Model;
+
+use GeometriaLab\Code\Reflection\DockBlock\PropertyTag;
+
+use Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
+    Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
+    Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection,
+    Zend\Code\Reflection\DocBlock\TagManager as ZendTagManager;
+
 /**
  * @author Ivan Shumkov
  */
-class GeometriaLab_Model_Definition
+class Definition
 {
     /**
      * Class name
      *
      * @var string
      */
-    protected $_className;
+    protected $className;
 
     /**
      * Properties
      *
      * @var array
      */
-    protected $_properties = array();
+    protected $properties = array();
+
+    /**
+     * Properties class map
+     *
+     * @var array
+     */
+    protected $defaultPropertiesClassMap = array(
+        'string'  => 'GeometriaLab\Model\Definition\Property\StringProperty',
+        'boolean' => 'GeometriaLab\Model\Definition\Property\StringProperty',
+        'float'   => 'GeometriaLab\Model\Definition\Property\StringProperty',
+        'integer' => 'GeometriaLab\Model\Definition\Property\StringProperty',
+    );
+
+    /**
+     * @var ZendTagManager
+     */
+    static protected $tagManager;
 
     /**
      * Constructor
@@ -26,9 +52,9 @@ class GeometriaLab_Model_Definition
      */
     public function __construct($className)
     {
-        $this->_className = $className;
+        $this->className = $className;
 
-        $this->_parseDocblock($className);
+        $this->parseDocblock($className);
     }
 
     /**
@@ -38,23 +64,23 @@ class GeometriaLab_Model_Definition
      */
     public function getClassName()
     {
-        return $this->_className;
+        return $this->className;
     }
 
     /**
      * Get property
      *
      * @param string $name
-     * @return GeometriaLab_Model_Definition_Property
-     * @throws GeometriaLab_Model_Exception
+     * @return Definition\Property\PropertyInterface
+     * @throws \Exception
      */
     public function getProperty($name)
     {
         if (!$this->hasProperty($name)) {
-            throw new GeometriaLab_Model_Exception("Property '$name' not present in model '$this->_className'");
+            throw new \Exception("Property '$name' not present in model '$this->className'");
         }
 
-        return $this->_properties[$name];
+        return $this->properties[$name];
     }
 
     /**
@@ -65,7 +91,7 @@ class GeometriaLab_Model_Definition
      */
     public function hasProperty($name)
     {
-        return isset($this->_properties[$name]);
+        return isset($this->properties[$name]);
     }
 
     /**
@@ -75,32 +101,32 @@ class GeometriaLab_Model_Definition
      */
     public function getProperties()
     {
-        return $this->_properties;
+        return $this->properties;
     }
 
     /**
      * Parse class docblock
      *
      * @param string $className
+     * @throws \Exception
      */
-    protected function _parseDocblock($className)
+    protected function parseDocblock($className)
     {
-        $reflection = new Zend_Reflection_Class($className);
+        $classReflection = new ZendClassReflection($className);
 
         try {
-            $docblock = $reflection->getDocblock();
-        } catch (Zend_Reflection_Exception $e) {
-
+            $docblock = new ZendDocBlockReflection($classReflection, static::getTagManager());
+        } catch (ZendInvalidArgumentException $e) {
+            throw new \Exception('Docblock not present');
         }
 
-        if (isset($docblock)) {
-            foreach($docblock->getTags() as $tag) {
-                switch ($tag->getName()) {
-                    case 'property':
-                        $this->_parsePropertyTag($tag);
-
-                        break;
-                }
+        /**
+         * @var \Zend\Code\Reflection\DocBlock\TagInterface $tag
+         */
+        foreach($docblock->getTags() as $tag) {
+            $methodName = "parse{$tag->getName()}Tag";
+            if (method_exists($this, $methodName)) {
+                call_user_func(array($this, $methodName), $tag);
             }
         }
     }
@@ -108,83 +134,48 @@ class GeometriaLab_Model_Definition
     /**
      * Parse property tag
      *
-     * @param Zend_Reflection_Docblock_Tag $tag
-     * @return GeometriaLab_Model_Definition_Property_Abstract
-     * @throws GeometriaLab_Model_Definition_Exception
+     * @param PropertyTag $tag
+     * @throws \Exception
      */
-    protected function _parsePropertyTag(Zend_Reflection_Docblock_Tag $tag)
+    protected function parsePropertyTag(PropertyTag $tag)
     {
-        $parts = preg_split("/[\W]+/", $tag->getDescription(), 3);
+        if (isset($this->defaultPropertiesClassMap[$tag->getType()])) {
+            $className = $this->defaultPropertiesClassMap[$tag->getType()];
 
-        if (count($parts) < 2 || 0 !== strpos($parts[1], '$')) {
-            throw new GeometriaLab_Model_Definition_Exception('Invalid property definition');
-        }
-
-        // Instance property by type
-        if (substr($parts[0], -2) === '[]') {
-            $itemPropertyName = substr($parts[0], 0, strlen($parts[1]) - 2);
-            $itemProperty = $this->_createPropertyObject($itemPropertyName);
-
-            $property = new GeometriaLab_Model_Definition_Property_Array();
-            $property->setItemProperty($itemProperty);
-        } else {
-            $property = $this->_createPropertyObject($parts[0]);
-        }
-
-        // Set property name
-        $name = substr($parts[1], 1);
-        $property->setName($name);
-
-        // Set property params
-        if (isset($parts[2])) {
-            $params = json_decode($parts[2]);
-
-            if ($params === false || !is_object($params)) {
-                throw new GeometriaLab_Model_Definition_Exception('Invalid params format, must be JSON');
-            }
-        } else {
-            $params = new stdClass();
-        }
-
-        if (isset($params->defaultValue)) {
-            $property->setDefaultValue($params->defaultValue);
-        }
-
-        $this->_properties[$property->getName()] = $property;
-
-        return $property;
-    }
-
-    /**
-     * Create property object by type
-     *
-     * @param string $type
-     * @return GeometriaLab_Model_Definition_Property_Interface
-     * @throws GeometriaLab_Model_Definition_Exception
-     */
-    protected function _createPropertyObject($type)
-    {
-        $defaultProperties = array('string', 'boolean', 'float', 'integer');
-        $definitions = GeometriaLab_Model_Definition_Manager::getInstance();
-        if (in_array($type, $defaultProperties)) {
-            $className = "GeometriaLab_Model_Definition_Property_" . ucfirst($type);
-
-            return new $className;
-        } else {
-            if (!$definitions->has($type) && class_exists($type)) {
-                $reflection = new Zend_Reflection_Class($type);
-                if ($reflection->isSubclassOf('GeometriaLab_Model')) {
-                    $model = new $type;
+            $property = new $className($tag->getParams());
+        } else if (class_exists($tag->getType())) {
+            $definitions = Definition\Manager::getInstance();
+            if (!$definitions->has($tag->getType())) {
+                $reflection = new \ReflectionClass($tag->getType());
+                if ($reflection->isSubclassOf('GeometriaLab\Model\ModelInterface')) {
+                    $definitions->define($tag->getType());
                 }
             }
 
-            if ($definitions->has($type)) {
-                $modelDefinition = $definitions->get($type);
-
-                return new GeometriaLab_Model_Definition_Property_Model($modelDefinition);
-            }
+            $property = new Definition\Property\ModelProperty();
+            $property->setModelDefinition($definitions->get($tag->getType()));
+        } else {
+            throw new \Exception("Invalid property type '{$tag->getType()}'");
         }
 
-        throw new GeometriaLab_Model_Definition_Exception("Invalid property type '$type'");
+        $property->setName(substr($tag->getVariableName(), 1));
+
+        if ($tag->isArray()) {
+            $propertyArray = new Definition\Property\ArrayProperty();
+            $propertyArray->setItemProperty($property);
+            $property = $propertyArray;
+        }
+
+        $this->properties[$property->getName()] = $property;
+    }
+
+    static protected function getTagManager()
+    {
+        if (static::$tagManager === null) {
+            static::$tagManager = new ZendTagManager(ZendTagManager::USE_DEFAULT_PROTOTYPES);
+            static::$tagManager->addTagPrototype(new PropertyTag());
+        }
+
+        return static::$tagManager;
     }
 }

@@ -1,6 +1,0 @@
-count: 32768
-ranges:
-  16384:
-    range: 1
-  32768:
-    range: 2

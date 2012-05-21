@@ -1,0 +1,29 @@
+{
+    "name": "GeometriaLab/ZFLibrary",
+    "description": "Zend Framework 2 library extending",
+    "type": "library",
+    "keywords": [
+        "framework",
+        "zf2"
+    ],
+    "homepage": "http://geometria-lab.net/",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "GeometriaLab": "library/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "master"
+        }
+    },
+    "require-dev" : {
+        "zendframework/zendframework" : "dev-master"
+    }
+}

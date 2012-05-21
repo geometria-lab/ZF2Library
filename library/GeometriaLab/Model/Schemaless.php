@@ -1,23 +1,22 @@
 <?php
 
-/**
- * @author Ivan Shumkov
- */
-class GeometriaLab_Model_Schemaless implements Iterator, Countable
+namespace GeometriaLab\Model;
+
+class Schemaless implements ModelInterface, \Iterator, \Countable
 {
     /**
      * Property iterator
      *
-     * @var array
+     * @var array|null
      */
-    protected $_propertyIteratorPosition = null;
+    protected $propertyIteratorPosition;
 
     /**
      * Property values
      *
      * @var array
      */
-    protected $_propertyValues = array();
+    protected $propertyValues = array();
 
     /**
      * Constructor
@@ -29,21 +28,19 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
         if ($data !== null) {
             $this->populate($data);
         }
-
-        $this->init();
     }
 
     /**
      * Populate model from array or iterable object
      *
-     * @param array|Traversable $data  Model data (must be array or iterable object)
-     * @return GeometriaLab_Model
-     * @throws GeometriaLab_Model_Exception
+     * @param array|\Traversable $data  Model data (must be array or iterable object)
+     * @return \GeometriaLab\Model\Schemaless
+     * @throws \Exception
      */
     public function populate($data)
     {
-        if (!GeometriaLab_Validate_IsIterable::staticIsValid($data)) {
-            throw new GeometriaLab_Model_Exception("Can't populate data. Must be array or iterated object.");
+        if (!is_array($data) && !$data instanceof \Traversable) {
+            throw new \Exception("Can't populate data. Must be array or iterated object.");
         }
 
         foreach ($data as $key => $value) {
@@ -54,26 +51,25 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
     }
 
     /**
-     * Get property
+     * Get property value
      *
      * @param $name
      * @return mixed
      */
     public function get($name)
     {
-        if (isset($this->_propertyValues[$name])) {
-            return $this->_propertyValues[$name];
+        if (isset($this->propertyValues[$name])) {
+            return $this->propertyValues[$name];
         } else {
             return null;
         }
     }
 
     /**
-     * Magic for get property
+     * Magic get property value
      *
      * @param $name
      * @return mixed
-     * @throws GeometriaLab_Model_Exception
      */
     public function __get($name)
     {
@@ -85,11 +81,11 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
      *
      * @param $name
      * @param $value
-     * @return GeometriaLab_Model
+     * @return \GeometriaLab\Model\Schemaless
      */
     public function set($name, $value)
     {
-        $this->_propertyValues[$name] = $value;
+        $this->propertyValues[$name] = $value;
 
         return $this;
     }
@@ -99,8 +95,7 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
      *
      * @param $name
      * @param $value
-     * @return GeometriaLab_Model
-     * @throws GeometriaLab_Model_Exception
+     * @return \GeometriaLab\Model\Schemaless
      */
     public function __set($name, $value)
     {
@@ -115,7 +110,7 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
      */
     public function has($name)
     {
-        return isset($this->_propertyValues[$name]);
+        return isset($this->propertyValues[$name]);
     }
 
     /**
@@ -138,7 +133,7 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
     {
         $array = array();
 
-        foreach ($this->_getProperties() as $name => $property) {
+        foreach ($this->getProperties() as $name => $property) {
             $array[$name] = $this->get($name);
         }
 
@@ -150,9 +145,9 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
      *
      * @return array
      */
-    protected function _getProperties()
+    protected function getProperties()
     {
-        return $this->_propertyValues;
+        return $this->propertyValues;
     }
 
     /*
@@ -168,26 +163,26 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
 
     public function next()
     {
-        return next($this->_propertyIteratorPosition);
+        return next($this->propertyIteratorPosition);
     }
 
     public function key()
     {
-        return current($this->_propertyIteratorPosition);
+        return current($this->propertyIteratorPosition);
     }
 
     public function valid()
     {
-        return key($this->_propertyIteratorPosition) !== null;
+        return key($this->propertyIteratorPosition) !== null;
     }
 
     public function rewind()
     {
-        if ($this->_propertyIteratorPosition === null) {
-            $this->_propertyIteratorPosition = array_keys($this->_getProperties());
+        if ($this->propertyIteratorPosition === null) {
+            $this->propertyIteratorPosition = array_keys($this->getProperties());
         }
 
-        return reset($this->_propertyIteratorPosition);
+        return reset($this->propertyIteratorPosition);
     }
 
     /*
@@ -196,15 +191,6 @@ class GeometriaLab_Model_Schemaless implements Iterator, Countable
 
     public function count()
     {
-        return count($this->_getProperties());
-    }
-
-    /**
-     * Callbacks
-     */
-
-    public function init()
-    {
-
+        return count($this->getProperties());
     }
 }

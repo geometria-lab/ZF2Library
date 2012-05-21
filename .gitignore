@@ -1,2 +1,6 @@
 .idea
-vendor/Zend
+tests/сonfiguration.php
+
+composer.lock
+composer.phar
+vendor/*

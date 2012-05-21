@@ -1,69 +1,70 @@
 <?php
 
-/**
- * @author Ivan Shumkov
- */
-class GeometriaLab_Model_Definition_Manager
+namespace GeometriaLab\Model\Definition;
+
+use GeometriaLab\Model\Definition;
+
+class Manager
 {
     /**
      * Instance
      *
-     * @var GeometriaLab_Model_Definition_Manager
+     * @var Manager
      */
-    static protected $_instance;
+    static protected $instance;
 
     /**
-     * Pro
+     * Definitions
      *
      * @var array
      */
-    protected $_definitions = array();
+    protected $definitions = array();
 
     /**
      * Get instance
      *
      * @static
-     * @return GeometriaLab_Model_Definition_Manager
+     * @return Manager
      */
     static public function getInstance()
     {
-        if (self::$_instance === null) {
-            self::$_instance = new self;
+        if (self::$instance === null) {
+            self::$instance = new self;
         }
 
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
      * Add model
      *
      * @param string $modelClass
-     * @return GeometriaLab_Model_Definition
-     * @throws GeometriaLab_Model_Exception
+     * @return Definition
+     * @throws \Exception
      */
     public function define($modelClass)
     {
         if ($this->has($modelClass)) {
-            throw new GeometriaLab_Model_Exception("Model '$modelClass' already defined");
+            throw new \Exception("Model '$modelClass' already defined");
         }
 
-        return $this->_definitions[$modelClass] = new GeometriaLab_Model_Definition($modelClass);
+        return $this->definitions[$modelClass] = new Definition($modelClass);
     }
 
     /**
      * Get model definition
      *
      * @param string $modelClass
-     * @return GeometriaLab_Model_Definition
-     * @throws GeometriaLab_Model_Exception
+     * @return Definition
+     * @throws \Exception
      */
     public function get($modelClass)
     {
         if (!$this->has($modelClass)) {
-            throw new GeometriaLab_Model_Exception("Model '$modelClass' not defined");
+            throw new \Exception("Model '$modelClass' not defined");
         }
 
-        return $this->_definitions[$modelClass];
+        return $this->definitions[$modelClass];
     }
 
     /**
@@ -74,6 +75,6 @@ class GeometriaLab_Model_Definition_Manager
      */
     public function has($modelClass)
     {
-        return isset($this->_definitions[$modelClass]);
+        return isset($this->definitions[$modelClass]);
     }
 }

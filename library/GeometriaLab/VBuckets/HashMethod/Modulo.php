@@ -1,11 +1,15 @@
 <?php
 
-class GeometriaLab_VBuckets_HashMethod_Modulo implements GeometriaLab_VBuckets_HashMethod_Interface
+namespace GeometriaLab\VBuckets\HashMethod;
+
+use GeometriaLab\VBuckets\Map\MapInterface;
+
+class Modulo implements HashMethodInterface
 {
-    public function getHash($key, GeometriaLab_VBuckets_Map_Interface $map)
+    public function getHash($key, MapInterface $map)
     {
         if (!is_scalar($key)) {
-            throw new GeometriaLab_VBuckets_HashMethod_Exception('Non scalar key');
+            throw new \Exception('Non scalar key');
         }
 
         if (is_string($key)) {

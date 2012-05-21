@@ -1,0 +1,7 @@
+<?php
+
+/**
+ * PHPUnit Code Coverage / Test Report
+ */
+defined('TESTS_GENERATE_REPORT') || define('TESTS_GENERATE_REPORT', false);
+defined('TESTS_GENERATE_REPORT_TARGET') || define('TESTS_GENERATE_REPORT_TARGET', '/path/to/target');

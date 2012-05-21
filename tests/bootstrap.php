@@ -1,22 +1,77 @@
 <?php
 
-define('DATA_DIR', realpath(__DIR__ . '/data'));
+/*
+ * Set error reporting to the level
+ */
+error_reporting( E_ALL | E_STRICT );
 
-// Ensure library/ is on include_path
-set_include_path(implode(PATH_SEPARATOR, array(
-    realpath(__DIR__ . '/../vendor'),
-    realpath(__DIR__ . '/../library'),
-    realpath(__DIR__ . '/library'),
+$phpUnitVersion = PHPUnit_Runner_Version::id();
+if ('@package_version@' !== $phpUnitVersion && version_compare($phpUnitVersion, '3.5.0', '<')) {
+    echo 'This version of PHPUnit (' . PHPUnit_Runner_Version::id() . ') is not supported in Zend Framework 2.x unit tests.' . PHP_EOL;
+    exit(1);
+}
+unset($phpUnitVersion);
+
+/*
+ * Determine the root, library, and tests directories of the framework
+ * distribution.
+ */
+$root    = realpath(dirname(__DIR__));
+$library = "$root/library";
+$tests   = "$root/tests";
+
+/*
+ * Prepend the Geometria Lab ZF Library library/ and tests/ directories to the
+ * include_path. This allows the tests to run out of the box and helps prevent
+ * loading other copies of the framework code and tests that would supersede
+ * this copy.
+ */
+$path = array(
+    $library,
+    $tests,
     get_include_path(),
-)));
+);
+set_include_path(implode(PATH_SEPARATOR, $path));
 
-require_once 'Zend/Loader/Autoloader.php';
-Zend_Loader_Autoloader::getInstance()->registerNamespace('GeometriaLab');
+/**
+ * Setup autoloading
+ */
+include __DIR__ .  '/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
-//GeometriaRu_Test_HelperBroker::addPath(LIBRARY_PATH . '/GeometriaRu/Test/Helper', 'GeometriaRu_Test_Helper');
+/*
+ * Load the user-defined test configuration file, if it exists; otherwise, load
+ * the default configuration.
+ */
+if (is_readable($tests . DIRECTORY_SEPARATOR . 'configuration.php')) {
+    require_once $tests . DIRECTORY_SEPARATOR . 'configuration.php';
+} else {
+    require_once $tests . DIRECTORY_SEPARATOR . 'configuration.php.dist';
+}
 
-//require_once 'GeometriaRu/Test/PHPUnit/Listener/Plugin.php';
+if (defined('TESTS_GENERATE_REPORT') && TESTS_GENERATE_REPORT === true) {
+    $codeCoverageFilter = PHP_CodeCoverage_Filter::getInstance();
 
-//if (version_compare(GeometriaRu_Test_PHPUnit_Runner_Version::id(), '3.6.10', '<')) {
-//    throw new GeometriaRu_Test_Exception('Version of PHPUnit less then 3.6.10');
-//}
+    $lastArg = end($_SERVER['argv']);
+    if (is_dir($tests . DIRECTORY_SEPARATOR . $lastArg)) {
+        $codeCoverageFilter->addDirectoryToWhitelist($tests . DIRECTORY_SEPARATOR . $lastArg);
+    } else if (is_file($tests . DIRECTORY_SEPARATOR . $lastArg)) {
+        $codeCoverageFilter->addDirectoryToWhitelist(dirname($tests . DIRECTORY_SEPARATOR . $lastArg));
+    } else {
+        $codeCoverageFilter->addDirectoryToWhitelist($library);
+    }
+
+    /*
+     * Omit from code coverage reports the contents of the tests directory
+     */
+    $codeCoverageFilter->addDirectoryToBlacklist($tests, '');
+    $codeCoverageFilter->addDirectoryToBlacklist(PEAR_INSTALL_DIR, '');
+    $codeCoverageFilter->addDirectoryToBlacklist(PHP_LIBDIR, '');
+
+    unset($codeCoverageFilter);
+}
+
+/*
+ * Unset global variables that are no longer needed.
+ */
+unset($root, $library, $tests, $path);
