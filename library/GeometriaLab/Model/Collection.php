@@ -26,7 +26,7 @@ class Collection implements \Iterator, \Countable, \ArrayAccess
     public function __construct($data = null)
     {
         if ($data !== null) {
-            $this->psuh($data);
+            $this->push($data);
         }
     }
 
