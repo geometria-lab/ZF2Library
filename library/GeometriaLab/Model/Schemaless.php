@@ -39,8 +39,8 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
      */
     public function populate($data)
     {
-        if (!is_array($data) && !$data instanceof \Traversable) {
-            throw new \Exception("Can't populate data. Must be array or iterated object.");
+        if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
+            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
         }
 
         foreach ($data as $key => $value) {

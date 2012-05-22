@@ -33,12 +33,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testGetVBucket()
     {
         $bucket = $this->_map->getVBucket(3123);
-        $this->assertInstanceOf('\GeometriaLab\VBucket\VBucket', $bucket);
+        $this->assertInstanceOf('\GeometriaLab\VBuckets\VBucket', $bucket);
         $this->assertEquals(3123, $bucket->id);
         $this->assertEquals(1, $bucket->range);
 
         $bucket = $this->_map->getVBucket(32434);
-        $this->assertInstanceOf('\GeometriaLab\VBucket\VBucket', $bucket);
+        $this->assertInstanceOf('\GeometriaLab\VBuckets\VBucket', $bucket);
         $this->assertEquals(32434, $bucket->id);
         $this->assertEquals(2, $bucket->range);
     }
@@ -46,7 +46,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testGetInvalidVBucket()
     {
-        $this->setExpectedException('GeometriaLab_VBuckets_Map_Exception');
+        $this->setExpectedException('\InvalidArgumentException');
         $this->_map->getVBucket(66666);
     }
 

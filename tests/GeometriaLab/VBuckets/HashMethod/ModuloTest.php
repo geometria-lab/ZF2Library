@@ -35,7 +35,10 @@ class ModuloTest extends \PHPUnit_Framework_TestCase
     public function testGetHash()
     {
         $id = $this->_hashMethod->getHash('da1231312321312das', $this->_map);
-        $this->assertEquals($id, $this->_hashMethod->getHash('dadas', $this->_map));
+        $this->assertEquals($id, $this->_hashMethod->getHash('da1231312321312das', $this->_map));
+
+        $id3 = $this->_hashMethod->getHash(12321, $this->_map);
+        $this->assertEquals($id3, $this->_hashMethod->getHash(12321, $this->_map));
 
         $id2 = $this->_hashMethod->getHash(123133121, $this->_map);
         $this->assertNotEquals($id2, $this->_hashMethod->getHash('dadas', $this->_map));

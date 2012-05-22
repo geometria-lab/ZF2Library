@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\VBuckets\Map;
 
-use GeometriaLab\VBuckets\Bucket;
+use GeometriaLab\VBuckets\VBucket;
 
 use Zend\Config\Config as ZendConfig;
 
@@ -29,18 +29,18 @@ class Config implements MapInterface
      * Get vBucket
      *
      * @param $id
-     * @return Bucket
-     * @throws \Exception
+     * @return VBucket
+     * @throws \InvalidArgumentException
      */
     public function getVBucket($id)
     {
-        foreach($this->_config['ranges'] as $maxId => $range) {
+        foreach($this->config['ranges'] as $maxId => $range) {
             if ($maxId >= $id) {
-                return new GeometriaLab_VBuckets_Bucket($id, $range);
+                return new VBucket($id, $range);
             }
         }
 
-        throw new GeometriaLab_VBuckets_Map_Exception("Invalid vBucket id $id");
+        throw new \InvalidArgumentException("Invalid vBucket id $id");
     }
 
     /**
@@ -50,13 +50,13 @@ class Config implements MapInterface
      */
     public function getVBucketsCount()
     {
-        return $this->_config['count'];
+        return $this->config['count'];
     }
 
     /**
      * Convert and validate Zend\Config to array
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      * @param ZendConfig $config
      * @return array
      */
@@ -65,17 +65,17 @@ class Config implements MapInterface
         $configArray = $config->toArray();
 
         if (!isset($configArray['count'])) {
-            throw new \Exception('Undefined vBuckets count');
+            throw new \InvalidArgumentException('Undefined vBuckets count');
         }
 
         $configArray['count'] = (integer)$configArray['count'];
 
         if ($configArray['count'] < 1) {
-            throw new \Exception('vBuckets count must be positive integer');
+            throw new \InvalidArgumentException('vBuckets count must be positive integer');
         }
 
         if (!isset($configArray['ranges']) || count($configArray['ranges']) == 0) {
-            throw new \Exception('Ranges not present');
+            throw new \InvalidArgumentException('Ranges not present');
         }
 
         ksort($configArray['ranges']);
@@ -83,13 +83,13 @@ class Config implements MapInterface
         $lastRangeMaxId = 0;
         foreach($configArray['ranges'] as $maxId => $range) {
             if (!is_int($maxId) || $maxId < 1 || $maxId > $config['count']) {
-                throw new \Exception('Invalid range');
+                throw new \InvalidArgumentException('Invalid range');
             }
             $lastRangeMaxId = $maxId;
         }
 
         if ($lastRangeMaxId != $configArray['count']) {
-            throw new \Exception('vBuckets count are not covered by ranges');
+            throw new \InvalidArgumentException('vBuckets count are not covered by ranges');
         }
 
         return $configArray;

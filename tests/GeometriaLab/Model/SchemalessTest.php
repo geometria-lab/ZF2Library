@@ -14,7 +14,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
 
     public function testPopulateByInvalidData()
     {
-        $this->setExpectedException('\Exception');
+        $this->setExpectedException('InvalidArgumentException');
         $m = new Schemaless();
         $m->populate(true);
     }
@@ -63,7 +63,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(1, $m->test1);
-        $this->assertEquals(2, $m->test1);
+        $this->assertEquals(2, $m->test2);
     }
 
     public function testSet()
