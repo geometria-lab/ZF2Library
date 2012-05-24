@@ -2,7 +2,8 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Code\Reflection\DocBlock\PropertyTag;
+use GeometriaLab\Code\Reflection\DocBlock\Tag\PropertyTag,
+    GeometriaLab\Model\Definition\Property\Factory;
 
 use Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
@@ -27,18 +28,6 @@ class Definition
      * @var array
      */
     protected $properties = array();
-
-    /**
-     * Properties class map
-     *
-     * @var array
-     */
-    protected $defaultPropertiesClassMap = array(
-        'string'  => 'GeometriaLab\Model\Definition\Property\StringProperty',
-        'boolean' => 'GeometriaLab\Model\Definition\Property\BooleanProperty',
-        'float'   => 'GeometriaLab\Model\Definition\Property\FloatProperty',
-        'integer' => 'GeometriaLab\Model\Definition\Property\IntegerProperty',
-    );
 
     /**
      * @var ZendTagManager
@@ -139,32 +128,8 @@ class Definition
      */
     protected function parsePropertyTag(PropertyTag $tag)
     {
-        if (isset($this->defaultPropertiesClassMap[$tag->getType()])) {
-            $className = $this->defaultPropertiesClassMap[$tag->getType()];
-
-            $property = new $className($tag->getParams());
-        } else if (class_exists($tag->getType())) {
-            $definitions = Definition\Manager::getInstance();
-            if (!$definitions->has($tag->getType())) {
-                $reflection = new \ReflectionClass($tag->getType());
-                if ($reflection->isSubclassOf('GeometriaLab\Model\ModelInterface')) {
-                    $definitions->define($tag->getType());
-                }
-            }
-
-            $property = new Definition\Property\ModelProperty();
-            $property->setModelDefinition($definitions->get($tag->getType()));
-        } else {
-            throw new \Exception("Invalid property type '{$tag->getType()}'");
-        }
-
+        $property = Factory::factory($tag->getType(), $tag->getParams());
         $property->setName(substr($tag->getVariableName(), 1));
-
-        if ($tag->isArray()) {
-            $propertyArray = new Definition\Property\ArrayProperty();
-            $propertyArray->setItemProperty($property);
-            $property = $propertyArray;
-        }
 
         $this->properties[$property->getName()] = $property;
     }

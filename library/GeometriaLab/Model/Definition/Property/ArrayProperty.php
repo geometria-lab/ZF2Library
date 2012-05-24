@@ -10,28 +10,66 @@ class ArrayProperty extends AbstractProperty
     protected $itemProperty;
 
     /**
-     * Set item property object
+     * @var string
+     */
+    protected $itemType;
+
+    /**
+     * Set item type
      *
-     * @param PropertyInterface $itemProperty
+     * @param string $type
      * @return ArrayProperty
      */
-    public function setItemProperty(PropertyInterface $itemProperty)
+    public function setItemType($type)
     {
-        $this->_itemProperty = $itemProperty;
+        $this->itemType = $type;
 
         return $this;
     }
 
     /**
-     * Get item property object
+     * Get item type
+     *
+     * @return string
+     */
+    public function getItemType()
+    {
+        return $this->itemType;
+    }
+
+    /**
+     * Set item property
+     *
+     * @param PropertyInterface $property
+     * @return ArrayProperty
+     */
+    public function setItemProperty(PropertyInterface $property)
+    {
+        $this->itemProperty = $property;
+
+        return $this;
+    }
+
+    /**
+     * Get item property
      *
      * @return PropertyInterface
      */
     public function getItemProperty()
     {
-        return $this->_itemProperty;
+        if ($this->itemProperty === null) {
+            $this->itemProperty = Factory::factory($this->getItemType());
+        }
+
+        return $this->itemProperty;
     }
 
+    /**
+     * Validate value
+     *
+     * @param mixin $value
+     * @return bool
+     */
     public function isValid($value)
     {
         if (!is_array($value)) {
@@ -39,7 +77,7 @@ class ArrayProperty extends AbstractProperty
         }
 
         foreach($value as $item) {
-            if (!$this->itemProperty->isValid($item)) {
+            if (!$this->getItemProperty()->isValid($item)) {
                 return false;
             }
         }

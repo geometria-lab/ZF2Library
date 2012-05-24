@@ -92,14 +92,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $model = new Schemaless(array('test' => 'new'));
         $c->set(1, $model);
 
-        $this->assertEquals($model, $c->toArray()[1]);
+        $models = $c->toArray();
+        $this->assertEquals($model, $models[1]);
     }
 
     public function testRemove()
     {
         $c = new Collection($this->models);
         $c->remove($this->models[1]);
-        $this->assertEquals($this->models[2], $c->toArray()[1]);
+        $models = $c->toArray();
+        $this->assertEquals($this->models[2], $models[1]);
     }
 
     public function testGet()

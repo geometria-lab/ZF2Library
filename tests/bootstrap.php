@@ -4,6 +4,7 @@
  * Set error reporting to the level
  */
 error_reporting( E_ALL | E_STRICT );
+ini_set('display_errors', true);
 
 $phpUnitVersion = PHPUnit_Runner_Version::id();
 if ('@package_version@' !== $phpUnitVersion && version_compare($phpUnitVersion, '3.5.0', '<')) {

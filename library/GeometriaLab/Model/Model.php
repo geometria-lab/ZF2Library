@@ -115,7 +115,9 @@ abstract class Model extends Schemaless
          * @var Definition\Property\PropertyInterface $property
          */
         foreach($this->getProperties() as $name => $property) {
-            $this->set($name, $property->getDefaultValue());
+            if ($property->getDefaultValue() !== null) {
+                $this->set($name, $property->getDefaultValue());
+            }
         }
     }
 
