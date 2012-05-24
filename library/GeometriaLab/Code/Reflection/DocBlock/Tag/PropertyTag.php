@@ -45,9 +45,9 @@ class PropertyTag extends ParamTag
         $this->variableName = $parts[1];
 
         // Get type
-        if (strpos($parts[0], 'array(') === 0) {
+        if (strpos($parts[0], '[]') === strlen($parts[0]) - 2) {
             $this->type = 'array';
-            $this->params['itemType'] = substr($parts[0], 6, strlen($parts[1]) - 1);
+            $this->params['itemType'] = substr($parts[0], 0, strlen($parts[0]) - 2);
         } else {
             $this->type = $parts[0];
         }
