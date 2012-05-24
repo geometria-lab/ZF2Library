@@ -23,6 +23,13 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getData(), $this->model->toArray());
     }
 
+    public function testPopulateByInvalidData()
+    {
+        $this->model->populate($this->getData());
+
+        $this->assertEquals($this->getData(), $this->model->toArray());
+    }
+
     public function testPopulateWithInvalidArgument()
     {
         $this->markTestIncomplete();
