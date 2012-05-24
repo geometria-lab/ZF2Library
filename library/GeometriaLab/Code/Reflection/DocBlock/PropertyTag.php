@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Code\Reflection\DockBlock;
+namespace GeometriaLab\Code\Reflection\DocBlock;
 
 use Zend\Code\Reflection\DocBlock\ParamTag;
 
@@ -33,9 +33,9 @@ class PropertyTag extends ParamTag
         }
 
         // Get type
-        if (substr($parts[0], -2) === '[]') {
+        if (strpos($parts[0], 'array(') === 0) {
             $this->isArray = true;
-            $this->type = substr($parts[0], 0, strlen($parts[1]) - 2);
+            $this->type = substr($parts[0], 6, strlen($parts[1]) - 1);
         } else {
             $this->type = $parts[0];
         }
@@ -55,13 +55,13 @@ class PropertyTag extends ParamTag
      */
     public function getParams()
     {
-        // TODO: Move to Zend\Serializer
+        // TODO: use Zend\Serializer
         $params = json_decode($this->description);
 
-        if ($params === false || !is_object($params)) {
-            return new \stdClass();
-        } else {
+        if (json_last_error() === JSON_ERROR_NONE && is_object($params)) {
             return $params;
+        } else {
+            return new \stdClass();
         }
     }
 }

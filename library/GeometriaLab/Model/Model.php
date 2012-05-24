@@ -26,22 +26,19 @@ abstract class Model extends Schemaless
     /**
      * Populate model from array or iterable object
      *
-     * @param array|\Traversable $data                      Model data (must be array or iterable object)
-     * @param bool               $ignoreUndefinedProperties
+     * @param array|\Traversable $data Model data (must be array or iterable object)
      * @return Model
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
-    public function populate($data, $ignoreUndefinedProperties = false)
+    public function populate($data)
     {
         if (!is_array($data) && !$data instanceof \Traversable) {
-            throw new \Exception("Can't populate data. Must be array or iterated object.");
+            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
         }
 
         foreach ($data as $key => $value) {
             if ($this->getPropertyDefinition($key) !== null) {
                 $this->set($key, $value);
-            } else if (!$ignoreUndefinedProperties) {
-                throw new \Exception("Property '$key' not defined");
             }
         }
 
@@ -103,7 +100,7 @@ abstract class Model extends Schemaless
      */
     protected function setup()
     {
-        $className = get_class();
+        $className = get_class($this);
 
         $definitions = Definition\Manager::getInstance();
 

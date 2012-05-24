@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Code\Reflection\DockBlock\PropertyTag;
+use GeometriaLab\Code\Reflection\DocBlock\PropertyTag;
 
 use Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
@@ -35,9 +35,9 @@ class Definition
      */
     protected $defaultPropertiesClassMap = array(
         'string'  => 'GeometriaLab\Model\Definition\Property\StringProperty',
-        'boolean' => 'GeometriaLab\Model\Definition\Property\StringProperty',
-        'float'   => 'GeometriaLab\Model\Definition\Property\StringProperty',
-        'integer' => 'GeometriaLab\Model\Definition\Property\StringProperty',
+        'boolean' => 'GeometriaLab\Model\Definition\Property\BooleanProperty',
+        'float'   => 'GeometriaLab\Model\Definition\Property\FloatProperty',
+        'integer' => 'GeometriaLab\Model\Definition\Property\IntegerProperty',
     );
 
     /**

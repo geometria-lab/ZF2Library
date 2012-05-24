@@ -120,6 +120,8 @@ class Collection implements \Iterator, \Countable, \ArrayAccess
 
         if ($offset) {
             unset($this->models[$offset]);
+            $this->models = array_values($this->models);
+            // TODO: rewind?
         }
 
         return $this;
@@ -376,5 +378,7 @@ class Collection implements \Iterator, \Countable, \ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->models[$offset]);
+        $this->models = array_values($this->models);
+        // TODO: rewind?
     }
 }

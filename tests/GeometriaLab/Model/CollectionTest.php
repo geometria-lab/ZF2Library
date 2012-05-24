@@ -55,8 +55,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Collection($this->models);
 
-        $this->assertEquals($this->models[0], $c->pop());
-        $this->assertEquals($this->models[1], $c->pop());
+        $this->assertEquals($this->models[4], $c->pop());
+        $this->assertEquals($this->models[3], $c->pop());
     }
 
     public function testUnshift()
@@ -81,8 +81,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testShift()
     {
         $c = new Collection($this->models);
-        $this->assertEquals($this->models[1], $c->shift());
         $this->assertEquals($this->models[0], $c->shift());
+        $this->assertEquals($this->models[1], $c->shift());
     }
 
     public function testSet()
@@ -168,44 +168,78 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSlice()
     {
-        $this->markTestIncomplete();
+        $c = new Collection($this->models);
+        $c2 = $c->getSlice(2, 2);
+
+        $this->assertEquals(array($this->models[2], $this->models[3]), $c2->toArray());
     }
 
     public function testSort()
     {
-        $this->markTestIncomplete();
+        $sortCallback = function($model1, $model2) {
+            if ($model1->test > $model2->test) {
+                return -1;
+            } else {
+                return 1;
+            }
+        };
 
-        //usort($this->models, $callback);
-        //$this->rewind();
+        $c = new Collection($this->models);
+        $c->sort($sortCallback);
+
+        usort($this->models, $sortCallback);
+        $this->assertEquals($this->models, $c->toArray());
     }
 
     public function testIterator()
     {
-        $this->markTestIncomplete();
+        $c = new Collection($this->models);
+
+        $this->_iterate($c);
+        $this->_iterate($c);
+    }
+
+    protected function _iterate($c)
+    {
+        reset($this->models);
+        foreach($c as $key => $value) {
+            $this->assertEquals(key($this->models), $key);
+            $this->assertEquals(current($this->models), $value);
+            next($this->models);
+        }
     }
 
     public function testCount()
     {
-        $this->markTestIncomplete();
+        $c = new Collection($this->models);
+        $this->assertEquals(5, count($c));
     }
 
     public function testOffsetExists()
     {
-        $this->markTestIncomplete();
+        $c = new Collection($this->models);
+        $this->assertTrue(isset($c[0]));
+        $this->assertFalse(isset($c[10]));
     }
 
     public function testOffsetGet()
     {
-        $this->markTestIncomplete();
+        $c = new Collection($this->models);
+        $this->assertEquals($this->models[0], $c[0]);
+        $this->assertNull($c[10]);
     }
 
     public function testOffsetSet()
     {
-        $this->markTestIncomplete();
+        $c = new Collection($this->models);
+        $c[0] = $this->models[4];
+        $this->assertEquals($this->models[4], $c->get(0));
     }
 
     public function testOffsetUnset()
     {
-        $this->markTestIncomplete();
+        $c = new Collection($this->models);
+        unset($c[4]);
+        $this->assertEquals(4, count($c));
     }
 }
