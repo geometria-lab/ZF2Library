@@ -39,12 +39,13 @@ class Factory
             if (!$definitions->has($type)) {
                 $reflection = new \ReflectionClass($type);
                 if ($reflection->isSubclassOf('GeometriaLab\Model\ModelInterface')) {
-                    $definitions->define($type);
+                    $definitions->add($type);
                 }
             }
 
-            $property = new ModelProperty();
-            $property->setModelDefinition($definitions->get($type));
+            $params['modelDefinition'] = $definitions->get($type);
+
+            $property = new ModelProperty($params);
         } else {
             throw new \InvalidArgumentException("Invalid property type '$type'");
         }

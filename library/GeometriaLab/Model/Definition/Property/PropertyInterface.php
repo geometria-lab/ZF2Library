@@ -10,5 +10,5 @@ interface PropertyInterface
     public function setDefaultValue($value);
     public function getDefaultValue();
 
-    public function isValid($value);
+    public function prepare($value);
 }

@@ -2,14 +2,17 @@
 
 namespace GeometriaLab\Model;
 
+use GeometriaLab\Model\Definition,
+    GeometriaLab\Model\Definition\DefinitionInterface;
+
 abstract class Model extends Schemaless
 {
     /**
      * Model definition
      *
-     * @var Definition
+     * @var DefinitionInterface
      */
-    protected $definition;
+    protected static $definition;
 
     /**
      * Constructor
@@ -24,39 +27,17 @@ abstract class Model extends Schemaless
     }
 
     /**
-     * Populate model from array or iterable object
-     *
-     * @param array|\Traversable $data Model data (must be array or iterable object)
-     * @return Model
-     * @throws \InvalidArgumentException
-     */
-    public function populate($data)
-    {
-        if (!is_array($data) && !$data instanceof \Traversable) {
-            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
-        }
-
-        foreach ($data as $key => $value) {
-            if ($this->getPropertyDefinition($key) !== null) {
-                $this->set($key, $value);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * Get property value
      *
      * @param $name
      * @return mixed
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function get($name)
     {
         $property = $this->getPropertyDefinition($name);
         if ($property === null) {
-            throw new \Exception("Property '$name' does not exists");
+            throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
         $method = "get{$name}";
@@ -64,7 +45,11 @@ abstract class Model extends Schemaless
             return call_user_func(array($this, $method));
         }
 
-        return $this->propertyValues[$name];
+        if (isset($this->propertyValues[$name])) {
+            return $this->propertyValues[$name];
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -73,16 +58,19 @@ abstract class Model extends Schemaless
      * @param $name
      * @param $value
      * @return Model
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function set($name, $value)
     {
         $property = $this->getPropertyDefinition($name);
         if ($property === null) {
-            throw new \Exception("Property '$name' does not exists");
+            throw new \InvalidArgumentException("Property '$name' does not exists");
         }
-        if (!$property->isValid($value)) {
-            throw new \Exception("Invalid value for property '$name'");
+
+        try {
+            $value = $property->prepare($value);
+        } catch (InvalidArgumentException $e) {
+            throw new \InvalidArgumentException("Invalid value for property '$name'");
         }
 
         $method = "set{$name}";
@@ -102,13 +90,15 @@ abstract class Model extends Schemaless
     {
         $className = get_class($this);
 
-        $definitions = Definition\Manager::getInstance();
+        if (static::$definition === null) {
+            $definitions = Definition\Manager::getInstance();
 
-        if (!$definitions->has($className)) {
-            $definitions->define($className);
+            if (!$definitions->has($className)) {
+                $definitions->add($this->createDefinition($className));
+            }
+
+            static::$definition = $definitions->get($className);
         }
-
-        $this->definition = $definitions->get($className);
 
         // Fill default values
         /**
@@ -128,7 +118,7 @@ abstract class Model extends Schemaless
      */
     protected function getProperties()
     {
-        return $this->definition->getProperties();
+        return static::$definition->getProperties();
     }
 
     /**
@@ -139,10 +129,21 @@ abstract class Model extends Schemaless
      */
     protected function getPropertyDefinition($name)
     {
-        if ($this->definition->hasProperty($name)) {
-            return $this->definition->getProperty($name);
+        if (static::$definition->hasProperty($name)) {
+            return static::$definition->getProperty($name);
         } else {
             return null;
         }
+    }
+
+    /**
+     * Create model definition by class name
+     *
+     * @param string $className
+     * @return Definition
+     */
+    protected function createDefinition($className)
+    {
+        return new Definition($className);
     }
 }

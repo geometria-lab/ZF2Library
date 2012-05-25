@@ -4,8 +4,19 @@ namespace GeometriaLab\Model\Definition\Property;
 
 class BooleanProperty extends AbstractProperty
 {
-    public function isValid($value)
+    /**
+     * Prepare value
+     *
+     * @param boolean $value
+     * @return boolean mixed
+     * @throws \InvalidArgumentException
+     */
+    public function prepare($value)
     {
-        return is_bool($value);
+        if (!is_bool($value)) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $value;
     }
 }

@@ -2,10 +2,25 @@
 
 namespace GeometriaLab\Code\Reflection\DocBlock\Tag;
 
-use Zend\Code\Reflection\DocBlock\Tag\ParamTag;
+use Zend\Code\Reflection\DocBlock\Tag\TagInterface;
 
-class PropertyTag extends ParamTag
+class PropertyTag implements TagInterface
 {
+    /**
+     * @var string
+     */
+    protected $type = null;
+
+    /**
+     * @var string
+     */
+    protected $propertyName = null;
+
+    /**
+     * @var string
+     */
+    protected $description = null;
+
     /**
      * Params
      *
@@ -30,19 +45,19 @@ class PropertyTag extends ParamTag
         // Get description and params
         if (isset($parts[2])) {
             // Remove new lines and spaces
-            $parts[2] = preg_replace('#\s+#', ' ', $parts[2]);
+            $parts[2] = preg_replace('#\s+#m', ' ', $parts[2]);
 
             // Try to encode description
             $params = json_decode($parts[2], true);
 
-            if (json_last_error() === JSON_ERROR_NONE && is_object($params)) {
+            if (json_last_error() === JSON_ERROR_NONE && is_array($params)) {
                 $this->params = $params;
-            } else {
+            } else if ($parts[2] !== '') {
                 $this->description = $parts[2];
             }
         }
 
-        $this->variableName = $parts[1];
+        $this->propertyName = $parts[1];
 
         // Get type
         if (strpos($parts[0], '[]') === strlen($parts[0]) - 2) {
@@ -64,7 +79,37 @@ class PropertyTag extends ParamTag
     }
 
     /**
-     * Get tag params
+     * Get property variable type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Get property name
+     *
+     * @return string
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
+    /**
+     * Get property description
+     *
+     * @return null|string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Get property params
      *
      * @return array
      */

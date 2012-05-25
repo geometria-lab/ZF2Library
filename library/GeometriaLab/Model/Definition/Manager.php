@@ -38,17 +38,19 @@ class Manager
     /**
      * Add model
      *
-     * @param string $modelClass
-     * @return Definition
+     * @param DefinitionInterface $definition
+     * @return DefinitionInterface
      * @throws \Exception
      */
-    public function define($modelClass)
+    public function add(DefinitionInterface $definition)
     {
-        if ($this->has($modelClass)) {
-            throw new \Exception("Model '$modelClass' already defined");
+        $className = $definition->getClassName();
+
+        if ($this->has($className)) {
+            throw new \Exception("Model '{$className}' already defined");
         }
 
-        return $this->definitions[$modelClass] = new Definition($modelClass);
+        return $this->definitions[$className] = $definition;
     }
 
     /**

@@ -4,8 +4,19 @@ namespace GeometriaLab\Model\Definition\Property;
 
 class IntegerProperty extends AbstractProperty
 {
-    public function isValid($value)
+    /**
+     * Prepare value
+     *
+     * @param integer $value
+     * @return integer
+     * @throws \InvalidArgumentException
+     */
+    public function prepare($value)
     {
-        return is_integer($value);
+        if (!is_integer($value)) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $value;
     }
 }

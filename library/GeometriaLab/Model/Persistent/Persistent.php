@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Model\Collection;
+namespace GeometriaLab\Model\Persistent\Collection;
 
 use GeometriaLab\Model\Collection;
 

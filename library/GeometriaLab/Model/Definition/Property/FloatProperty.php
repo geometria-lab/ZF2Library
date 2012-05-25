@@ -4,8 +4,19 @@ namespace GeometriaLab\Model\Definition\Property;
 
 class FloatProperty extends AbstractProperty
 {
-    public function isValid($value)
+    /**
+     * Validate property
+     *
+     * @param float $value
+     * @return float
+     * @throws \InvalidArgumentException
+     */
+    public function prepare($value)
     {
-        return is_float($value);
+        if (!is_float($value)) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $value;
     }
 }

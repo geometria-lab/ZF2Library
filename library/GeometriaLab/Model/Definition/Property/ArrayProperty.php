@@ -65,23 +65,20 @@ class ArrayProperty extends AbstractProperty
     }
 
     /**
-     * Validate value
+     * Prepare value
      *
-     * @param mixin $value
-     * @return bool
+     * @param array $value
+     * @return array
+     * @throws \InvalidArgumentException
      */
-    public function isValid($value)
+    public function prepare($value)
     {
         if (!is_array($value)) {
-            return false;
+            throw new \InvalidArgumentException();
         }
 
-        foreach($value as $item) {
-            if (!$this->getItemProperty()->isValid($item)) {
-                return false;
-            }
-        }
+        $value = array_map(array($this->getItemProperty(), 'prepare'), $value);
 
-        return true;
+        return $value;
     }
 }

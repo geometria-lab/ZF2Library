@@ -3,17 +3,15 @@
 namespace GeometriaLab\Model;
 
 use GeometriaLab\Code\Reflection\DocBlock\Tag\PropertyTag,
-    GeometriaLab\Model\Definition\Property\Factory;
+    GeometriaLab\Model\Definition\Property\Factory,
+    GeometriaLab\Model\Definition\DefinitionInterface;
 
 use Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
     Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection,
     Zend\Code\Reflection\DocBlock\TagManager as ZendTagManager;
 
-/**
- * @author Ivan Shumkov
- */
-class Definition
+class Definition implements DefinitionInterface
 {
     /**
      * Class name
@@ -128,10 +126,20 @@ class Definition
      */
     protected function parsePropertyTag(PropertyTag $tag)
     {
-        $property = Factory::factory($tag->getType(), $tag->getParams());
-        $property->setName(substr($tag->getVariableName(), 1));
+        $name = substr($tag->getPropertyName(), 1);
 
-        $this->properties[$property->getName()] = $property;
+        if ($this->hasProperty($name)) {
+            throw new \InvalidArgumentException("Property with name '$name' already exists");
+        }
+
+        if ($tag->getDescription() !== null) {
+            throw new \InvalidArgumentException("Not valid JSON params for property '$name'");
+        }
+
+        $params = $tag->getParams();
+        $params['name'] = $name;
+
+        $this->properties[$name] = Factory::factory($tag->getType(), $params);
     }
 
     static protected function getTagManager()

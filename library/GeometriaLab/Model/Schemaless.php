@@ -33,9 +33,9 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
     /**
      * Populate model from array or iterable object
      *
-     * @param array|\Traversable $data  Model data (must be array or iterable object)
+     * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
      * @return \GeometriaLab\Model\Schemaless
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function populate($data)
     {

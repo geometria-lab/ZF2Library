@@ -34,7 +34,7 @@ abstract class AbstractProperty extends ZendOptions implements PropertyInterface
      * Set name
      *
      * @param $name
-     * @return GeometriaLab_Model_Definition_Property_Abstract
+     * @return AbstractProperty
      */
     public function setName($name)
     {
@@ -56,7 +56,8 @@ abstract class AbstractProperty extends ZendOptions implements PropertyInterface
     /**
      * Set default value
      *
-     * @return GeometriaLab_Model_Definition_Property_Abstract
+     * @param $value
+     * @return AbstractProperty
      */
     public function setDefaultValue($value)
     {
