@@ -39,7 +39,7 @@ class Factory
             if (!$definitions->has($type)) {
                 $reflection = new \ReflectionClass($type);
                 if ($reflection->isSubclassOf('GeometriaLab\Model\ModelInterface')) {
-                    $definitions->add($type);
+                    $definitions->add($type::getDefinition());
                 }
             }
 

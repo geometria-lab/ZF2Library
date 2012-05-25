@@ -38,7 +38,7 @@ class Manager
     /**
      * Add model
      *
-     * @param DefinitionInterface $definition
+     * @param DefinitionInterface $modelClass
      * @return DefinitionInterface
      * @throws \Exception
      */
@@ -57,7 +57,7 @@ class Manager
      * Get model definition
      *
      * @param string $modelClass
-     * @return Definition
+     * @return DefinitionInterface
      * @throws \Exception
      */
     public function get($modelClass)

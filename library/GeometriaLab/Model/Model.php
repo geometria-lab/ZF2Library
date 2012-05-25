@@ -2,8 +2,7 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Definition,
-    GeometriaLab\Model\Definition\DefinitionInterface;
+use GeometriaLab\Model\Definition;
 
 abstract class Model extends Schemaless
 {
@@ -13,6 +12,11 @@ abstract class Model extends Schemaless
      * @var DefinitionInterface
      */
     protected static $definition;
+
+    /**
+     * @var string
+     */
+    protected static $definitionClass = '\GeometriaLab\Model\Definition';
 
     /**
      * Constructor
@@ -84,20 +88,29 @@ abstract class Model extends Schemaless
     }
 
     /**
+     * Create model definition by class name
+     *
+     * @param string $className
+     * @return \GeometriaLab\Model\Definition\DefinitionInterface
+     */
+    public static function getDefinition()
+    {
+        if (static::$definition === null) {
+            static::$definition = new static::$definitionClass(get_called_class());
+        }
+
+        return static::$definition;
+    }
+
+    /**
      * Setup model
      */
     protected function setup()
     {
-        $className = get_class($this);
+        $definitions = Definition\Manager::getInstance();
 
-        if (static::$definition === null) {
-            $definitions = Definition\Manager::getInstance();
-
-            if (!$definitions->has($className)) {
-                $definitions->add($this->createDefinition($className));
-            }
-
-            static::$definition = $definitions->get($className);
+        if (!$definitions->has(get_class($this))) {
+            $definitions->add(static::getDefinition());
         }
 
         // Fill default values
@@ -134,16 +147,5 @@ abstract class Model extends Schemaless
         } else {
             return null;
         }
-    }
-
-    /**
-     * Create model definition by class name
-     *
-     * @param string $className
-     * @return Definition
-     */
-    protected function createDefinition($className)
-    {
-        return new Definition($className);
     }
 }

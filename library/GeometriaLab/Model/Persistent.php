@@ -14,6 +14,13 @@ abstract class Persistent extends Model
     protected static $mapper;
 
     /**
+     *
+     *
+     * @var string
+     */
+    protected static $definitionClass = '\GeometriaLab\Model\Persistent\Definition';
+
+    /**
      * Set mapper
      *
      * @static
