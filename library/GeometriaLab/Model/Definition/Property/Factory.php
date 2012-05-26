@@ -38,8 +38,10 @@ class Factory
             $definitions = Definition\Manager::getInstance();
             if (!$definitions->has($type)) {
                 $reflection = new \ReflectionClass($type);
-                if ($reflection->isSubclassOf('GeometriaLab\Model\ModelInterface')) {
-                    $definitions->add($type::getDefinition());
+                if ($reflection->isSubclassOf('GeometriaLab\Model\Model')) {
+                    $definitions->add($type::createDefinition());
+                } else {
+                    throw new \InvalidArgumentException("Property type '$type' is not model");
                 }
             }
 

@@ -9,14 +9,9 @@ abstract class Model extends Schemaless
     /**
      * Model definition
      *
-     * @var DefinitionInterface
+     * @var Definition\DefinitionInterface
      */
-    protected static $definition;
-
-    /**
-     * @var string
-     */
-    protected static $definitionClass = '\GeometriaLab\Model\Definition';
+    protected $definition;
 
     /**
      * Constructor
@@ -88,18 +83,15 @@ abstract class Model extends Schemaless
     }
 
     /**
-     * Create model definition by class name
+     * Create model definition
      *
-     * @param string $className
-     * @return \GeometriaLab\Model\Definition\DefinitionInterface
+     * @return Definition
      */
-    public static function getDefinition()
+    public static function createDefinition()
     {
-        if (static::$definition === null) {
-            static::$definition = new static::$definitionClass(get_called_class());
-        }
+        $className = get_called_class();
 
-        return static::$definition;
+        return new Definition($className);
     }
 
     /**
@@ -109,9 +101,13 @@ abstract class Model extends Schemaless
     {
         $definitions = Definition\Manager::getInstance();
 
-        if (!$definitions->has(get_class($this))) {
-            $definitions->add(static::getDefinition());
+        $className = get_class($this);
+
+        if (!$definitions->has($className)) {
+            $definitions->add(static::createDefinition());
         }
+
+        $this->definition = $definitions->get($className);
 
         // Fill default values
         /**
@@ -131,7 +127,7 @@ abstract class Model extends Schemaless
      */
     protected function getProperties()
     {
-        return static::$definition->getProperties();
+        return $this->definition->getProperties();
     }
 
     /**
@@ -142,8 +138,8 @@ abstract class Model extends Schemaless
      */
     protected function getPropertyDefinition($name)
     {
-        if (static::$definition->hasProperty($name)) {
-            return static::$definition->getProperty($name);
+        if ($this->definition->hasProperty($name)) {
+            return $this->definition->getProperty($name);
         } else {
             return null;
         }

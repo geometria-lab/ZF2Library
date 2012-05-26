@@ -39,7 +39,21 @@ abstract class Persistent extends Model
      */
     public static function getMapper()
     {
+        $className = get_called_class();
+
+        $definitions = Definition\Manager::getInstance();
+
+        if ($definitions->has($className)) {
+            $definition = $definitions->get($className);
+        } else {
+
+        }
+
+
         if (static::$mapper === null) {
+
+
+
             static::$mapper = static::$definition->createMapper();
         }
 
@@ -49,11 +63,12 @@ abstract class Persistent extends Model
     /**
      * Create persistent model definition
      *
-     * @param string $className
      * @return Persistent\Definition
      */
-    protected function createDefinition($className)
+    public static function createDefinition()
     {
+        $className = get_called_class();
+
         return new Persistent\Definition($className);
     }
 }

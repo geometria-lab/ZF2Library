@@ -142,6 +142,12 @@ class Definition implements DefinitionInterface
         $this->properties[$name] = Factory::factory($tag->getType(), $params);
     }
 
+    /**
+     * Get tag manager
+     *
+     * @static
+     * @return ZendTagManager
+     */
     static protected function getTagManager()
     {
         if (static::$tagManager === null) {
