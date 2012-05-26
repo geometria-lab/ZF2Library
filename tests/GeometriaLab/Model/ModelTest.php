@@ -102,6 +102,13 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new TestModels\SubModel(array('id' => 1, 'title' => 'Hello')), $this->model->subTest);
     }
 
+    public function testSettersAndGetters()
+    {
+        $this->model->callbackProperty = 1;
+        $this->assertEquals(1,  $this->model->getCallbackProperty());
+        $this->assertEquals(1,  $this->model->callbackProperty);
+    }
+
     protected function getData()
     {
         return array(

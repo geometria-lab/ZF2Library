@@ -4,6 +4,7 @@ namespace GeometriaLabTest\Model\TestModels;
 
 /**
  * @property boolean                                       $booleanProperty
+ * @property boolean                                       $callbackProperty
  * @property float                                         $floatProperty
  * @property integer                                       $integerProperty
  * @property string                                        $stringProperty   {"defaultValue" : "default"}
@@ -15,5 +16,15 @@ namespace GeometriaLabTest\Model\TestModels;
  */
 class Model extends \GeometriaLab\Model\Model
 {
+    protected $callbackProperty;
 
+    public function getCallbackProperty()
+    {
+        return $this->callbackProperty;
+    }
+
+    public function setCallbackProperty($value)
+    {
+        $this->callbackProperty = $value;
+    }
 }

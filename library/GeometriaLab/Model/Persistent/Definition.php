@@ -37,7 +37,11 @@ class Definition extends Model\Definition
     {
         $className = $this->mapperTag->getReturnType();
 
-        return new $className($this->mapperTag->getParams());
+        $params = $this->mapperTag->getParams();
+
+        $params['modelClass'] = $this->getClassName();
+
+        return new $className($params);
     }
 
     /**
