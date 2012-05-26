@@ -7,16 +7,22 @@ use Zend\Code\Reflection\DocBlock\Tag\TagInterface;
 class MethodTag implements TagInterface
 {
     /**
+     * Return type
+     *
      * @var string
      */
     protected $returnType = null;
 
     /**
+     * Method name
+     *
      * @var string
      */
     protected $methodName = null;
 
     /**
+     * Description
+     *
      * @var string
      */
     protected $description = null;
@@ -51,7 +57,7 @@ class MethodTag implements TagInterface
         $this->isStatic = $match[1] === 'static';
 
         // Get type
-        $this->type = $match[2];
+        $this->returnType = $match[2];
 
         // Get name
         $this->methodName = $match[3];

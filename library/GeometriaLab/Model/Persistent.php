@@ -2,35 +2,10 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Persistent\Mapper\MapperInterface;
+use GeometriaLab\Model\Persistent\Mapper;
 
 abstract class Persistent extends Model
 {
-    /**
-     * Mapper
-     *
-     * @var MapperInterface
-     */
-    protected static $mapper;
-
-    /**
-     *
-     *
-     * @var string
-     */
-    protected static $definitionClass = '\GeometriaLab\Model\Persistent\Definition';
-
-    /**
-     * Set mapper
-     *
-     * @static
-     * @param MapperInterface $mapper
-     */
-    public static function setMapper(MapperInterface $mapper)
-    {
-        static::$mapper = $mapper;
-    }
-
     /**
      * Get mapper
      *
@@ -41,23 +16,20 @@ abstract class Persistent extends Model
     {
         $className = get_called_class();
 
-        $definitions = Definition\Manager::getInstance();
+        $mappers = Mapper\Manager::getInstance();
 
-        if ($definitions->has($className)) {
+        if (!$mappers->has($className)) {
+            $definitions = Definition\Manager::getInstance();
+            if (!$definitions->has($className)) {
+                $className::createDefinition();
+            }
+
             $definition = $definitions->get($className);
-        } else {
 
+            $mappers->add($className, $definition->createMapper());
         }
 
-
-        if (static::$mapper === null) {
-
-
-
-            static::$mapper = static::$definition->createMapper();
-        }
-
-        return static::$mapper;
+        return $mappers->get($className);
     }
 
     /**
@@ -67,8 +39,14 @@ abstract class Persistent extends Model
      */
     public static function createDefinition()
     {
+        $definitions = Definition\Manager::getInstance();
+
         $className = get_called_class();
 
-        return new Persistent\Definition($className);
+        if (!$definitions->has($className)) {
+            $definitions->add(new Persistent\Definition($className));
+        }
+
+        return $definitions->get($className);
     }
 }

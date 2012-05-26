@@ -62,7 +62,11 @@ class Definition extends Model\Definition
      */
     protected function parseMethodTag(MethodTag $tag)
     {
-        if ($tag->getMethodName() === 'getMapper()' && $tag->isStatic()) {
+        if ($tag->getMethodName() === 'getMapper()') {
+            if (!$tag->isStatic() || !class_exists($tag->getReturnType()) || $tag->getParams() === array()) {
+                throw new \InvalidArgumentException('Invalid mapper definition!');
+            }
+
             $this->mapperTag = $tag;
         }
     }

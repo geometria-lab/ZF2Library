@@ -22,10 +22,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        var_dump(TestModels\Model::createDefinition());
-        var_dump(TestModels\SubModel::createDefinition());
-
-
         $data = $this->getData();
         $this->model->populate($data);
 

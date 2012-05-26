@@ -10,10 +10,8 @@
  *                                                                                             5, 6, 7, 8]}
  * @property string[]                                     $arrayOfString
  * @property \GeometriaLabTest\Model\TestModels\SubModel[] $arrayOfSubTest
- *
- * @method static \GeometriaLab\Model\Persistent\Mapper getMapper()
  */
-class Persistent extends \GeometriaLab\Model\Persistent
+class PersistentWithoutDefinition extends \GeometriaLab\Model\Persistent
 {
 
 }

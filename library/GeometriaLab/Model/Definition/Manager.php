@@ -36,9 +36,9 @@ class Manager implements \IteratorAggregate
     }
 
     /**
-     * Add model
+     * Add model definition
      *
-     * @param DefinitionInterface $modelClass
+     * @param DefinitionInterface $definition
      * @return DefinitionInterface
      * @throws \Exception
      */

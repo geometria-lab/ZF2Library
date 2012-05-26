@@ -13,7 +13,7 @@ namespace GeometriaLabTest\Model\TestModels;
  * @property string[]                                     $arrayOfString
  * @property \GeometriaLabTest\Model\TestModels\SubModel[] $arrayOfSubTest
  *
- * @method static \GeometriaLab\Model\Persistent\Mapper\Mongo getMapper()    dasdad dasas das da
+ * @method static \GeometriaLab\Model\Persistent\Mapper\Mongo getMapper()  {"collectionName" : "aaaaa"}
  */
 class Persistent extends \GeometriaLab\Model\Persistent
 {

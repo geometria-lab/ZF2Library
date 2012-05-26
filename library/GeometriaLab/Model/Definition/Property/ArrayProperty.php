@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Model\Definition\Property;
 
+use GeometriaLab\Model\Definition;
+
 class ArrayProperty extends AbstractProperty
 {
     /**
@@ -58,7 +60,7 @@ class ArrayProperty extends AbstractProperty
     public function getItemProperty()
     {
         if ($this->itemProperty === null) {
-            $this->itemProperty = Factory::factory($this->getItemType());
+            $this->itemProperty = Definition::createProperty($this->getItemType());
         }
 
         return $this->itemProperty;

@@ -89,9 +89,15 @@ abstract class Model extends Schemaless
      */
     public static function createDefinition()
     {
+        $definitions = Definition\Manager::getInstance();
+
         $className = get_called_class();
 
-        return new Definition($className);
+        if (!$definitions->has($className)) {
+            $definitions->add(new Definition($className));
+        }
+
+        return $definitions->get($className);
     }
 
     /**
@@ -99,15 +105,7 @@ abstract class Model extends Schemaless
      */
     protected function setup()
     {
-        $definitions = Definition\Manager::getInstance();
-
-        $className = get_class($this);
-
-        if (!$definitions->has($className)) {
-            $definitions->add(static::createDefinition());
-        }
-
-        $this->definition = $definitions->get($className);
+        $this->definition = static::createDefinition();
 
         // Fill default values
         /**

@@ -5,29 +5,29 @@ namespace GeometriaLab\Model\Definition\Property;
 class ModelProperty extends AbstractProperty
 {
     /**
-     * @var \GeometriaLab\Model\Definition
+     * @var string
      */
-    protected $modelDefinition;
+    protected $modelClass;
 
     /**
      * Set model definition
      *
-     * @param \GeometriaLab\Model\Definition $modelDefinition
+     * @param string $modelClass
      * @return ModelProperty
      */
-    public function setModelDefinition(\GeometriaLab\Model\Definition $modelDefinition)
+    public function setModelClass($modelClass)
     {
-        $this->modelDefinition = $modelDefinition;
+        $this->modelClass = $modelClass;
 
         return $this;
     }
 
     /**
-     * @return \GeometriaLab\Model\Definition
+     * @return string
      */
-    public function getModelDefinition()
+    public function getModelClass()
     {
-        return $this->modelDefinition;
+        return $this->modelClass;
     }
 
     /**
@@ -38,10 +38,10 @@ class ModelProperty extends AbstractProperty
      */
     public function prepare($value)
     {
-        if (is_a($value, $this->getModelDefinition()->getClassName())) {
+        if (is_a($value, $this->getModelClass())) {
             return $value;
         } else {
-            $className = $this->getModelDefinition()->getClassName();
+            $className = $this->getModelClass();
             return new $className($value);
         }
     }

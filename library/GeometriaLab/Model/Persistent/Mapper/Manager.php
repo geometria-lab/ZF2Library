@@ -4,26 +4,115 @@ namespace GeometriaLab\Model\Persistent\Mapper;
 
 class Manager implements \IteratorAggregate
 {
-    protected $mappers;
+    /**
+     * Instance
+     *
+     * @var Manager
+     */
+    static protected $instance;
 
-    protected static $instance;
+    /**
+     * Mappers
+     *
+     * @var array
+     */
+    protected $mappers = array();
 
-    public static function getInstance()
+    /**
+     * Get instance
+     *
+     * @static
+     * @return Manager
+     */
+    static public function getInstance()
     {
-        if (static::$instance === null) {
-            static::$instance = new self;
+        if (self::$instance === null) {
+            self::$instance = new self;
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
+    /**
+     * Add mapper
+     *
+     * @param string          $modelClass
+     * @param MapperInterface $mapper
+     * @return MapperInterface
+     * @throws \InvalidArgumentException
+     */
+    public function add($modelClass, MapperInterface $mapper)
+    {
+        $modelClass = $this->filterClassName($modelClass);
+
+        if ($this->has($modelClass)) {
+            throw new \InvalidArgumentException("Model '{$modelClass}' already defined");
+        }
+
+        return $this->mappers[$modelClass] = $mapper;
+    }
+
+    /**
+     * Get model definition
+     *
+     * @param string $modelClass
+     * @return MapperInterface
+     * @throws \InvalidArgumentException
+     */
     public function get($modelClass)
     {
-        
+        $modelClass = $this->filterClassName($modelClass);
+
+        if (!$this->has($modelClass)) {
+            throw new \InvalidArgumentException("Model '$modelClass' not defined");
+        }
+
+        return $this->mappers[$modelClass];
     }
 
+    /**
+     * Get all definition
+     *
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->mappers;
+    }
+
+    /**
+     * Has model definition?
+     *
+     * @param string $modelClass
+     * @return bool
+     */
     public function has($modelClass)
     {
+        $modelClass = $this->filterClassName($modelClass);
 
+        return isset($this->mappers[$modelClass]);
+    }
+
+    /**
+     * Iterator
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->getAll());
+    }
+
+    /**
+     * @param $className
+     * @return string
+     */
+    protected function filterClassName($className)
+    {
+        if (strpos($className, '\\') === 0) {
+            $className = substr($className, 1);
+        }
+
+        return $className;
     }
 }
