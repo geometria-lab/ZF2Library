@@ -59,6 +59,7 @@ class Definition extends Model\Definition
      * Parse method tag
      *
      * @param MethodTag $tag
+     * @throws \InvalidArgumentException
      */
     protected function parseMethodTag(MethodTag $tag)
     {

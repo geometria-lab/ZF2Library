@@ -9,7 +9,7 @@ abstract class Model extends Schemaless
     /**
      * Model definition
      *
-     * @var Definition\DefinitionInterface
+     * @var Definition|Definition\DefinitionInterface
      */
     protected $definition;
 
@@ -68,7 +68,7 @@ abstract class Model extends Schemaless
 
         try {
             $value = $property->prepare($value);
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new \InvalidArgumentException("Invalid value for property '$name'");
         }
 

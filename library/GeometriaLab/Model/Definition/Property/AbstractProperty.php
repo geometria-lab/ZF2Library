@@ -16,7 +16,7 @@ abstract class AbstractProperty extends ZendOptions implements PropertyInterface
     /**
      * Default value
      *
-     * @var mixin
+     * @var mixed
      */
     protected $defaultValue;
 
@@ -46,7 +46,7 @@ abstract class AbstractProperty extends ZendOptions implements PropertyInterface
     /**
      * Get default value
      *
-     * @return mixin
+     * @return mixed
      */
     public function getDefaultValue()
     {

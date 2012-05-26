@@ -6,14 +6,22 @@ use GeometriaLab\Model\Persistent\Mapper;
 
 abstract class Persistent extends Model
 {
+    public function save()
+    {
+
+    }
+
     /**
      * Get mapper
      *
      * @static
-     * @return MapperInterface
+     * @return Persistent\Mapper\MapperInterface
      */
     public static function getMapper()
     {
+        /**
+         * @var Persistent $className
+         */
         $className = get_called_class();
 
         $mappers = Mapper\Manager::getInstance();
@@ -24,6 +32,9 @@ abstract class Persistent extends Model
                 $className::createDefinition();
             }
 
+            /**
+             * @var Persistent\Definition $definition
+             */
             $definition = $definitions->get($className);
 
             $mappers->add($className, $definition->createMapper());

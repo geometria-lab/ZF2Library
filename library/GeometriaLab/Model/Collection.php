@@ -236,11 +236,17 @@ class Collection implements \Iterator, \Countable, \ArrayAccess
      */
     public function getByCondition($condition)
     {
+        /**
+         * @var Collection $collection
+         */
         $collection = new $this;
 
         if (count($this)) {
             if (!is_callable($condition)) {
-                $callback = function($model) use ($condition) {
+                $callback = function(ModelInterface $model) use ($condition) {
+                    /**
+                     * @var ModelInterface $model
+                     */
                     foreach ($condition as $name => $value) {
                         if ($model->get($name) != $value) {
                             return false;
@@ -268,6 +274,9 @@ class Collection implements \Iterator, \Countable, \ArrayAccess
      */
     public function getSlice($offset, $length = null)
     {
+        /**
+         * @var Collection $collection
+         */
         $collection = new $this;
 
         if (count($this)) {

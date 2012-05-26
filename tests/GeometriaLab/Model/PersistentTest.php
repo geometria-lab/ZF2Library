@@ -18,6 +18,7 @@ class PersistentTest extends \PHPUnit_Framework_TestCase
     {
         $model = $this->model;
         $mapper = $model::getMapper();
+        $this->assertInstanceOf('\GeometriaLab\Model\Persistent\Mapper\Mongo', $mapper);
     }
 
     protected function getData()

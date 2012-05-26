@@ -21,8 +21,8 @@ class VBuckets
     /**
      * Constructor
      *
-     * @param HashMethodInterface $hash
      * @param MapInterface  $map
+     * @param HashMethodInterface $hashMethod
      */
     public function __construct(MapInterface $map, HashMethodInterface $hashMethod)
     {
