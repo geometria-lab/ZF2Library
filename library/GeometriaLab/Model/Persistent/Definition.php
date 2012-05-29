@@ -15,11 +15,11 @@ class Definition extends Model\Definition
     protected $mapperTag;
 
     /**
-     * Constructor
+     * Protected constructor
      *
      * @param string $className
      */
-    public function __construct($className)
+    protected function __construct($className)
     {
         if (!static::getTagManager()->hasTag('method')) {
             static::getTagManager()->addTagPrototype(new MethodTag());

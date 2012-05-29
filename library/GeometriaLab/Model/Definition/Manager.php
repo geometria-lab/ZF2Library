@@ -21,6 +21,14 @@ class Manager implements \IteratorAggregate
     protected $definitions = array();
 
     /**
+     * Private constructor
+     */
+    final private function __construct()
+    {
+
+    }
+
+        /**
      * Get instance
      *
      * @static

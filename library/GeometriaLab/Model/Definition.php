@@ -47,11 +47,11 @@ class Definition implements DefinitionInterface
     );
 
     /**
-     * Constructor
+     * Protected constructor
      *
      * @param string $className
      */
-    public function __construct($className)
+    protected function __construct($className)
     {
         $this->className = $className;
 

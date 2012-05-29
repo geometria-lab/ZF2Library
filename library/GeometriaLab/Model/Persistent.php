@@ -16,7 +16,13 @@ abstract class Persistent extends Model
 
     public function save()
     {
-
+        if ($this->isNew()) {
+            return static::getMapper()->create($this);
+        } else if ($this->isChanged()) {
+            return static::getMapper()->update($this);
+        } else {
+            return false;
+        }
     }
 
     public function delete()
@@ -27,13 +33,18 @@ abstract class Persistent extends Model
     /**
      * Is not saved model
      *
-     * @return bool
+     * @return boolean
      */
     public function isNew()
     {
         return empty($this->cleanPropertyValues);
     }
 
+    /**
+     * Is model changed
+     *
+     * @return boolean
+     */
     public function isChanged()
     {
         foreach($this->getProperties() as $property) {
@@ -45,11 +56,22 @@ abstract class Persistent extends Model
         return false;
     }
 
+    /**
+     * Is property changed
+     *
+     * @param $name
+     * @return bool
+     */
     public function isPropertyChanged($name)
     {
         return $this->getClean($name) !== $this->get($name);
     }
 
+    /**
+     * Get changed property
+     *
+     * @return array
+     */
     public function getChangedProperties()
     {
         $changedProperties = array();
@@ -62,6 +84,13 @@ abstract class Persistent extends Model
         return $changedProperties;
     }
 
+    /**
+     * Get property change
+     *
+     * @param $name
+     * @return array
+     * @throws \InvalidArgumentException
+     */
     public function getChange($name)
     {
         $property = $this->getPropertyDefinition($name);
@@ -78,6 +107,11 @@ abstract class Persistent extends Model
         return $change;
     }
 
+    /**
+     * Get model changes
+     *
+     * @return array
+     */
     public function getChanges()
     {
         $changes = array();
@@ -87,6 +121,13 @@ abstract class Persistent extends Model
         return $changes;
     }
 
+    /**
+     * Get clean property value
+     *
+     * @param $name
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
     public function getClean($name)
     {
         $property = $this->getPropertyDefinition($name);
@@ -101,6 +142,11 @@ abstract class Persistent extends Model
         }
     }
 
+    /**
+     * Mark model as clean
+     *
+     * @return Persistent
+     */
     public function markClean()
     {
         $this->cleanPropertyValues = $this->propertyValues;
