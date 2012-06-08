@@ -1,6 +1,5 @@
 .idea
 tests/сonfiguration.php
 
-composer.lock
 composer.phar
-vendor/*
+vendor
