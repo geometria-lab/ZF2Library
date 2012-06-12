@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Model\Definition\Property;
+namespace GeometriaLab\Model\Schema\Property;
 
 interface PropertyInterface
 {

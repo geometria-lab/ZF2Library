@@ -1,19 +1,19 @@
 <?php
 
-namespace GeometriaLab\Model\Definition\Property;
+namespace GeometriaLab\Model\Schema\Property;
 
-class BooleanProperty extends AbstractProperty
+class StringProperty extends AbstractProperty
 {
     /**
      * Prepare value
      *
-     * @param boolean $value
-     * @return boolean mixed
+     * @param string $value
+     * @return string
      * @throws \InvalidArgumentException
      */
     public function prepare($value)
     {
-        if (!is_bool($value)) {
+        if (!is_string($value)) {
             throw new \InvalidArgumentException();
         }
 

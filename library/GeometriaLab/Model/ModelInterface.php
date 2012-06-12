@@ -7,15 +7,15 @@ interface ModelInterface extends Schemaless\ModelInterface
     /**
      * Get definition
      *
-     * @return Definition\DefinitionInterface
+     * @return Schema
      */
-    public function getDefinition();
+    public function getSchema();
 
     /**
-     * Create model definition
+     * Create model schema
      *
      * @static
-     * @return Definition\DefinitionInterface
+     * @return Schema
      */
-    static public function createDefinition();
+    static public function createSchema();
 }

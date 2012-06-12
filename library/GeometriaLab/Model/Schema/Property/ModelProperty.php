@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Model\Definition\Property;
+namespace GeometriaLab\Model\Schema\Property;
 
 class ModelProperty extends AbstractProperty
 {
@@ -10,7 +10,7 @@ class ModelProperty extends AbstractProperty
     protected $modelClass;
 
     /**
-     * Set model definition
+     * Set model class
      *
      * @param string $modelClass
      * @return ModelProperty

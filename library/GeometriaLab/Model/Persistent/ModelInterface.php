@@ -90,7 +90,7 @@ interface ModelInterface extends \GeometriaLab\Model\ModelInterface
      * Create persistent model definition
      *
      * @static
-     * @return Definition
+     * @return Schema
      */
-    static public function createDefinition();
+    static public function createSchema();
 }

@@ -3,16 +3,15 @@
 namespace GeometriaLab\Model;
 
 use GeometriaLab\Code\Reflection\DocBlock\Tag\PropertyTag,
-    GeometriaLab\Model\Definition\Property\PropertyInterface,
-    GeometriaLab\Model\Definition\Property\ModelProperty,
-    GeometriaLab\Model\Definition\DefinitionInterface;
+    GeometriaLab\Model\Schema\Property\PropertyInterface,
+    GeometriaLab\Model\Schema\Property\ModelProperty;
 
 use Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
     Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection,
     Zend\Code\Reflection\DocBlock\TagManager as ZendTagManager;
 
-class Definition implements DefinitionInterface
+class Schema
 {
     /**
      * Class name
@@ -39,11 +38,11 @@ class Definition implements DefinitionInterface
      * @var array
      */
     static protected $propertiesClassMap = array(
-        'string'  => 'GeometriaLab\Model\Definition\Property\StringProperty',
-        'array'   => 'GeometriaLab\Model\Definition\Property\ArrayProperty',
-        'boolean' => 'GeometriaLab\Model\Definition\Property\BooleanProperty',
-        'float'   => 'GeometriaLab\Model\Definition\Property\FloatProperty',
-        'integer' => 'GeometriaLab\Model\Definition\Property\IntegerProperty',
+        'string'  => 'GeometriaLab\Model\Schema\Property\StringProperty',
+        'array'   => 'GeometriaLab\Model\Schema\Property\ArrayProperty',
+        'boolean' => 'GeometriaLab\Model\Schema\Property\BooleanProperty',
+        'float'   => 'GeometriaLab\Model\Schema\Property\FloatProperty',
+        'integer' => 'GeometriaLab\Model\Schema\Property\IntegerProperty',
     );
 
     /**
@@ -51,11 +50,26 @@ class Definition implements DefinitionInterface
      *
      * @param string $className
      */
-    public function __construct($className)
+    public function __construct($className = null)
+    {
+        if ($className !== null) {
+            $this->className = $className;
+
+            $this->parseDocblock($className);
+        }
+    }
+
+    /**
+     * Set class name
+     *
+     * @param $className
+     * @return Schema
+     */
+    public function setClassName($className)
     {
         $this->className = $className;
 
-        $this->parseDocblock($className);
+        return $this;
     }
 
     /**
@@ -96,23 +110,6 @@ class Definition implements DefinitionInterface
         $this->properties[$name] = $property;
 
         return $this;
-    }
-
-    /**
-     * Create and set property
-     *
-     * @param string $name
-     * @param string $type
-     * @param array $params
-     * @return PropertyInterface
-     */
-    public function createAndSetProperty($name, $type, array $params = array())
-    {
-        $params['name'] = $name;
-
-        $property = static::createProperty($type, $params);
-
-        return $this->setProperty($name, $property);
     }
 
     /**
@@ -158,6 +155,23 @@ class Definition implements DefinitionInterface
         }
 
         return $property;
+    }
+
+    /**
+     * Create and set property
+     *
+     * @param string $name
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     */
+    protected function createAndSetProperty($name, $type, array $params = array())
+    {
+        $params['name'] = $name;
+
+        $property = static::createProperty($type, $params);
+
+        return $this->setProperty($name, $property);
     }
 
     /**

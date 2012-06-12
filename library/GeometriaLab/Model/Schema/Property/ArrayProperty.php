@@ -1,8 +1,8 @@
 <?php
 
-namespace GeometriaLab\Model\Definition\Property;
+namespace GeometriaLab\Model\Schema\Property;
 
-use GeometriaLab\Model\Definition;
+use GeometriaLab\Model\Schema;
 
 class ArrayProperty extends AbstractProperty
 {
@@ -60,7 +60,7 @@ class ArrayProperty extends AbstractProperty
     public function getItemProperty()
     {
         if ($this->itemProperty === null) {
-            $this->itemProperty = Definition::createProperty($this->getItemType());
+            $this->itemProperty = Schema::createProperty($this->getItemType());
         }
 
         return $this->itemProperty;

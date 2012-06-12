@@ -3,16 +3,23 @@
 namespace GeometriaLab\Model\Persistent;
 
 use GeometriaLab\Code\Reflection\DocBlock\Tag\MethodTag,
-    GeometriaLab\Model\Definition\Property\PropertyInterface;
+    GeometriaLab\Model\Schema\Property\PropertyInterface;
 
-class Definition extends \GeometriaLab\Model\Definition
+class Schema extends \GeometriaLab\Model\Schema
 {
     /**
-     * Mapper tag
+     * Mapper class
      *
-     * @var MethodTag
+     * @var string
      */
-    protected $mapperTag;
+    protected $mapperClass;
+
+    /**
+     * Mapper params
+     *
+     * @var array
+     */
+    protected $mapperOptions = array();
 
     /**
      * Primary property names
@@ -26,7 +33,7 @@ class Definition extends \GeometriaLab\Model\Definition
      *
      * @param string $className
      */
-    public function __construct($className)
+    public function __construct($className = null)
     {
         if (!static::getTagManager()->hasTag('method')) {
             static::getTagManager()->addTagPrototype(new MethodTag());
@@ -36,40 +43,43 @@ class Definition extends \GeometriaLab\Model\Definition
     }
 
     /**
-     * Create and set property
+     * Set mapper class
      *
-     * @param string $name
-     * @param string $type
-     * @param array $params
-     * @return PropertyInterface
+     * @param string $mapperClass
      */
-    public function createAndSetProperty($name, $type, array $params = array())
+    public function setMapperClass($mapperClass)
     {
-        if (isset($params['primary'])) {
-            if ($params['primary']) {
-                $this->primaryPropertyNames[] = $name;
-            }
-
-            unset($params['primary']);
-        }
-
-        return parent::createAndSetProperty($name, $type, $params);
+        $this->mapperClass = $mapperClass;
     }
 
     /**
-     * Create mapper from definition
+     * Get mapper class
      *
-     * @return Mapper\MapperInterface
+     * @return string
      */
-    public function createMapper()
+    public function getMapperClass()
     {
-        $className = $this->mapperTag->getReturnType();
+        return $this->mapperClass;
+    }
 
-        $params = $this->mapperTag->getParams();
+    /**
+     * Set mapper params
+     *
+     * @param array $mapperOptions
+     */
+    public function setMapperOptions($mapperOptions)
+    {
+        $this->mapperOptions = $mapperOptions;
+    }
 
-        $params['modelClass'] = $this->getClassName();
-
-        return new $className($params);
+    /**
+     * Get mapper
+     *
+     * @return array
+     */
+    public function getMapperOptions()
+    {
+        return $this->mapperOptions;
     }
 
     /**
@@ -96,6 +106,27 @@ class Definition extends \GeometriaLab\Model\Definition
     }
 
     /**
+     * Create and set property
+     *
+     * @param string $name
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     */
+    protected function createAndSetProperty($name, $type, array $params = array())
+    {
+        if (isset($params['primary'])) {
+            if ($params['primary']) {
+                $this->primaryPropertyNames[] = $name;
+            }
+
+            unset($params['primary']);
+        }
+
+        return parent::createAndSetProperty($name, $type, $params);
+    }
+
+    /**
      * Parse class docblock
      *
      * @param string $className
@@ -105,8 +136,8 @@ class Definition extends \GeometriaLab\Model\Definition
     {
         parent::parseDocblock($className);
 
-        if ($this->mapperTag === null) {
-            throw new \InvalidArgumentException('Mapper definition not present!');
+        if ($this->mapperClass === null) {
+            throw new \InvalidArgumentException('Mapper not present!');
         }
 
         if (empty($this->primaryPropertyNames)) {
@@ -127,7 +158,10 @@ class Definition extends \GeometriaLab\Model\Definition
                 throw new \InvalidArgumentException('Invalid mapper definition!');
             }
 
-            $this->mapperTag = $tag;
+            $this->setMapperClass($tag->getReturnType());
+            $this->setMapperOptions($tag->getParams());
         }
     }
+
+
 }

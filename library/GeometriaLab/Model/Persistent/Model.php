@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Persistent;
 
-use GeometriaLab\Model\Definition,
+use GeometriaLab\Model\Schema\Manager,
     GeometriaLab\Model\Persistent\Mapper;
 
 class Model extends \GeometriaLab\Model\Model implements ModelInterface
@@ -156,7 +156,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      * Mark model as clean, or remove clean data
      *
      * @param boolean $flag
-     * @return Persistent
+     * @return Model
      */
     public function markClean($flag = true)
     {
@@ -169,29 +169,30 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      * Get mapper
      *
      * @static
-     * @return Persistent\Mapper\MapperInterface
+     * @return Mapper\MapperInterface
      */
     static public function getMapper()
     {
-        /**
-         * @var Persistent $className
-         */
         $className = get_called_class();
 
         $mappers = Mapper\Manager::getInstance();
 
         if (!$mappers->has($className)) {
-            $definitions = Definition\Manager::getInstance();
-            if (!$definitions->has($className)) {
-                $className::createDefinition();
+            $schemas = Schema\Manager::getInstance();
+            if (!$schemas->has($className)) {
+                $schema = $className::createSchema();
+            } else {
+                $schema = $schemas->get($className);
             }
 
+            $mapperClassName = $schema->getMapperClass();
             /**
-             * @var Definition $definition
+             * @var Mapper\MapperInterface
              */
-            $definition = $definitions->get($className);
+            $mapper = new $mapperClassName($schema->getMapperOptions());
+            $mapper->setModelClass($className);
 
-            $mappers->add($className, $definition->createMapper());
+            $mappers->add($className, $mapper);
         }
 
         return $mappers->get($className);
@@ -200,16 +201,16 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
     /**
      * Create persistent model definition
      *
-     * @return Definition|Definition\DefinitionInterface
+     * @return Schema
      */
-    static public function createDefinition()
+    static public function createSchema()
     {
-        $definitions = Definition\Manager::getInstance();
+        $definitions = Schema\Manager::getInstance();
 
         $className = get_called_class();
 
         if (!$definitions->has($className)) {
-            $definitions->add(new Persistent\Definition($className));
+            $definitions->add(new Schema($className));
         }
 
         return $definitions->get($className);

@@ -1,8 +1,8 @@
 <?php
 
-namespace GeometriaLab\Model\Definition;
+namespace GeometriaLab\Model\Schema;
 
-use GeometriaLab\Model\Definition;
+use GeometriaLab\Model\Schema;
 
 class Manager implements \IteratorAggregate
 {
@@ -14,11 +14,11 @@ class Manager implements \IteratorAggregate
     static protected $instance;
 
     /**
-     * Definitions
+     * Schemas
      *
-     * @var array
+     * @var Schema[]
      */
-    protected $definitions = array();
+    protected $schemas = array();
 
     /**
      * Constructor is protected - Singleton
@@ -28,7 +28,7 @@ class Manager implements \IteratorAggregate
 
     }
 
-        /**
+    /**
      * Get manager instance
      *
      * @static
@@ -52,30 +52,30 @@ class Manager implements \IteratorAggregate
     }
 
     /**
-     * Add model definition
+     * Add model schema
      *
-     * @param DefinitionInterface $definition
-     * @return DefinitionInterface
+     * @param Schema $schema
+     * @return Manager
      * @throws \Exception
      */
-    public function add(DefinitionInterface $definition)
+    public function add(Schema $schema)
     {
-        $className = $definition->getClassName();
+        $className = $schema->getClassName();
 
         $className = $this->filterClassName($className);
 
         if ($this->has($className)) {
-            throw new \Exception("Model '{$className}' already defined");
+            throw new \Exception("Model '{$className}' schema already added");
         }
 
-        return $this->definitions[$className] = $definition;
+        return $this->schemas[$className] = $schema;
     }
 
     /**
-     * Get model definition
+     * Get model schema
      *
      * @param string $modelClass
-     * @return DefinitionInterface
+     * @return Schema
      * @throws \Exception
      */
     public function get($modelClass)
@@ -83,24 +83,24 @@ class Manager implements \IteratorAggregate
         $modelClass = $this->filterClassName($modelClass);
 
         if (!$this->has($modelClass)) {
-            throw new \Exception("Model '$modelClass' not defined");
+            throw new \Exception("Model '$modelClass' schema not added");
         }
 
-        return $this->definitions[$modelClass];
+        return $this->schemas[$modelClass];
     }
 
     /**
-     * Get all definition
+     * Get all schemas
      *
-     * @return array
+     * @return Schema[]
      */
     public function getAll()
     {
-        return $this->definitions;
+        return $this->schemas;
     }
 
     /**
-     * Has model definition?
+     * Has model schema?
      *
      * @param string $modelClass
      * @return bool
@@ -109,17 +109,15 @@ class Manager implements \IteratorAggregate
     {
         $modelClass = $this->filterClassName($modelClass);
 
-        return isset($this->definitions[$modelClass]);
+        return isset($this->schemas[$modelClass]);
     }
 
     /**
      * Iterator
-     *
-     * @return \ArrayIterator
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->getAll());
+        return $this->getAll();
     }
 
     /**

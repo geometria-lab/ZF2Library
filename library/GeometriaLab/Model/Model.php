@@ -2,16 +2,16 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Definition;
+use GeometriaLab\Model\Schema;
 
 class Model extends Schemaless\Model implements ModelInterface
 {
     /**
      * Model definition
      *
-     * @var Definition|Definition\DefinitionInterface
+     * @var Schema
      */
-    protected $definition;
+    protected $schema;
 
     /**
      * Constructor
@@ -34,8 +34,7 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     public function get($name)
     {
-        $property = $this->getPropertyDefinition($name);
-        if ($property === null) {
+        if (!$this->getSchema()->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
@@ -61,10 +60,11 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     public function set($name, $value)
     {
-        $property = $this->getPropertyDefinition($name);
-        if ($property === null) {
+        if (!$this->getSchema()->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
+
+        $property = $this->getSchema()->getProperty($name);
 
         try {
             $value = $property->prepare($value);
@@ -85,29 +85,29 @@ class Model extends Schemaless\Model implements ModelInterface
     /**
      * Get definition
      *
-     * @return Definition|Definition\DefinitionInterface
+     * @return Schema
      */
-    public function getDefinition()
+    public function getSchema()
     {
-        return $this->definition;
+        return $this->schema;
     }
 
     /**
-     * Create model definition
+     * Create model schema
      *
-     * @return Definition|Definition\DefinitionInterface
+     * @return Schema
      */
-    static public function createDefinition()
+    static public function createSchema()
     {
-        $definitions = Definition\Manager::getInstance();
+        $schemas = Schema\Manager::getInstance();
 
         $className = get_called_class();
 
-        if (!$definitions->has($className)) {
-            $definitions->add(new Definition($className));
+        if (!$schemas->has($className)) {
+            $schemas->add(new Schema($className));
         }
 
-        return $definitions->get($className);
+        return $schemas->get($className);
     }
 
     /**
@@ -115,11 +115,11 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     protected function setup()
     {
-        $this->definition = static::createDefinition();
+        $this->schema = static::createSchema();
 
         // Fill default values
         /**
-         * @var Definition\Property\PropertyInterface $property
+         * @var Schema\Property\PropertyInterface $property
          */
         foreach($this->getProperties() as $name => $property) {
             if ($property->getDefaultValue() !== null) {
@@ -131,25 +131,10 @@ class Model extends Schemaless\Model implements ModelInterface
     /**
      * Get properties
      *
-     * @return array
+     * @return Schema\Property\PropertyInterface[]
      */
     protected function getProperties()
     {
-        return $this->getDefinition()->getProperties();
-    }
-
-    /**
-     * Get property definition
-     *
-     * @param string $name
-     * @return Definition\Property\PropertyInterface|null
-     */
-    protected function getPropertyDefinition($name)
-    {
-        if ($this->getDefinition()->hasProperty($name)) {
-            return $this->getDefinition()->getProperty($name);
-        } else {
-            return null;
-        }
+        return $this->getSchema()->getProperties();
     }
 }
