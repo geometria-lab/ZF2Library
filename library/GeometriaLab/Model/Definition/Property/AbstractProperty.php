@@ -4,7 +4,7 @@ namespace GeometriaLab\Model\Definition\Property;
 
 use \Zend\Stdlib\Options as ZendOptions;
 
-abstract class AbstractProperty extends ZendOptions implements PropertyInterface
+abstract class AbstractProperty implements PropertyInterface
 {
     /**
      * Name
@@ -19,6 +19,24 @@ abstract class AbstractProperty extends ZendOptions implements PropertyInterface
      * @var mixed
      */
     protected $defaultValue;
+
+    /**
+     * Constructor
+     *
+     * @param array $options
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(array $options = array())
+    {
+        foreach($options as $option => $value) {
+            $method = "set$option";
+            if (method_exists($this, $method)) {
+                $this->$method($value);
+            } else {
+                throw new \InvalidArgumentException("Unknown property option '$option'");
+            }
+        }
+    }
 
     /**
      * Get name

@@ -24,7 +24,7 @@ class Definition implements DefinitionInterface
     /**
      * Properties
      *
-     * @var array
+     * @var PropertyInterface[]
      */
     protected $properties = array();
 
@@ -51,7 +51,7 @@ class Definition implements DefinitionInterface
      *
      * @param string $className
      */
-    protected function __construct($className)
+    public function __construct($className)
     {
         $this->className = $className;
 
@@ -72,7 +72,7 @@ class Definition implements DefinitionInterface
      * Get property
      *
      * @param string $name
-     * @return Definition\Property\PropertyInterface
+     * @return PropertyInterface
      * @throws \Exception
      */
     public function getProperty($name)
@@ -82,6 +82,37 @@ class Definition implements DefinitionInterface
         }
 
         return $this->properties[$name];
+    }
+
+    /**
+     * Set property
+     *
+     * @param string $name
+     * @param PropertyInterface $property
+     * @return Definition
+     */
+    public function setProperty($name, PropertyInterface $property)
+    {
+        $this->properties[$name] = $property;
+
+        return $this;
+    }
+
+    /**
+     * Create and set property
+     *
+     * @param string $name
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     */
+    public function createAndSetProperty($name, $type, array $params = array())
+    {
+        $params['name'] = $name;
+
+        $property = static::createProperty($type, $params);
+
+        return $this->setProperty($name, $property);
     }
 
     /**
@@ -98,11 +129,35 @@ class Definition implements DefinitionInterface
     /**
      * Get all properties
      *
-     * @return array
+     * @return PropertyInterface[]
      */
     public function getProperties()
     {
         return $this->properties;
+    }
+
+    /**
+     * Create property by type and params
+     *
+     * @static
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     * @throws \InvalidArgumentException
+     */
+    static public function createProperty($type, array $params = array())
+    {
+        if (isset(static::$propertiesClassMap[$type])) {
+            $className = static::$propertiesClassMap[$type];
+            $property = new $className($params);
+        } else if (class_exists($type)) {
+            $params['modelClass'] = $type;
+            $property = new ModelProperty($params);
+        } else {
+            throw new \InvalidArgumentException("Invalid property type '$type'");
+        }
+
+        return $property;
     }
 
     /**
@@ -142,42 +197,15 @@ class Definition implements DefinitionInterface
     {
         $name = substr($tag->getPropertyName(), 1);
 
-        if ($this->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property with name '$name' already exists");
-        }
-
         if ($tag->getDescription() !== null) {
             throw new \InvalidArgumentException("Not valid JSON params for property '$name'");
         }
 
-        $params = $tag->getParams();
-        $params['name'] = $name;
-
-        $this->properties[$name] = static::createProperty($tag->getType(), $params);
-    }
-
-    /**
-     * Create property by type and params
-     *
-     * @static
-     * @param string $type
-     * @param array $params
-     * @return PropertyInterface
-     * @throws \InvalidArgumentException
-     */
-    static public function createProperty($type, array $params = array())
-    {
-        if (isset(static::$propertiesClassMap[$type])) {
-            $className = static::$propertiesClassMap[$type];
-            $property = new $className($params);
-        } else if (class_exists($type)) {
-            $params['modelClass'] = $type;
-            $property = new ModelProperty($params);
-        } else {
-            throw new \InvalidArgumentException("Invalid property type '$type'");
+        if ($this->hasProperty($name)) {
+            throw new \InvalidArgumentException("Property with name '$name' already exists");
         }
 
-        return $property;
+        $this->createAndSetProperty($name, $tag->getType(), $tag->getParams());
     }
 
     /**

@@ -2,10 +2,10 @@
 
 namespace GeometriaLab\Model\Persistent;
 
-use GeometriaLab\Model,
-    GeometriaLab\Code\Reflection\DocBlock\Tag\MethodTag;
+use GeometriaLab\Code\Reflection\DocBlock\Tag\MethodTag,
+    GeometriaLab\Model\Definition\Property\PropertyInterface;
 
-class Definition extends Model\Definition
+class Definition extends \GeometriaLab\Model\Definition
 {
     /**
      * Mapper tag
@@ -15,11 +15,18 @@ class Definition extends Model\Definition
     protected $mapperTag;
 
     /**
+     * Primary property names
+     *
+     * @var array
+     */
+    protected $primaryPropertyNames = array();
+
+    /**
      * Protected constructor
      *
      * @param string $className
      */
-    protected function __construct($className)
+    public function __construct($className)
     {
         if (!static::getTagManager()->hasTag('method')) {
             static::getTagManager()->addTagPrototype(new MethodTag());
@@ -29,9 +36,30 @@ class Definition extends Model\Definition
     }
 
     /**
+     * Create and set property
+     *
+     * @param string $name
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     */
+    public function createAndSetProperty($name, $type, array $params = array())
+    {
+        if (isset($params['primary'])) {
+            if ($params['primary']) {
+                $this->primaryPropertyNames[] = $name;
+            }
+
+            unset($params['primary']);
+        }
+
+        return parent::createAndSetProperty($name, $type, $params);
+    }
+
+    /**
      * Create mapper from definition
      *
-     * @return \GeometriaLab\Model\Persistent\Mapper\MapperInterface
+     * @return Mapper\MapperInterface
      */
     public function createMapper()
     {
@@ -42,6 +70,29 @@ class Definition extends Model\Definition
         $params['modelClass'] = $this->getClassName();
 
         return new $className($params);
+    }
+
+    /**
+     * Get primary property names
+     *
+     * @return array
+     */
+    public function getPrimaryPropertyNames()
+    {
+        return $this->primaryPropertyNames;
+    }
+
+    /**
+     * Set primary property names
+     *
+     * @param array $names
+     * @return Definition
+     */
+    public function setPrimaryPropertyNames(array $names)
+    {
+        $this->primaryPropertyNames = $names;
+
+        return $this;
     }
 
     /**
@@ -56,6 +107,10 @@ class Definition extends Model\Definition
 
         if ($this->mapperTag === null) {
             throw new \InvalidArgumentException('Mapper definition not present!');
+        }
+
+        if (empty($this->primaryPropertyNames)) {
+            throw new \InvalidArgumentException('Primary property (primary key) not present!');
         }
     }
 

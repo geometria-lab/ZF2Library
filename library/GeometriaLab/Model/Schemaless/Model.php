@@ -1,8 +1,8 @@
 <?php
 
-namespace GeometriaLab\Model;
+namespace GeometriaLab\Model\Schemaless;
 
-class Schemaless implements ModelInterface, \Iterator, \Countable
+class Model implements ModelInterface, \Iterator
 {
     /**
      * Property iterator
@@ -34,7 +34,7 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
      * Populate model from array or iterable object
      *
      * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
-     * @return \GeometriaLab\Model\Schemaless
+     * @return Model
      * @throws \InvalidArgumentException
      */
     public function populate($data)
@@ -53,7 +53,7 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
     /**
      * Get property value
      *
-     * @param $name
+     * @param string $name
      * @return mixed
      */
     public function get($name)
@@ -68,7 +68,7 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
     /**
      * Magic get property value
      *
-     * @param $name
+     * @param string $name
      * @return mixed
      */
     public function __get($name)
@@ -79,9 +79,9 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
     /**
      * Set property
      *
-     * @param $name
-     * @param $value
-     * @return \GeometriaLab\Model\Schemaless
+     * @param string $name
+     * @param mixed $value
+     * @return Model
      */
     public function set($name, $value)
     {
@@ -93,9 +93,9 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
     /**
      * Magic for set property
      *
-     * @param $name
-     * @param $value
-     * @return \GeometriaLab\Model\Schemaless
+     * @param string $name
+     * @param mixed $value
+     * @return Model
      */
     public function __set($name, $value)
     {
@@ -105,7 +105,7 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
     /**
      * Has property
      *
-     * @param $name
+     * @param string $name
      * @return bool
      */
     public function has($name)
@@ -116,7 +116,7 @@ class Schemaless implements ModelInterface, \Iterator, \Countable
     /**
      * Magic for get property
      *
-     * @param $name
+     * @param string $name
      * @return bool
      */
     public function __isset($name)

@@ -9,17 +9,17 @@ class PropertyTag implements TagInterface
     /**
      * @var string
      */
-    protected $type = null;
+    protected $type;
 
     /**
      * @var string
      */
-    protected $propertyName = null;
+    protected $propertyName;
 
     /**
      * @var string
      */
-    protected $description = null;
+    protected $description;
 
     /**
      * Params
@@ -116,5 +116,10 @@ class PropertyTag implements TagInterface
     public function getParams()
     {
         return $this->params;
+    }
+
+    public function setParams()
+    {
+        $this->params = $params;
     }
 }

@@ -4,7 +4,7 @@ namespace GeometriaLab\Model;
 
 use GeometriaLab\Model\Definition;
 
-abstract class Model extends Schemaless
+class Model extends Schemaless\Model implements ModelInterface
 {
     /**
      * Model definition
@@ -54,9 +54,9 @@ abstract class Model extends Schemaless
     /**
      * Set property value
      *
-     * @param $name
-     * @param $value
-     * @return Model
+     * @param string $name
+     * @param mixed $value
+     * @return Model|ModelInterface
      * @throws \InvalidArgumentException
      */
     public function set($name, $value)
@@ -83,11 +83,21 @@ abstract class Model extends Schemaless
     }
 
     /**
+     * Get definition
+     *
+     * @return Definition|Definition\DefinitionInterface
+     */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
      * Create model definition
      *
-     * @return Definition
+     * @return Definition|Definition\DefinitionInterface
      */
-    public static function createDefinition()
+    static public function createDefinition()
     {
         $definitions = Definition\Manager::getInstance();
 
@@ -125,7 +135,7 @@ abstract class Model extends Schemaless
      */
     protected function getProperties()
     {
-        return $this->definition->getProperties();
+        return $this->getDefinition()->getProperties();
     }
 
     /**
@@ -136,8 +146,8 @@ abstract class Model extends Schemaless
      */
     protected function getPropertyDefinition($name)
     {
-        if ($this->definition->hasProperty($name)) {
-            return $this->definition->getProperty($name);
+        if ($this->getDefinition()->hasProperty($name)) {
+            return $this->getDefinition()->getProperty($name);
         } else {
             return null;
         }
