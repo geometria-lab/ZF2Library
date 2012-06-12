@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model;
 
-class Collection implements \Iterator, \Countable, \ArrayAccess
+class Collection implements CollectionInterface
 {
     /**
      * Models

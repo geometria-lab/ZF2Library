@@ -21,7 +21,7 @@ class Manager implements \IteratorAggregate
     protected $definitions = array();
 
     /**
-     * Private constructor
+     * Constructor is protected - Singleton
      */
     final private function __construct()
     {
@@ -29,7 +29,7 @@ class Manager implements \IteratorAggregate
     }
 
         /**
-     * Get instance
+     * Get manager instance
      *
      * @static
      * @return Manager
@@ -41,6 +41,14 @@ class Manager implements \IteratorAggregate
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function __clone()
+    {
+        throw new \RuntimeException('Cloning of ' . __CLASS__ . ' is forbidden. It is a singleton');
     }
 
     /**

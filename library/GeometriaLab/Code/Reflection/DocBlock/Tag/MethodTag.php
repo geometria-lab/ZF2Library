@@ -11,21 +11,21 @@ class MethodTag implements TagInterface
      *
      * @var string
      */
-    protected $returnType = null;
+    protected $returnType;
 
     /**
      * Method name
      *
      * @var string
      */
-    protected $methodName = null;
+    protected $methodName;
 
     /**
      * Description
      *
      * @var string
      */
-    protected $description = null;
+    protected $description;
 
     /**
      * Is static method

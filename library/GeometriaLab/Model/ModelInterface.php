@@ -2,13 +2,20 @@
 
 namespace GeometriaLab\Model;
 
-interface ModelInterface
+interface ModelInterface extends Schemaless\ModelInterface
 {
-    public function populate($data);
+    /**
+     * Get definition
+     *
+     * @return Definition\DefinitionInterface
+     */
+    public function getDefinition();
 
-    public function get($value);
-
-    public function set($name, $value);
-
-    public function has($name);
+    /**
+     * Create model definition
+     *
+     * @static
+     * @return Definition\DefinitionInterface
+     */
+    static public function createDefinition();
 }
