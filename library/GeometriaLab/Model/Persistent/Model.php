@@ -103,8 +103,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function getChange($name)
     {
-        $property = $this->getPropertyDefinition($name);
-        if ($property === null) {
+        if (!$this->getSchema()->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
@@ -140,8 +139,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function getClean($name)
     {
-        $property = $this->getPropertyDefinition($name);
-        if ($property === null) {
+        if (!$this->getSchema()->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
@@ -199,20 +197,20 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
     }
 
     /**
-     * Create persistent model definition
+     * Create persistent model schema
      *
      * @return Schema
      */
     static public function createSchema()
     {
-        $definitions = Schema\Manager::getInstance();
+        $schemas = Schema\Manager::getInstance();
 
         $className = get_called_class();
 
-        if (!$definitions->has($className)) {
-            $definitions->add(new Schema($className));
+        if (!$schemas->has($className)) {
+            $schemas->add(new Schema($className));
         }
 
-        return $definitions->get($className);
+        return $schemas->get($className);
     }
 }

@@ -2,31 +2,24 @@
 
 namespace GeometriaLab\Model\Persistent\Mapper;
 
-use GeometriaLab\Model\PersistentInterface,
+use GeometriaLab\Model\Persistent\ModelInterface,
     GeometriaLab\Model\Persistent\CollectionInterface;
 
 interface MapperInterface
 {
     /**
      * @abstract
-     * @param $id
-     * @return PersistentInterface
+     * @param integer|array $id
+     * @return ModelInterface|CollectionInterface
      */
     public function get($id);
 
     /**
      * @abstract
      * @param QueryInterface $query
-     * @return PersistentInterface
-     */
-    public function getByQuery(QueryInterface $query);
-
-    /**
-     * @abstract
-     * @param QueryInterface $query
      * @return CollectionInterface
      */
-    public function getAllByQuery(QueryInterface $query);
+    public function getByQuery(QueryInterface $query);
 
     /**
      * @abstract

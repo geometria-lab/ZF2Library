@@ -3,9 +3,9 @@
 namespace GeometriaLab\Mongo\Model;
 
 use GeometriaLab\Mongo,
+    GeometriaLab\Model\Persistent\ModelInterface,
     GeometriaLab\Model\Persistent\Collection,
-    GeometriaLab\Model\Persistent\Mapper\AbstractMapper,
-    GeometriaLab\Model\PersistentInterface;
+    GeometriaLab\Model\Persistent\Mapper\AbstractMapper;
 
 class Mapper extends AbstractMapper
 {
@@ -213,27 +213,25 @@ class Mapper extends AbstractMapper
     /**
      * Create model in storage
      *
-     * @param PersistentInterface $model
+     * @param ModelInterface $model
      * @return boolean
      */
-    public function create(PersistentInterface $model)
+    public function create(ModelInterface $model)
     {
         $this->validateModel($model);
 
         $modelData = $model->toArray();
 
-        new MongoId($data[$this->_primaryKeyName]);
+        if (!isset($modelData['id']) && $this->getPrimaryKeyGenerator()) {
+            $modelData['id'] = new \MongoId($this->getPrimaryKeyGenerator()->generate());
+        }
 
         $storageData = $this->transformModelDataForStorage($modelData);
-
-        if (!isset($storageData['_id']) && $this->getPrimaryKeyGenerator()) {
-            $storageData['_id'] = $this->getPrimaryKeyGenerator()->generate();
-        }
 
         $result = $this->getMongoCollection()->insert($storageData, array('safe' => true));
 
         if ($result) {
-            $model->set('id', $storageData['_id']);
+            $model->set('id', (string)$storageData['_id']);
             $model->markClean();
 
             return true;
@@ -250,7 +248,7 @@ class Mapper extends AbstractMapper
 
         $storageData = $this->transformModelDataForStorage($modelData);
 
-        $criteria = array('_id' => $storageData['_id']);
+        $criteria = array('_id' => new MongoId($storageData['_id']));
 
         $this->getMongoCollection()->update($criteria, array('$set' => $storageData));
 

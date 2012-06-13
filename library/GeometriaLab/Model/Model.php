@@ -7,7 +7,7 @@ use GeometriaLab\Model\Schema;
 class Model extends Schemaless\Model implements ModelInterface
 {
     /**
-     * Model definition
+     * Model schema
      *
      * @var Schema
      */
@@ -83,7 +83,7 @@ class Model extends Schemaless\Model implements ModelInterface
     }
 
     /**
-     * Get definition
+     * Get schema
      *
      * @return Schema
      */

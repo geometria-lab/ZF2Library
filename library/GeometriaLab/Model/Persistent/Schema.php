@@ -96,7 +96,7 @@ class Schema extends \GeometriaLab\Model\Schema
      * Set primary property names
      *
      * @param array $names
-     * @return Definition
+     * @return Schema
      */
     public function setPrimaryPropertyNames(array $names)
     {
@@ -137,7 +137,7 @@ class Schema extends \GeometriaLab\Model\Schema
         parent::parseDocblock($className);
 
         if ($this->mapperClass === null) {
-            throw new \InvalidArgumentException('Mapper not present!');
+            throw new \InvalidArgumentException('Mapper method tag not present in docblock!');
         }
 
         if (empty($this->primaryPropertyNames)) {
@@ -155,7 +155,7 @@ class Schema extends \GeometriaLab\Model\Schema
     {
         if ($tag->getMethodName() === 'getMapper()') {
             if (!$tag->isStatic() || !class_exists($tag->getReturnType()) || $tag->getParams() === array()) {
-                throw new \InvalidArgumentException('Invalid mapper definition!');
+                throw new \InvalidArgumentException('Invalid mapper method tag in docblock!');
             }
 
             $this->setMapperClass($tag->getReturnType());

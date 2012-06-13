@@ -78,6 +78,29 @@ abstract class AbstractMapper implements MapperInterface
     }
 
     /**
+     * Set collection class
+     *
+     * @param string $collectionClass
+     * @return AbstractMapper
+     */
+    public function setCollectionClass($collectionClass)
+    {
+        $this->collectionClass = $collectionClass;
+
+        return $this;
+    }
+
+    /**
+     * Get collection class
+     *
+     * @return string
+     */
+    public function getCollectionClass()
+    {
+        return $this->collectionClass;
+    }
+
+    /**
      * Set primary key generator
      *
      * @param string|PrimaryKeyGeneratorInterface $primaryKeyGenerator

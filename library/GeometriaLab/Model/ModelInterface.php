@@ -5,7 +5,7 @@ namespace GeometriaLab\Model;
 interface ModelInterface extends Schemaless\ModelInterface
 {
     /**
-     * Get definition
+     * Get schema
      *
      * @return Schema
      */

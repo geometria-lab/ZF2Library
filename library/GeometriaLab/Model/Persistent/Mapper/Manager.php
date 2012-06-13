@@ -14,7 +14,7 @@ class Manager implements \IteratorAggregate
     /**
      * Mappers
      *
-     * @var array
+     * @var MapperInterface[]
      */
     protected $mappers = array();
 
@@ -53,7 +53,7 @@ class Manager implements \IteratorAggregate
     }
 
     /**
-     * Get model definition
+     * Get model mapper
      *
      * @param string $modelClass
      * @return MapperInterface
@@ -71,9 +71,9 @@ class Manager implements \IteratorAggregate
     }
 
     /**
-     * Get all definition
+     * Get all mappers
      *
-     * @return array
+     * @return MapperInterface[]
      */
     public function getAll()
     {
@@ -81,7 +81,7 @@ class Manager implements \IteratorAggregate
     }
 
     /**
-     * Has model definition?
+     * Has mapper?
      *
      * @param string $modelClass
      * @return bool
@@ -100,7 +100,7 @@ class Manager implements \IteratorAggregate
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->getAll());
+        return $this->getAll();
     }
 
     /**

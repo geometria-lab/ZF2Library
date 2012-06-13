@@ -103,7 +103,7 @@ class Schema
      *
      * @param string $name
      * @param PropertyInterface $property
-     * @return Definition
+     * @return Schema
      */
     public function setProperty($name, PropertyInterface $property)
     {
