@@ -4,136 +4,11 @@ namespace GeometriaLab\Mongo\Model;
 
 use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\ModelInterface,
-    GeometriaLab\Model\Persistent\Collection,
+    GeometriaLab\Model\Persistent\CollectionInterface,
     GeometriaLab\Model\Persistent\Mapper\AbstractMapper;
 
 class Mapper extends AbstractMapper
 {
-    /**
-     * @abstract
-     * @param $id
-     * @return PersistentInterface
-     */
-    public function get($id)
-    {
-        return $this->getByQuery($this->query()->condition(array('_id' => $id)));
-    }
-
-    /**
-     *
-     * @param Query $query
-     * @return PersistentInterface
-     */
-    public function getByQuery(Query $query)
-    {
-        $this->fetch()
-    }
-
-    /**
-     * @abstract
-     * @param Query $query
-     * @return CollectionInterface
-     */
-    public function getAllByQuery(Query $query)
-    {
-        $cursor = $this->find($query);
-    }
-
-    /**
-     *
-     * @param Query $query
-     * @return \MongoCursor
-     */
-    protected function find(Query $query)
-    {
-        $cursor = $this->getMongoCollection()->find($query->getCondition(), $query->getFields());
-
-        if ($query->getSort() !== null) {
-            $cursor->sort($query->getSort());
-        }
-
-        if ($query->getLimit() !== null) {
-            $cursor->limit($query->getLimit());
-        }
-
-        if ($query->getOffset() !== null) {
-            $cursor->skip($query->getOffset());
-        }
-
-        return $cursor;
-    }
-
-    /**
-     * Count
-     *
-     * @param array $condition
-     * @return integer
-     */
-    public function count(array $condition = array())
-    {
-        if (!empty($condition)) {
-            $condition = $this->query()->condition($condition)
-                                       ->getCondition();
-        }
-
-        return $this->getMongoCollection()->count($condition);
-    }
-
-    /**
-     * @abstract
-     * @param PersistentInterface $model
-     * @return boolean
-     */
-    public function create(PersistentInterface $model);
-
-    /**
-     * @abstract
-     * @param PersistentInterface $model
-     * @return boolean
-     */
-    public function update(PersistentInterface $model);
-
-    /**
-     * @abstract
-     * @param array $data
-     * @param array $condition
-     * @return boolean
-     */
-    public function updateByCondition(array $data, array $condition = array());
-
-    /**
-     * @abstract
-     * @param PersistentInterface $model
-     * @return boolean
-     */
-    public function delete(PersistentInterface $model);
-
-    /**
-     * @abstract
-     * @param array $condition
-     * @return boolean
-     */
-    public function deleteByCondition(array $condition);
-
-    /**
-     * Get query
-     *
-     * @return Query
-     */
-    public function query()
-    {
-        return new Query($this);
-    }
-
-
-
-
-
-
-
-
-
-
     /**
      * Mongo instance name
      *
@@ -208,6 +83,88 @@ class Mapper extends AbstractMapper
     public function getMongoInstanceName()
     {
         return $this->mongoInstanceName;
+    }
+
+    /**
+     * Get model by primary key
+     *
+     * @param integer $id
+     * @return ModelInterface
+     */
+    public function get($id)
+    {
+        return $this->getByCondition(array('_id' => $id));
+    }
+
+    /**
+     * Get model by condition
+     *
+     * @param array $condition
+     * @return ModelInterface
+     */
+    public function getByCondition(array $condition)
+    {
+        $query = $this->query()->condition($condition);
+
+        return $this->getAllByQuery($query)->getFirst();
+    }
+
+    /**
+     * Get models collection by query
+     *
+     * @param Query $query
+     * @return CollectionInterface
+     */
+    public function getAllByQuery(Query $query)
+    {
+        $cursor = $this->find($query);
+
+        $collection = new $this->collectionClass($cursor);
+
+        $cursor->reset();
+
+        return $collection;
+    }
+
+    /**
+     * Find monogo documents by query
+     *
+     * @param Query $query
+     * @return \MongoCursor
+     */
+    protected function find(Query $query)
+    {
+        $cursor = $this->getMongoCollection()->find($query->getCondition(), $query->getFields());
+
+        if ($query->getSort() !== null) {
+            $cursor->sort($query->getSort());
+        }
+
+        if ($query->getLimit() !== null) {
+            $cursor->limit($query->getLimit());
+        }
+
+        if ($query->getOffset() !== null) {
+            $cursor->skip($query->getOffset());
+        }
+
+        return $cursor;
+    }
+
+    /**
+     * Count
+     *
+     * @param array $condition
+     * @return integer
+     */
+    public function count(array $condition = array())
+    {
+        if (!empty($condition)) {
+            $condition = $this->query()->condition($condition)
+                                       ->getCondition();
+        }
+
+        return $this->getMongoCollection()->count($condition);
     }
 
     /**
@@ -288,120 +245,14 @@ class Mapper extends AbstractMapper
     }
 
     /**
+     * Get query
      *
-     * @param  string $id
-     * @return Geometria_Model_Interface
+     * @return Query
      */
-    public function fetch($id)
+    public function query()
     {
-        $key = $this->_translateKey($this->_primaryKeyName, false);
-        return $this->fetchOne(array($key => $id));
+        return new Query($this);
     }
-
-    /**
-     *
-     * @param array   $cond
-     * @param array   $sort
-     * @param integer $count
-     * @param integer $offset
-     *
-     * @return Geometria_Model_Collection
-     */
-    public function fetchAll(array $cond = null, array $sort = null, $count = null, $offset = null)
-    {
-        $query = $this->_makeQuery($cond, $sort, $count, $offset);
-        return $this->findByQuery($query);
-    }
-
-    /**
-     *
-     * @param MongoCursor $cursor
-     * @param string $valueField
-     * @param string $keyField
-     * @return array
-     */
-    protected function _collectFieldFromCursor($cursor, $valueField, $keyField = null)
-    {
-        $ids = array();
-
-        foreach ($cursor as $item) {
-            if (null !== $keyField) {
-                $ids [$item[$keyField]]= $item[$valueField];
-            } else {
-                $ids []= $item[$valueField];
-            }
-        }
-
-        return $ids;
-    }
-
-    /**
-     *
-     * @param array $cond
-     * @return integer
-     */
-    public function getCount(array $condition = null)
-    {
-        $query = $this->_makeQuery($cond);
-        return $this->countByQuery($query);
-    }
-
-    /**
-     *
-     * @param array $query
-     * @return integer
-     */
-    public function countByQuery($query)
-    {
-        return $this->_getCollection()->count($query['cond']);
-    }
-
-    /**
-     *
-     * @param array $cond
-     * @param array $sort
-     *
-     * @return Geometria_Model_Interface
-     */
-    public function fetchOne(array $cond = null, array $sort = null)
-    {
-        $query = $this->_makeQuery($cond, $sort, 1, 0);
-        $data = $this->findByQuery($query);
-        return $data->current();
-    }
-
-    /**
-     *
-     * @param array $query
-     * @return Geometria_Model_Collection
-     */
-    protected function findByQuery($query)
-    {
-        if (empty($query['fields'])) {
-            $cursor = $this->_getCollection()->find($query['cond']);
-        } else {
-            $cursor = $this->_getCollection()->find($query['cond'], $query['fields']);
-        }
-
-        if (!empty($query['sort'])) {
-            $cursor->sort($query['sort']);
-        }
-
-        if (!empty($query['limit'])) {
-            $cursor->limit($query['limit']);
-        }
-
-        if (!empty($query['offset'])) {
-            $cursor->skip($query['offset']);
-        }
-
-        $data = iterator_to_array($cursor);
-
-        $cursor->reset();
-
-        return $this->createModelCollection($data);
-    }
-
 
     protected function validateModel(PersistentInterface $model)
     {
@@ -425,8 +276,6 @@ class Mapper extends AbstractMapper
 
         $this->isPrimaryKeysValidated = true;
     }
-
-
 
     /**
      * Get MongoDB instance

@@ -8,39 +8,49 @@ use GeometriaLab\Model\Persistent\ModelInterface,
 interface MapperInterface
 {
     /**
-     * @abstract
-     * @param integer|array $id
-     * @return ModelInterface|CollectionInterface
+     * Get model by primary key
+     *
+     * @param integer $id
+     * @return ModelInterface
      */
     public function get($id);
 
     /**
-     * @abstract
+     * Get model by condition
+     *
+     * @param array $condition
+     * @return ModelInterface
+     */
+    public function getByCondition(array $condition);
+
+    /**
+     * Get models collection by query
+     *
      * @param QueryInterface $query
      * @return CollectionInterface
      */
-    public function getByQuery(QueryInterface $query);
+    public function getAllByQuery(QueryInterface $query);
 
     /**
      * @abstract
-     * @param null $condition
+     * @param array $condition
      * @return integer
      */
     public function count(array $condition = array());
 
     /**
      * @abstract
-     * @param PersistentInterface $model
+     * @param ModelInterface $model
      * @return boolean
      */
-    public function create(PersistentInterface $model);
+    public function create(ModelInterface $model);
 
     /**
      * @abstract
-     * @param PersistentInterface $model
+     * @param ModelInterface $model
      * @return boolean
      */
-    public function update(PersistentInterface $model);
+    public function update(ModelInterface $model);
 
     /**
      * @abstract
@@ -48,14 +58,14 @@ interface MapperInterface
      * @param array $condition
      * @return boolean
      */
-    public function updateByCondition(array $data, array $condition = array());
+    public function updateByCondition(array $data, array $condition);
 
     /**
      * @abstract
-     * @param PersistentInterface $model
+     * @param ModelInterface $model
      * @return boolean
      */
-    public function delete(PersistentInterface $model);
+    public function delete(ModelInterface $model);
 
     /**
      * @abstract
@@ -63,10 +73,4 @@ interface MapperInterface
      * @return boolean
      */
     public function deleteByCondition(array $condition);
-
-    /**
-     * @abstract
-     * @return QueryInterface
-     */
-    public function query();
 }
