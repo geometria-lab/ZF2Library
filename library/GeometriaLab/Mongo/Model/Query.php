@@ -12,7 +12,7 @@ class Query extends AbstractQuery
                                  '$nor', '$or', '$and', '$size', '$type',
                                  '$near', '$regex');
 
-    public function fields(array $fields)
+    public function se(array $fields)
     {
 
     }
@@ -30,16 +30,16 @@ class Query extends AbstractQuery
 
                     if (!empty($keys)) {
                         foreach ($value as $serviceKey => $data) {
-                            $this->condition[$field][$serviceKey] = $this->_formatValue($field, $data);
+                            $this->where[$field][$serviceKey] = $this->_formatValue($field, $data);
                         }
                     } else {
-                        $this->condition[$field]['$in'] = $this->_formatValue($field, $value);
+                        $this->where[$field]['$in'] = $this->_formatValue($field, $value);
                     }
                 } else {
-                    $this->condition[$field] = $this->_formatValue($field, $value);
+                    $this->where[$field] = $this->_formatValue($field, $value);
                 }
             }
-            $this->condition = $this->translateToStorage($condition);
+            $this->where = $this->translateToStorage($condition);
         }
 
         return $this;

@@ -5,19 +5,31 @@ namespace GeometriaLab\Model\Persistent\Mapper;
 interface QueryInterface
 {
     /**
-     * Returned fields
+     * Selected fields
      *
      * @param array $fields
      * @return QueryInterface
      */
-    public function fields(array $fields);
+    public function select(array $fields);
+
+    /**
+     * @abstract
+     * @return array|null
+     */
+    public function getSelect();
+
+    /**
+     * @abstract
+     * @return boolean
+     */
+    public function hasSelect();
 
     /**
      * Reset returned fields
      *
      * @return QueryInterface
      */
-    public function resetFields();
+    public function resetSelect();
 
     /**
      * Add condition
@@ -25,15 +37,19 @@ interface QueryInterface
      * @param array $condition
      * @return QueryInterface
      */
-    public function condition(array $condition);
+    public function where(array $condition);
 
-    public function getCondition();
+    public function getWhere();
 
-    public function resetCondition();
+    public function hasWhere();
+
+    public function resetWhere();
 
     public function sort($field, $ascending = true);
 
     public function getSort();
+
+    public function hasSort();
 
     public function resetSort();
 
@@ -41,7 +57,15 @@ interface QueryInterface
 
     public function getLimit();
 
+    public function hasLimit();
+
+    public function resetLimit();
+
     public function offset($offset);
 
     public function getOffset();
+
+    public function hasOffset();
+
+    public function resetOffset();
 }

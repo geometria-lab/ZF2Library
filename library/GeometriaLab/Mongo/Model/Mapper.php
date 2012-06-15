@@ -104,9 +104,9 @@ class Mapper extends AbstractMapper
      */
     public function getByCondition(array $condition)
     {
-        $query = $this->query()->condition($condition);
+        $query = $this->createQuery()->condition($condition)->limit(1);
 
-        return $this->getAllByQuery($query)->getFirst();
+        return $this->getAll($query)->getFirst();
     }
 
     /**
@@ -115,11 +115,14 @@ class Mapper extends AbstractMapper
      * @param Query $query
      * @return CollectionInterface
      */
-    public function getAllByQuery(Query $query)
+    public function getAll(Query $query = null)
     {
         $cursor = $this->find($query);
 
-        $collection = new $this->collectionClass($cursor);
+        // TODO: Create models?
+
+        $collection = new $this->collectionClass();
+        $collection->push($cursor);
 
         $cursor->reset();
 
@@ -134,17 +137,17 @@ class Mapper extends AbstractMapper
      */
     protected function find(Query $query)
     {
-        $cursor = $this->getMongoCollection()->find($query->getCondition(), $query->getFields());
+        $cursor = $this->getMongoCollection()->find($query->getWhere(), $query->getSelect());
 
-        if ($query->getSort() !== null) {
+        if ($query->hasSort()) {
             $cursor->sort($query->getSort());
         }
 
-        if ($query->getLimit() !== null) {
+        if ($query->hasLimit()) {
             $cursor->limit($query->getLimit());
         }
 
-        if ($query->getOffset() !== null) {
+        if ($query->hasOffset()) {
             $cursor->skip($query->getOffset());
         }
 
@@ -197,7 +200,7 @@ class Mapper extends AbstractMapper
         }
     }
 
-    public function update(PersistentInterface $model)
+    public function update(ModelInterface $model)
     {
         $this->validateModel($model);
 
@@ -214,12 +217,21 @@ class Mapper extends AbstractMapper
         return true;
     }
 
-    public function updateByCondition($condition, $data)
+    /**
+     * Update by condition
+     *
+     * @param array $data
+     * @param array $condition
+     * @return boolean
+     */
+    public function updateByCondition(array $data, array $condition)
     {
-        return $this->_getCollection()->update($query['cond'], array('$set' => $data), array('multiple' => true));
+        $query = $this->createQuery()->where($condition);
+
+        return $this->getMongoCollection()->update($query->getWhere(), array('$set' => $data), array('multiple' => true));
     }
 
-    public function delete(PersistentInterface $model)
+    public function delete(ModelInterface $model)
     {
         $propertyNamesMap = array_flip($this->propertyNamesMap);
         $keyName = isset($propertyNamesMap['_id']) ? $propertyNamesMap['_id'] : '_id';
@@ -245,16 +257,16 @@ class Mapper extends AbstractMapper
     }
 
     /**
-     * Get query
+     * Create query
      *
      * @return Query
      */
-    public function query()
+    public function createQuery()
     {
         return new Query($this);
     }
 
-    protected function validateModel(PersistentInterface $model)
+    protected function validateModel(ModelInterface $model)
     {
         parent::validateModel($model);
 

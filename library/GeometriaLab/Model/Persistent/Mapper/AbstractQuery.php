@@ -14,18 +14,18 @@ abstract class AbstractQuery implements QueryInterface
     protected $mapper;
 
     /**
-     * Fields
+     * Select
      *
      * @var array|null
      */
-    protected $fields;
+    protected $select;
 
     /**
-     * Condition
+     * Where
      *
      * @var array|null
      */
-    protected $condition;
+    protected $where;
 
     /**
      * Sort
@@ -42,6 +42,8 @@ abstract class AbstractQuery implements QueryInterface
     protected $limit;
 
     /**
+     * Offset
+     *
      * @var integer|null
      */
     protected $offset;
@@ -57,47 +59,61 @@ abstract class AbstractQuery implements QueryInterface
     }
 
     /**
+     * Select fields
+     *
      * @param array $fields
      * @return AbstractQuery|QueryInterface
      */
-    public function fields(array $fields)
+    public function select(array $fields)
     {
-        $this->fields = $fields;
+        $this->select = $fields;
 
         return $this;
     }
 
     /**
+     * Get select
+     *
      * @return array|null
      */
-    public function getFields()
+    public function getSelect()
     {
-        return $this->fields;
+        return $this->select;
+    }
+
+    /**
+     * Has select?
+     *
+     * @return boolean
+     */
+    public function hasSelect()
+    {
+        return $this->select !== null;
     }
 
     /**
      * @return AbstractQuery|QueryInterface
      */
-    public function resetFields()
+    public function resetSelect()
     {
-        $this->fields = null;
+        $this->select = null;
 
         return $this;
     }
 
     /**
-     * Get conditions
+     * Get where
      *
      * @return array|null
      */
-    public function getCondition()
+    public function getWhere()
     {
-        return $this->condition;
+        return $this->where;
     }
 
-    public function resetCondition()
+    public function resetWhere()
     {
-        $this->condition = null;
+        $this->where = null;
 
         return $this;
     }

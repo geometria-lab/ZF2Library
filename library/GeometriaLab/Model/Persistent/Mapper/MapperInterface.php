@@ -29,7 +29,7 @@ interface MapperInterface
      * @param QueryInterface $query
      * @return CollectionInterface
      */
-    public function getAllByQuery(QueryInterface $query);
+    public function getAll(QueryInterface $query = null);
 
     /**
      * @abstract
@@ -73,4 +73,10 @@ interface MapperInterface
      * @return boolean
      */
     public function deleteByCondition(array $condition);
+
+    /**
+     * @abstract
+     * @return QueryInterface
+     */
+    public function createQuery();
 }

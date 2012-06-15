@@ -42,6 +42,8 @@ class Collection implements CollectionInterface
         if ($data instanceof ModelInterface) {
             array_push($this->models, $data);
         } else if (is_array($data) || $data instanceof \Traversable) {
+            // TODO: Create models?
+
             foreach ($data as $model) {
                 $this->push($model);
             }

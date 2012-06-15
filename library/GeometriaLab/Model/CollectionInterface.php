@@ -5,13 +5,6 @@ namespace GeometriaLab\Model;
 interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
 {
     /**
-     * Constructor
-     *
-     * @param mixed $data
-     */
-    public function __construct($data = null);
-
-    /**
      * Add model or models to the end of a collection
      *
      * @param mixed $data
