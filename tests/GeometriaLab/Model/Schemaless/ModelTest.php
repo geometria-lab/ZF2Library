@@ -1,27 +1,27 @@
 <?php
 
-namespace GeometriaLabTest\Model;
+namespace GeometriaLabTest\Model\Schemaless;
 
-use GeometriaLab\Model\Schemaless;
+use GeometriaLab\Model\Schemaless\Model;
 
-class SchemalessTest extends \PHPUnit_Framework_TestCase
+class ModelTest extends \PHPUnit_Framework_TestCase
 {
     public function testPopulateOnConstruct()
     {
-        $m = new Schemaless(array('test' => true));
+        $m = new Model(array('test' => true));
         $this->assertTrue($m->test);
     }
 
     public function testPopulateByInvalidData()
     {
         $this->setExpectedException('InvalidArgumentException');
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate(true);
     }
 
     public function testPopulateByArray()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate(array('test' => true));
         $this->assertTrue($m->get('test'));
     }
@@ -31,20 +31,20 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
         $o = new \stdClass();
         $o->test = true;
 
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate($o);
         $this->assertTrue($m->get('test'));
     }
 
     public function testGetNotPresentProperty()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $this->assertNull($m->get('test'));
     }
 
     public function testGet()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate(array(
             'test1' => 1,
             'test2' => 2
@@ -56,7 +56,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
 
     public function testMagicGet()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate(array(
             'test1' => 1,
             'test2' => 2
@@ -68,7 +68,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
 
     public function testSet()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $m->set('test1', 1)
           ->set('test2', 2);
 
@@ -79,7 +79,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
 
     public function testMagicSet()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $m->test1 = 1;
         $m->test2 = 2;
 
@@ -89,7 +89,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
 
     public function testHas()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate(array(
             'test1' => 1,
             'test2' => null
@@ -101,7 +101,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
 
     public function testMagicHas()
     {
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate(array(
             'test1' => 1,
             'test2' => null
@@ -117,7 +117,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
             'test1' => 1,
             'test2' => 2
         );
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate($array);
         $this->assertEquals($array, $m->toArray());
     }
@@ -131,7 +131,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
             'test4' => 4,
             'test5' => 5
         );
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate($array);
 
         $this->_iterate($m, $array);
@@ -154,7 +154,7 @@ class SchemalessTest extends \PHPUnit_Framework_TestCase
             'test1' => 1,
             'test2' => 2
         );
-        $m = new Schemaless();
+        $m = new Model();
         $m->populate($array);
         $this->assertEquals(2, count($m));
     }

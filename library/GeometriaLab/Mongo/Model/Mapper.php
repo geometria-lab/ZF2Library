@@ -333,6 +333,8 @@ class Mapper extends AbstractMapper
     public function transformStorageDataForModel(array $data)
     {
         $data = parent::transformStorageDataForModel($data);
+
+        return $data;
     }
 
     /**

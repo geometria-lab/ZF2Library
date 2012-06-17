@@ -3,7 +3,7 @@
 namespace GeometriaLabTest\Model;
 
 use GeometriaLab\Model\Collection,
-    GeometriaLab\Model\Schemaless;
+    GeometriaLab\Model\Schemaless\Model;
 
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,11 +15,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->models = array(
-            new Schemaless(array('test' => 1)),
-            new Schemaless(array('test' => 2)),
-            new Schemaless(array('test' => 3)),
-            new Schemaless(array('test' => 4)),
-            new Schemaless(array('test' => 5))
+            new Model(array('test' => 1)),
+            new Model(array('test' => 2)),
+            new Model(array('test' => 3)),
+            new Model(array('test' => 4)),
+            new Model(array('test' => 5))
         );
     }
 
@@ -89,7 +89,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Collection($this->models);
 
-        $model = new Schemaless(array('test' => 'new'));
+        $model = new Model(array('test' => 'new'));
         $c->set(1, $model);
 
         $models = $c->toArray();

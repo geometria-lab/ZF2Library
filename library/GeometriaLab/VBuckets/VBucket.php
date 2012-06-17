@@ -2,9 +2,9 @@
 
 namespace GeometriaLab\VBuckets;
 
-use GeometriaLab\Model;
+use GeometriaLab\Model\Schemaless\Model;
 
-class VBucket extends Model\Schemaless
+class VBucket extends Model
 {
     public function __construct($id, $data)
     {
