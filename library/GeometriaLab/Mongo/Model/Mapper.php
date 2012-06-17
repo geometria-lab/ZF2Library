@@ -227,6 +227,8 @@ class Mapper extends AbstractMapper
 
         $storageData = $this->transformModelDataForStorage($modelData);
 
+        unset($storageData['_id']);
+
         $this->getMongoCollection()->update($query->getWhere(), array('$set' => $storageData));
 
         $model->markClean();
@@ -245,7 +247,9 @@ class Mapper extends AbstractMapper
     {
         $query = $this->createQuery()->where($condition);
 
-        return $this->getMongoCollection()->update($query->getWhere(), array('$set' => $data), array('multiple' => true));
+        $storageData = $this->transformModelDataForStorage($data);
+
+        return $this->getMongoCollection()->update($query->getWhere(), array('$set' => $storageData), array('multiple' => true));
     }
 
     /**
@@ -256,14 +260,9 @@ class Mapper extends AbstractMapper
      */
     public function delete(ModelInterface $model)
     {
-        $propertyNamesMap = array_flip($this->propertyNamesMap);
-        $keyName = isset($propertyNamesMap['_id']) ? $propertyNamesMap['_id'] : '_id';
+        $query = $this->createQuery()->where(array('id' => $model->get('id')));
 
-        $criteria = array(
-            '_id' => $model->get($keyName)
-        );
-
-        $result = $this->getMongoCollection()->remove($criteria, array('safe' => true));
+        $result = $this->getMongoCollection()->remove($query->getWhere(), array('safe' => true));
 
         if ($result) {
             $model->markClean(false);
@@ -324,14 +323,16 @@ class Mapper extends AbstractMapper
     {
         $data = parent::transformModelDataForStorage($data);
 
-        $data['_id] = new \MongoId()
+        if (isset($data['_id'])) {
+            $data['_id'] = new MongoId($data['_id']);
+        }
 
         return $data;
     }
 
     public function transformStorageDataForModel(array $data)
     {
-
+        $data = parent::transformStorageDataForModel($data);
     }
 
     /**
