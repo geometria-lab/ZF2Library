@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Persistent\Mapper;
 
-use \GeometriaLab\Model\PersistentInterface;
+use \GeometriaLab\Model\ModelInterface;
 
 use \Zend\Stdlib\Options as ZendOptions;
 
@@ -13,7 +13,7 @@ abstract class AbstractMapper implements MapperInterface
      *
      * @var string
      */
-    protected $modelClass = '\GeometriaLab\Model\Persistent';
+    protected $modelClass = '\GeometriaLab\Model\Persistent\Model';
 
     /**
      * Collection class name
@@ -135,10 +135,10 @@ abstract class AbstractMapper implements MapperInterface
     /**
      * Validate model
      *
-     * @param PersistentInterface $model
+     * @param ModelInterface $model
      * @throws \InvalidArgumentException
      */
-    protected function validateModel(PersistentInterface $model)
+    protected function validateModel(ModelInterface $model)
     {
         if (!is_a($model, $this->getModelClass())) {
             throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");

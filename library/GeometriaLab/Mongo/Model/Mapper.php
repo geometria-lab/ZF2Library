@@ -93,7 +93,7 @@ class Mapper extends AbstractMapper
      */
     public function get($id)
     {
-        return $this->getByCondition(array('_id' => $id));
+        return $this->getByCondition(array('id' => $id));
     }
 
     /**
@@ -104,7 +104,7 @@ class Mapper extends AbstractMapper
      */
     public function getByCondition(array $condition)
     {
-        $query = $this->createQuery()->condition($condition)->limit(1);
+        $query = $this->createQuery()->where($condition)->limit(1);
 
         return $this->getAll($query)->getFirst();
     }
@@ -117,12 +117,23 @@ class Mapper extends AbstractMapper
      */
     public function getAll(Query $query = null)
     {
+        if ($query === null) {
+            $query = $this->createQuery();
+        }
+
         $cursor = $this->find($query);
 
-        // TODO: Create models?
+        $modelClass = $this->getModelClass();
+        $collectionClass = $this->getCollectionClass();
 
-        $collection = new $this->collectionClass();
-        $collection->push($cursor);
+        $collection = new $collectionClass();
+
+        foreach($cursor as $document) {
+            $model = new $modelClass($document);
+            $model->populate($document);
+
+            $collection->push($model);
+        }
 
         $cursor->reset();
 
@@ -183,7 +194,7 @@ class Mapper extends AbstractMapper
         $modelData = $model->toArray();
 
         if (!isset($modelData['id']) && $this->getPrimaryKeyGenerator()) {
-            $modelData['id'] = new \MongoId($this->getPrimaryKeyGenerator()->generate());
+            $modelData['id'] = $this->getPrimaryKeyGenerator()->generate();
         }
 
         $storageData = $this->transformModelDataForStorage($modelData);
@@ -191,7 +202,7 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->insert($storageData, array('safe' => true));
 
         if ($result) {
-            $model->set('id', (string)$storageData['_id']);
+            $model->set('id', $storageData['_id']);
             $model->markClean();
 
             return true;
@@ -200,17 +211,23 @@ class Mapper extends AbstractMapper
         }
     }
 
+    /**
+     * Update model
+     *
+     * @param ModelInterface $model
+     * @return bool
+     */
     public function update(ModelInterface $model)
     {
         $this->validateModel($model);
 
         $modelData = $model->toArray();
 
+        $query = $this->createQuery()->where(array('id' => $modelData['id']));
+
         $storageData = $this->transformModelDataForStorage($modelData);
 
-        $criteria = array('_id' => new MongoId($storageData['_id']));
-
-        $this->getMongoCollection()->update($criteria, array('$set' => $storageData));
+        $this->getMongoCollection()->update($query->getWhere(), array('$set' => $storageData));
 
         $model->markClean();
 
@@ -231,6 +248,12 @@ class Mapper extends AbstractMapper
         return $this->getMongoCollection()->update($query->getWhere(), array('$set' => $data), array('multiple' => true));
     }
 
+    /**
+     * Delete model
+     *
+     * @param ModelInterface $model
+     * @return boolean
+     */
     public function delete(ModelInterface $model)
     {
         $propertyNamesMap = array_flip($this->propertyNamesMap);
@@ -251,9 +274,17 @@ class Mapper extends AbstractMapper
         }
     }
 
-    public function deleteByCondition($condition)
+    /**
+     * Delete by condition
+     *
+     * @param array $condition
+     * @return boolean|mixed
+     */
+    public function deleteByCondition(array $condition)
     {
+        $query = $this->createQuery()->where($condition);
 
+        return $this->getMongoCollection()->remove($query->getWhere());
     }
 
     /**
@@ -287,6 +318,20 @@ class Mapper extends AbstractMapper
         }
 
         $this->isPrimaryKeysValidated = true;
+    }
+
+    public function transformModelDataForStorage(array $data)
+    {
+        $data = parent::transformModelDataForStorage($data);
+
+        $data['_id] = new \MongoId()
+
+        return $data;
+    }
+
+    public function transformStorageDataForModel(array $data)
+    {
+
     }
 
     /**
