@@ -14,7 +14,7 @@ class BooleanProperty extends AbstractProperty
     public function prepare($value)
     {
         if (!is_bool($value)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("must be boolean");
         }
 
         return $value;

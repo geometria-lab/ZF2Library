@@ -11,7 +11,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->model = new TestModels\Model();
+        $this->model = new Models\Model();
     }
 
     public function testPropertyDefaultValue()
@@ -93,13 +93,13 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testSetInvalidDataToArrayOfSubTest()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        $this->model->arrayOfSubTest = array(new TestModels\SubModel(array('id' => 1, 'title' => 'Hello')), array('tsa' => 123));
+        $this->model->arrayOfSubTest = array(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), array('tsa' => 123));
     }
 
     public function setArrayToModelProperty()
     {
         $this->model->subTest = array('id' => 1, 'title' => 'Hello');
-        $this->assertEquals(new TestModels\SubModel(array('id' => 1, 'title' => 'Hello')), $this->model->subTest);
+        $this->assertEquals(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), $this->model->subTest);
     }
 
     public function testSettersAndGetters()
@@ -116,10 +116,10 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'floatProperty'   => 3.4,
             'integerProperty' => 10,
             'stringProperty'  => 'test',
-            'subTest'         => new TestModels\SubModel(array('id' => 1, 'title' => 'Hello')),
+            'subTest'         => new Models\SubModel(array('id' => 1, 'title' => 'Hello')),
             'arrayOfInteger'  => array(9, 10, 11, 12, 13),
             'arrayOfString'   => array('string1', 'string2'),
-            'arrayOfSubTest'  => array(new TestModels\SubModel(array('id' => 1, 'title' => 'Hello')), new TestModels\SubModel(array('id' => 2, 'title' => 'Hello2')))
+            'arrayOfSubTest'  => array(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), new Models\SubModel(array('id' => 2, 'title' => 'Hello2')))
         );
     }
 }

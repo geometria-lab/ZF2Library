@@ -76,7 +76,7 @@ class ArrayProperty extends AbstractProperty
     public function prepare($value)
     {
         if (!is_array($value)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("must be array");
         }
 
         $value = array_map(array($this->getItemProperty(), 'prepare'), $value);

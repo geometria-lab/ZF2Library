@@ -101,6 +101,13 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
+    public function where(array $where)
+    {
+        $this->where = $where;
+
+        return $this;
+    }
+
     /**
      * Get where
      *

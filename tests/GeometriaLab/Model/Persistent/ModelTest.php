@@ -2,12 +2,12 @@
 
 namespace GeometriaLabTest\Model\Persistent;
 
-use GeometriaLabTest\Model\TestModels\PersistentModel;
+use GeometriaLabTest\Model\Persistent\Models\PersistentModel;
 
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \GeometriaLabTest\Model\TestModels\PersistentModel
+     * @var PersistentModel
      */
     protected $model;
 
@@ -20,7 +20,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $model = $this->model;
         $mapper = $model::getMapper();
-        $this->assertInstanceOf('\GeometriaLab\Model\Persistent\Mapper\Mongo', $mapper);
+        $this->assertInstanceOf('\GeometriaLab\Mongo\Model\Mapper', $mapper);
     }
 
     protected function getData()

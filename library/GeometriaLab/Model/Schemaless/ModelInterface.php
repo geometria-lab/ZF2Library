@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Schemaless;
 
-interface ModelInterface extends \Traversable, \Countable
+interface ModelInterface extends \Countable
 {
     /**
      * Populate model from array or iterable object

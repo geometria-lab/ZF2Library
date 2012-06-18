@@ -12,11 +12,6 @@ class Query extends AbstractQuery
                                  '$nor', '$or', '$and', '$size', '$type',
                                  '$near', '$regex');
 
-    public function se(array $fields)
-    {
-
-    }
-
     /**
      * @param array $condition
      * @return Query

@@ -14,7 +14,7 @@ class StringProperty extends AbstractProperty
     public function prepare($value)
     {
         if (!is_string($value)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("must be string");
         }
 
         return $value;

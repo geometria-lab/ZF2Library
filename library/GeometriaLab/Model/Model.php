@@ -69,7 +69,7 @@ class Model extends Schemaless\Model implements ModelInterface
         try {
             $value = $property->prepare($value);
         } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException("Invalid value for property '$name'");
+            throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
         }
 
         $method = "set{$name}";

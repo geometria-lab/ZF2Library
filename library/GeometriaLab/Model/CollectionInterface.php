@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Model;
 
+use GeometriaLab\Model\Schemaless\ModelInterface;
+
 interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
 {
     /**

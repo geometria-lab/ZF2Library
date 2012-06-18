@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Persistent;
 
-use GeometriaLab\Model\Schema\Manager,
+use GeometriaLab\Model\Schema\Manager as SchemaManager,
     GeometriaLab\Model\Persistent\Mapper;
 
 class Model extends \GeometriaLab\Model\Model implements ModelInterface
@@ -203,7 +203,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     static public function createSchema()
     {
-        $schemas = Schema\Manager::getInstance();
+        $schemas = SchemaManager::getInstance();
 
         $className = get_called_class();
 

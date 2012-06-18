@@ -1,7 +1,5 @@
 <?php
 
-namespace GeometriaLabTest\Model\TestModels;
-
 /**
  * @property boolean                                      $booleanProperty
  * @property float                                        $floatProperty
@@ -13,9 +11,9 @@ namespace GeometriaLabTest\Model\TestModels;
  * @property string[]                                     $arrayOfString
  * @property \GeometriaLabTest\Model\TestModels\SubModel[] $arrayOfSubTest
  *
- * @method static \GeometriaLab\Mongo\Model\Mapper getMapper()  {"collectionName" : "test"}
+ * @method static getMapper()  {"collectionName" : "test"}
  */
-class PersistentModel extends \GeometriaLab\Model\Persistent\Model
+class PersistentModelWithInvalidDefinition extends \GeometriaLab\Model\Persistent\Model
 {
 
 }

@@ -14,7 +14,7 @@ class IntegerProperty extends AbstractProperty
     public function prepare($value)
     {
         if (!is_integer($value)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("must be integer");
         }
 
         return $value;

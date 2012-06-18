@@ -14,7 +14,7 @@ class FloatProperty extends AbstractProperty
     public function prepare($value)
     {
         if (!is_float($value)) {
-            throw new \InvalidArgumentException();
+            throw new \InvalidArgumentException("must be float");
         }
 
         return $value;
