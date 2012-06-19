@@ -181,29 +181,13 @@ class Mapper extends AbstractMapper
      */
     public function create(ModelInterface $model)
     {
-        if (!is_a($model, $this->getModelClass())) {
-            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
-        }
+        $data = $this->getModelDataForStorage($model);
 
-        $data = array();
-        $primary = array();
-        foreach($model->getSchema()->getProperties() as $name => $property) {
-            if ($property->isPersistent()) {
-                $data[$name] = $model->get($name);
-                if ($property->isPrimary()) {
-                    $primary[] = $name;
-                }
-            }
-        }
-
-        if (count($primary) !== 1 || $primary[0] !== 'id') {
-            throw new \InvalidArgumentException("Mongo mapper support only one primary key 'id'");
-        }
-
-        // After this line does not work
-
-        if (!isset($data['id']) && $this->getPrimaryKeyGenerator()) {
-            $data['_id'] = $this->getPrimaryKeyGenerator()->generate();
+        if (isset($data['id'])) {
+            $data['_id'] = new MongoId($data['id']);
+            unset($data['id']);
+        } else if ($this->getPrimaryKeyGenerator()) {
+            $data['_id'] = new MongoId($this->getPrimaryKeyGenerator()->generate());
         }
 
         $storageData = $this->transformModelDataForStorage($data);
@@ -228,7 +212,14 @@ class Mapper extends AbstractMapper
      */
     public function update(ModelInterface $model)
     {
-        $this->validateModel($model);
+        $data = $this->getModelDataForStorage($model, true);
+
+        if (isset($data['id'])) {
+            $data['_id'] = new MongoId($data['id']);
+            unset($data['id']);
+        } else if ($this->getPrimaryKeyGenerator()) {
+            $data['_id'] = new MongoId($this->getPrimaryKeyGenerator()->generate());
+        }
 
         $modelData = $model->toArray();
 
@@ -243,6 +234,32 @@ class Mapper extends AbstractMapper
         $model->markClean();
 
         return true;
+    }
+
+    protected function getModelData(ModelInterface $model, $changed = false)
+    {
+        if (!is_a($model, $this->getModelClass())) {
+            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
+        }
+
+        $data = array();
+        $primary = array();
+        foreach($model->getSchema()->getProperties() as $name => $property) {
+            if ($property->isPersistent()) {
+                if (!$changed || $model->isPropertyChanged($name)) {
+                    $data[$name] = $model->get($name);
+                }
+                if ($property->isPrimary()) {
+                    $primary[] = $name;
+                }
+            }
+        }
+
+        if (count($primary) !== 1 || $primary[0] !== 'id') {
+            throw new \InvalidArgumentException("Mongo mapper support only one primary key 'id'");
+        }
+
+        return $data;
     }
 
     /**
