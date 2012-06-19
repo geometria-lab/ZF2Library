@@ -133,19 +133,6 @@ abstract class AbstractMapper implements MapperInterface
     }
 
     /**
-     * Validate model
-     *
-     * @param ModelInterface $model
-     * @throws \InvalidArgumentException
-     */
-    protected function validateModel(ModelInterface $model)
-    {
-        if (!is_a($model, $this->getModelClass())) {
-            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
-        }
-    }
-
-    /**
      * Transform model data for storage
      *
      * @param array $data

@@ -24,15 +24,6 @@ class Mapper extends AbstractMapper
     protected $collectionName;
 
     /**
-     * Property names map
-     *
-     * @var array
-     */
-    protected $propertyNamesMap = array(
-        'id' => '_id'
-    );
-
-    /**
      * Flag for validate model primary keys only once
      *
      * @var bool
@@ -186,18 +177,36 @@ class Mapper extends AbstractMapper
      *
      * @param ModelInterface $model
      * @return boolean
+     * @throws \InvalidArgumentException
      */
     public function create(ModelInterface $model)
     {
-        $this->validateModel($model);
-
-        $modelData = $model->toArray();
-
-        if (!isset($modelData['id']) && $this->getPrimaryKeyGenerator()) {
-            $modelData['id'] = $this->getPrimaryKeyGenerator()->generate();
+        if (!is_a($model, $this->getModelClass())) {
+            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
         }
 
-        $storageData = $this->transformModelDataForStorage($modelData);
+        $data = array();
+        $primary = array();
+        foreach($model->getSchema()->getProperties() as $name => $property) {
+            if ($property->isPersistent()) {
+                $data[$name] = $model->get($name);
+                if ($property->isPrimary()) {
+                    $primary[] = $name;
+                }
+            }
+        }
+
+        if (count($primary) !== 1 || $primary[0] !== 'id') {
+            throw new \InvalidArgumentException("Mongo mapper support only one primary key 'id'");
+        }
+
+        // After this line does not work
+
+        if (!isset($data['id']) && $this->getPrimaryKeyGenerator()) {
+            $data['_id'] = $this->getPrimaryKeyGenerator()->generate();
+        }
+
+        $storageData = $this->transformModelDataForStorage($data);
 
         $result = $this->getMongoCollection()->insert($storageData, array('safe' => true));
 
@@ -294,29 +303,6 @@ class Mapper extends AbstractMapper
     public function createQuery()
     {
         return new Query($this);
-    }
-
-    protected function validateModel(ModelInterface $model)
-    {
-        parent::validateModel($model);
-
-        if (!$this->isPrimaryKeysValidated) {
-            $primaryPropertiesNames = $model->getDefinition()->getPrimaryPropertyNames();
-
-            if (count($primaryPropertiesNames) > 1) {
-                throw new \InvalidArgumentException('Mongo mapper supports only one primary property');
-            }
-
-            if ($primaryPropertiesNames[0] !== 'id') {
-                throw new \InvalidArgumentException("Primary property must be 'id'");
-            }
-
-            if (!isset($this->propertyNamesMap['id']) || $this->propertyNamesMap['id'] !== '_id') {
-                throw new \InvalidArgumentException("Primary property 'id' must be mapped to mongo default '_id' field");
-            }
-        }
-
-        $this->isPrimaryKeysValidated = true;
     }
 
     public function transformModelDataForStorage(array $data)
