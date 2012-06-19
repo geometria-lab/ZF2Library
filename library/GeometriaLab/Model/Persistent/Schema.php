@@ -22,11 +22,17 @@ class Schema extends \GeometriaLab\Model\Schema
     protected $mapperOptions = array();
 
     /**
-     * Primary property names
+     * Properties class map
      *
      * @var array
      */
-    protected $primaryPropertyNames = array();
+    static protected $propertiesClassMap = array(
+        'string'  => 'GeometriaLab\Model\Persistent\Schema\Property\StringProperty',
+        'array'   => 'GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty',
+        'boolean' => 'GeometriaLab\Model\Persistent\Schema\Property\BooleanProperty',
+        'float'   => 'GeometriaLab\Model\Persistent\Schema\Property\FloatProperty',
+        'integer' => 'GeometriaLab\Model\Persistent\Schema\Property\IntegerProperty',
+    );
 
     /**
      * Protected constructor
@@ -83,50 +89,6 @@ class Schema extends \GeometriaLab\Model\Schema
     }
 
     /**
-     * Get primary property names
-     *
-     * @return array
-     */
-    public function getPrimaryPropertyNames()
-    {
-        return $this->primaryPropertyNames;
-    }
-
-    /**
-     * Set primary property names
-     *
-     * @param array $names
-     * @return Schema
-     */
-    public function setPrimaryPropertyNames(array $names)
-    {
-        $this->primaryPropertyNames = $names;
-
-        return $this;
-    }
-
-    /**
-     * Create and set property
-     *
-     * @param string $name
-     * @param string $type
-     * @param array $params
-     * @return PropertyInterface
-     */
-    protected function createAndSetProperty($name, $type, array $params = array())
-    {
-        if (isset($params['primary'])) {
-            if ($params['primary']) {
-                $this->primaryPropertyNames[] = $name;
-            }
-
-            unset($params['primary']);
-        }
-
-        return parent::createAndSetProperty($name, $type, $params);
-    }
-
-    /**
      * Parse class docblock
      *
      * @param string $className
@@ -140,9 +102,13 @@ class Schema extends \GeometriaLab\Model\Schema
             throw new \InvalidArgumentException('Mapper method tag not present in docblock!');
         }
 
-        if (empty($this->primaryPropertyNames)) {
-            throw new \InvalidArgumentException('Primary property (primary key) not present!');
+        foreach($this->getProperties() as $property) {
+            if ($property->isPrimary()) {
+                return;
+            }
         }
+
+        throw new \InvalidArgumentException('Primary property (primary key) not present!');
     }
 
     /**

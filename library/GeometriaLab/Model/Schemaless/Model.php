@@ -127,14 +127,18 @@ class Model implements ModelInterface, \Iterator
     /**
      * Convert model to array
      *
+     * @param integer $depth
      * @return array
      */
-    public function toArray()
+    public function toArray($depth = 0)
     {
         $array = array();
-
         foreach ($this->getProperties() as $name => $property) {
             $array[$name] = $this->get($name);
+
+            if ($depth !== 0 && $array[$name] instanceof ModelInterface) {
+                $array[$name] = $array[$name]->toArray($depth === -1 ? -1 : $depth - 1);
+            }
         }
 
         return $array;

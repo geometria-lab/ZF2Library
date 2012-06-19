@@ -2,8 +2,6 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
-use \Zend\Stdlib\Options as ZendOptions;
-
 abstract class AbstractProperty implements PropertyInterface
 {
     /**

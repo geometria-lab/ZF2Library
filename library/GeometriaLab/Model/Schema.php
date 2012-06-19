@@ -101,13 +101,12 @@ class Schema
     /**
      * Set property
      *
-     * @param string $name
      * @param PropertyInterface $property
      * @return Schema
      */
-    public function setProperty($name, PropertyInterface $property)
+    public function setProperty(PropertyInterface $property)
     {
-        $this->properties[$name] = $property;
+        $this->properties[$property->getName()] = $property;
 
         return $this;
     }
@@ -158,23 +157,6 @@ class Schema
     }
 
     /**
-     * Create and set property
-     *
-     * @param string $name
-     * @param string $type
-     * @param array $params
-     * @return PropertyInterface
-     */
-    protected function createAndSetProperty($name, $type, array $params = array())
-    {
-        $params['name'] = $name;
-
-        $property = static::createProperty($type, $params);
-
-        return $this->setProperty($name, $property);
-    }
-
-    /**
      * Parse class docblock
      *
      * @param string $className
@@ -219,7 +201,12 @@ class Schema
             throw new \InvalidArgumentException("Property with name '$name' already exists");
         }
 
-        $this->createAndSetProperty($name, $tag->getType(), $tag->getParams());
+        $params = $tag->getParams();
+        $params['name'] = $name;
+
+        $property = static::createProperty($tag->getType(), $params);
+
+        $this->setProperty($property);
     }
 
     /**
