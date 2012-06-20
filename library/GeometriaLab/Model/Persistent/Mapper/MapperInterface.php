@@ -85,4 +85,11 @@ interface MapperInterface
      * @return string
      */
     public function getModelClass();
+
+    /**
+     * @abstract
+     * @param string $modelClass
+     * @return MapperInterface
+     */
+    public function setModelClass($modelClass);
 }

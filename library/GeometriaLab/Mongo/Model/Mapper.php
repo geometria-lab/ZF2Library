@@ -5,7 +5,8 @@ namespace GeometriaLab\Mongo\Model;
 use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\ModelInterface,
     GeometriaLab\Model\Persistent\CollectionInterface,
-    GeometriaLab\Model\Persistent\Mapper\AbstractMapper;
+    GeometriaLab\Model\Persistent\Mapper\AbstractMapper,
+    GeometriaLab\Model\Persistent\Mapper\QueryInterface;
 
 class Mapper extends AbstractMapper
 {
@@ -103,10 +104,10 @@ class Mapper extends AbstractMapper
     /**
      * Get models collection by query
      *
-     * @param Query $query
+     * @param QueryInterface $query
      * @return CollectionInterface
      */
-    public function getAll(Query $query = null)
+    public function getAll(QueryInterface $query = null)
     {
         if ($query === null) {
             $query = $this->createQuery();
@@ -117,9 +118,15 @@ class Mapper extends AbstractMapper
         $modelClass = $this->getModelClass();
         $collectionClass = $this->getCollectionClass();
 
+        /**
+         * @var CollectionInterface $collection
+         */
         $collection = new $collectionClass();
 
         foreach($cursor as $document) {
+            /**
+             * @var ModelInterface $model
+             */
             $model = new $modelClass($document);
             $model->populate($document);
 
@@ -165,8 +172,7 @@ class Mapper extends AbstractMapper
     public function count(array $condition = array())
     {
         if (!empty($condition)) {
-            $condition = $this->query()->condition($condition)
-                                       ->getCondition();
+            $condition = $this->createQuery()->where($condition)->getWhere();
         }
 
         return $this->getMongoCollection()->count($condition);
@@ -298,6 +304,10 @@ class Mapper extends AbstractMapper
 
         $data = array();
         $primary = array();
+
+        /**
+         * @var \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface $property
+         */
         foreach($model->getSchema()->getProperties() as $name => $property) {
             if ($property->isPersistent()) {
                 if (!$changed || $model->isPropertyChanged($name)) {
@@ -316,7 +326,7 @@ class Mapper extends AbstractMapper
         return $this->transformModelDataForStorage($data);
     }
 
-    public function transformModelDataForStorage(array $data)
+    protected function transformModelDataForStorage(array $data)
     {
         $data = parent::transformModelDataForStorage($data);
 

@@ -176,8 +176,15 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         $mappers = Mapper\Manager::getInstance();
 
         if (!$mappers->has($className)) {
-            $schemas = Schema\Manager::getInstance();
+            $schemas = SchemaManager::getInstance();
+
+            /**
+             * @var Schema $schema
+             */
             if (!$schemas->has($className)) {
+                /**
+                 * @var ModelInterface $className
+                 */
                 $schema = $className::createSchema();
             } else {
                 $schema = $schemas->get($className);
@@ -185,7 +192,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
 
             $mapperClassName = $schema->getMapperClass();
             /**
-             * @var Mapper\MapperInterface
+             * @var Mapper\MapperInterface $mapper
              */
             $mapper = new $mapperClassName($schema->getMapperOptions());
             $mapper->setModelClass($className);

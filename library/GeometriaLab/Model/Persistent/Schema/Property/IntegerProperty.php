@@ -22,7 +22,7 @@ class IntegerProperty extends \GeometriaLab\Model\Schema\Property\IntegerPropert
      * Mark property as persistent (needs save to storage)
      *
      * @param boolean $persistent
-     * @return AbstractProperty|PropertyInterface
+     * @return PropertyInterface
      */
     public function setPersistent($persistent)
     {
@@ -45,7 +45,7 @@ class IntegerProperty extends \GeometriaLab\Model\Schema\Property\IntegerPropert
      * Mark property as primary
      *
      * @param boolean $primary
-     * @return AbstractProperty|PropertyInterface
+     * @return PropertyInterface
      */
     public function setPrimary($primary)
     {

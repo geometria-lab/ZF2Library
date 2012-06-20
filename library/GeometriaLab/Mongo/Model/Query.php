@@ -13,25 +13,7 @@ class Query extends AbstractQuery
                                  '$nor', '$or', '$and', '$size', '$type',
                                  '$near', '$regex');
 
-    /**
-     * Set selected fields
-     *
-     * @param array $fields
-     * @return QueryInterface|Query
-     * @throws \InvalidArgumentException
-     */
-    public function select(array $fields)
-    {
-        foreach($fields as $field => $include) {
-            if (!$this->getModelSchema()->hasProperty($field)) {
-                throw new \InvalidArgumentException("Selected field '$field' not present in model!");
-            }
-        }
 
-        $this->select = $this->getMapper()->transformModelDataForStorage($fields);
-
-        return $this;
-    }
 
     /**
      * Add where condition
@@ -58,8 +40,6 @@ class Query extends AbstractQuery
                 }
             }
 
-            $conditions = $this->getMapper()->transformModelDataForStorage($conditions);
-
             if ($this->where === null) {
                 $this->where = $conditions;
             } else {
@@ -84,7 +64,7 @@ class Query extends AbstractQuery
             throw new \InvalidArgumentException("Sorted field '$field' not present in model!");
         }
 
-        $sort = $this->getMapper()->transformModelDataForStorage(array($field => $ascending ? 1 : -1));
+        $sort = array($field => $ascending ? 1 : -1);
 
         if ($this->sort === null) {
             $this->sort = $sort;
@@ -93,15 +73,6 @@ class Query extends AbstractQuery
         }
 
         return $this;
-    }
-
-    protected function validateFieldValue($field, $value)
-    {
-        if (!$this->getModelSchema()->hasProperty($field)) {
-            throw new \InvalidArgumentException("Field in where '$field' not present in model!");
-        }
-
-        return $this->getModelSchema()->getProperty($field)->prepare($value);
     }
 
     protected function getModelSchema()

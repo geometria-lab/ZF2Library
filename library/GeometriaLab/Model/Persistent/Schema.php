@@ -3,7 +3,7 @@
 namespace GeometriaLab\Model\Persistent;
 
 use GeometriaLab\Code\Reflection\DocBlock\Tag\MethodTag,
-    GeometriaLab\Model\Schema\Property\PropertyInterface;
+    GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface;
 
 class Schema extends \GeometriaLab\Model\Schema
 {
@@ -102,6 +102,9 @@ class Schema extends \GeometriaLab\Model\Schema
             throw new \InvalidArgumentException('Mapper method tag not present in docblock!');
         }
 
+        /***
+         * @var PropertyInterface $property
+         */
         foreach($this->getProperties() as $property) {
             if ($property->isPrimary()) {
                 return;
