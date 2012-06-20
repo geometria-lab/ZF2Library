@@ -59,14 +59,24 @@ abstract class AbstractQuery implements QueryInterface
     }
 
     /**
-     * Select fields
+     * Get mapper
      *
-     * @param array $fields
-     * @return AbstractQuery|QueryInterface
+     * @return MapperInterface
      */
-    public function select(array $fields)
+    public function getMapper()
     {
-        $this->select = $fields;
+        return $this->mapper;
+    }
+
+    /**
+     * Set mapper
+     *
+     * @param $mapper
+     * @return AbstractQuery
+     */
+    public function setMapper($mapper)
+    {
+        $this->mapper = $mapper;
 
         return $this;
     }
@@ -101,13 +111,6 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
-    public function where(array $where)
-    {
-        $this->where = $where;
-
-        return $this;
-    }
-
     /**
      * Get where
      *
@@ -118,6 +121,21 @@ abstract class AbstractQuery implements QueryInterface
         return $this->where;
     }
 
+    /**
+     * Has where?
+     *
+     * @return boolean
+     */
+    public function hasWhere()
+    {
+        return $this->where !== null;
+    }
+
+    /**
+     * Reset where
+     *
+     * @return AbstractQuery
+     */
     public function resetWhere()
     {
         $this->where = null;
@@ -125,11 +143,31 @@ abstract class AbstractQuery implements QueryInterface
         return $this;
     }
 
+    /**
+     * Get sort
+     *
+     * @return array|null
+     */
     public function getSort()
     {
         return $this->sort;
     }
 
+    /**
+     * Has sort?
+     *
+     * @return bool
+     */
+    public function hasSort()
+    {
+        return $this->sort !== null;
+    }
+
+    /**
+     * Reset sort
+     *
+     * @return AbstractQuery
+     */
     public function resetSort()
     {
         $this->sort = null;
@@ -149,6 +187,18 @@ abstract class AbstractQuery implements QueryInterface
         return $this->limit;
     }
 
+    public function hasLimit()
+    {
+        return $this->limit !== null;
+    }
+
+    public function resetLimit()
+    {
+        $this->limit = null;
+
+        return $this;
+    }
+
     public function offset($offset)
     {
         $this->offset = $offset;
@@ -159,5 +209,17 @@ abstract class AbstractQuery implements QueryInterface
     public function getOffset()
     {
         return $this->offset;
+    }
+
+    public function hasOffset()
+    {
+        return $this->offset !== null;
+    }
+
+    public function resetOffset()
+    {
+        $this->offset = null;
+
+        return $this;
     }
 }

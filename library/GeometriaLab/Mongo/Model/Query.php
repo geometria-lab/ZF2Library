@@ -3,6 +3,7 @@
 namespace GeometriaLab\Mongo\Model;
 
 use GeometriaLab\Model\Persistent\Mapper\AbstractQuery,
+    GeometriaLab\Model\Persistent\Mapper\QueryInterface,
     GeometriaLab\Model\Persistent\Mapper\MapperInterface;
 
 class Query extends AbstractQuery
@@ -13,150 +14,99 @@ class Query extends AbstractQuery
                                  '$near', '$regex');
 
     /**
-     * @param array $condition
-     * @return Query
+     * Set selected fields
+     *
+     * @param array $fields
+     * @return QueryInterface|Query
+     * @throws \InvalidArgumentException
      */
-    public function condition(array $condition)
+    public function select(array $fields)
     {
-        if (!empty($condition)) {
-            foreach ($condition as $field => $value) {
+        foreach($fields as $field => $include) {
+            if (!$this->getModelSchema()->hasProperty($field)) {
+                throw new \InvalidArgumentException("Selected field '$field' not present in model!");
+            }
+        }
+
+        $this->select = $this->getMapper()->transformModelDataForStorage($fields);
+
+        return $this;
+    }
+
+    /**
+     * Add where condition
+     *
+     * @param array $where
+     * @return QueryInterface|Query
+     */
+    public function where(array $where)
+    {
+        if (!empty($where)) {
+            $conditions = array();
+            foreach($where as $field => $value) {
                 if (is_array($value)) {
                     $keys = array_intersect(array_keys($value), $this->mongoKeys);
-
                     if (!empty($keys)) {
                         foreach ($value as $serviceKey => $data) {
-                            $this->where[$field][$serviceKey] = $this->_formatValue($field, $data);
+                            $conditions[$field][$serviceKey] = $this->validateFieldValue($field, $data);
                         }
                     } else {
-                        $this->where[$field]['$in'] = $this->_formatValue($field, $value);
+                        $conditions[$field]['$in'] = $this->validateFieldValue($field, $value);
                     }
                 } else {
-                    $this->where[$field] = $this->_formatValue($field, $value);
+                    $conditions[$field] = $this->validateFieldValue($field, $value);
                 }
             }
-            $this->where = $this->translateToStorage($condition);
+
+            $conditions = $this->getMapper()->transformModelDataForStorage($conditions);
+
+            if ($this->where === null) {
+                $this->where = $conditions;
+            } else {
+                 $this->where = array_merge($this->where, $conditions);
+            }
         }
 
         return $this;
     }
 
+    /**
+     * Add sorting by field
+     *
+     * @param string $field
+     * @param boolean $ascending
+     * @return Query|QueryInterface
+     * @throws \InvalidArgumentException
+     */
     public function sort($field, $ascending = true)
     {
+        if (!$this->getModelSchema()->hasProperty($field)) {
+            throw new \InvalidArgumentException("Sorted field '$field' not present in model!");
+        }
 
+        $sort = $this->getMapper()->transformModelDataForStorage(array($field => $ascending ? 1 : -1));
+
+        if ($this->sort === null) {
+            $this->sort = $sort;
+        } else {
+            $this->sort = array_merge($this->sort, $sort);
+        }
+
+        return $this;
     }
 
-
-
-
-
-    /**
-     *
-     * @param array   $cond
-     * @param array   $sort
-     * @param integer $count
-     * @param integer $offset
-     *
-     * @return Morph_Query
-     */
-    protected function _makeQuery($cond = array(), $sort = array(), $count = null, $offset = null)
+    protected function validateFieldValue($field, $value)
     {
-        $query = array();
-
-        $query['cond'] = $this->_makeCond($cond);
-        $query['sort'] = $this->_makeSort($sort);
-
-        if ($count) {
-            $query['limit'] = $count;
+        if (!$this->getModelSchema()->hasProperty($field)) {
+            throw new \InvalidArgumentException("Field in where '$field' not present in model!");
         }
 
-        if ($offset) {
-            $query['offset'] = $offset;
-        }
-
-        return $query;
+        return $this->getModelSchema()->getProperty($field)->prepare($value);
     }
 
-    /**
-     *
-     * @param array $sort
-     * @return array
-     */
-    protected function _makeSort($sort = array())
+    protected function getModelSchema()
     {
-        $sorting = array();
-
-        if (!empty($sort)) {
-            foreach ($sort as $key => $value) {
-                $sorting[$this->_translateKey($key)] = ($value == 1) ? 1 : -1;
-            }
-        }
-
-        return $sorting;
-    }
-
-    /**
-     *
-     * @param $data
-     * @return array
-     */
-    protected function _prepare($data)
-    {
-        $formattedData = array();
-
-        foreach ($data as $key => $value) {
-            $formattedData[$key] = $this->_formatValue($key, $value);
-        }
-
-        return $formattedData;
-    }
-
-    /**
-     *
-     * @param string $key
-     * @param mixed $value
-     */
-    protected function _formatValue($key, $value)
-    {
-        $type = call_user_func_array(array($this->getModelClass(), 'getPropertyType'), array($key));
-
-        if (is_array($value)) {
-            foreach ($value as &$val) {
-                $val = $this->_formatValue($key, $val);
-            }
-            return $value;
-        }
-
-        if ($value instanceof MongoId || $value instanceof MongoRegex) {
-            return $value;
-        }
-
-        switch ($type) {
-            case 'int':
-            case 'integer':
-            case 'int[]':
-            case 'integer[]':
-                return (int) $value;
-            case 'str':
-            case 'string':
-            case 'str[]':
-            case 'string[]':
-                return (string) $value;
-            case 'bool':
-            case 'boolean':
-            case 'bool[]':
-            case 'boolean[]':
-                return (boolean)$value;
-            case 'float':
-            case 'float[]':
-                return (float) $value;
-            case 'MongoId':
-                return new MongoId($value);
-            default:
-                $method = '_format' . $key;
-                if (method_exists($this, $method)) {
-                    return $this->$method($value);
-                }
-                return $value;
-        }
+        $schemas = \GeometriaLab\Model\Schema\Manager::getInstance();
+        return $schemas->get($this->getMapper()->getModelClass());
     }
 }

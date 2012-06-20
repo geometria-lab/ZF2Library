@@ -79,4 +79,10 @@ interface MapperInterface
      * @return QueryInterface
      */
     public function createQuery();
+
+    /**
+     * @abstract
+     * @return string
+     */
+    public function getModelClass();
 }

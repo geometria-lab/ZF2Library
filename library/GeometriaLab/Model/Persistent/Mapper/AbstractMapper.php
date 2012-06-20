@@ -138,7 +138,7 @@ abstract class AbstractMapper implements MapperInterface
      * @param array $data
      * @return array
      */
-    protected function transformModelDataForStorage(array $data)
+    public function transformModelDataForStorage(array $data)
     {
         foreach($this->propertyNamesMap as $model => $storage) {
             $data[$storage] = $data[$model];
@@ -154,7 +154,7 @@ abstract class AbstractMapper implements MapperInterface
      * @param array $data
      * @return array
      */
-    protected function transformStorageDataForModel(array $data)
+    public function transformStorageDataForModel(array $data)
     {
         foreach($this->propertyNamesMap as $model => $storage) {
             $data[$model] = $data[$storage];

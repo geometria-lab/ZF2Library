@@ -39,12 +39,30 @@ interface QueryInterface
      */
     public function where(array $condition);
 
+    /**
+     * @abstract
+     * @return array|null
+     */
     public function getWhere();
 
+    /**
+     * @abstract
+     * @return boolean
+     */
     public function hasWhere();
 
+    /**
+     * @abstract
+     * @return QueryInterface
+     */
     public function resetWhere();
 
+    /**
+     * @abstract
+     * @param $field
+     * @param bool $ascending
+     * @return QueryInterface
+     */
     public function sort($field, $ascending = true);
 
     public function getSort();
