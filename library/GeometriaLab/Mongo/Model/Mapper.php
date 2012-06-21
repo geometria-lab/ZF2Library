@@ -146,10 +146,28 @@ class Mapper extends AbstractMapper
      */
     protected function find(Query $query)
     {
-        $cursor = $this->getMongoCollection()->find($query->getWhere(), $query->getSelect());
+        $arguments = array();
+
+        if ($query->hasWhere()) {
+            $arguments[] = $this->transformModelDataForStorage($query->getWhere());
+        }
+        if ($query->hasSelect()) {
+            $arguments[] = $this->transformModelDataForStorage($query->getSelect());
+        }
+
+        /**
+         * @var \MongoCursor $cursor
+         */
+        $cursor = call_user_func_array(array($this->getMongoCollection(), 'find'), $arguments);
 
         if ($query->hasSort()) {
-            $cursor->sort($query->getSort());
+            $sort = $this->transformModelDataForStorage($query->getSort());
+
+            foreach($sort as $field => &$ascending) {
+                $ascending = $ascending ? 1 : -1;
+            }
+
+            $cursor->sort($sort);
         }
 
         if ($query->hasLimit()) {
@@ -172,7 +190,8 @@ class Mapper extends AbstractMapper
     public function count(array $condition = array())
     {
         if (!empty($condition)) {
-            $condition = $this->createQuery()->where($condition)->getWhere();
+            $query = $this->createQuery()->where($condition);
+            $condition = $this->transformModelDataForStorage($query->getWhere());
         }
 
         return $this->getMongoCollection()->count($condition);
@@ -238,10 +257,11 @@ class Mapper extends AbstractMapper
     public function updateByCondition(array $data, array $condition)
     {
         $query = $this->createQuery()->where($condition);
+        $condition = $this->transformModelDataForStorage($query->getWhere());
 
         $storageData = $this->transformModelDataForStorage($data);
 
-        return $this->getMongoCollection()->update($query->getWhere(), array('$set' => $storageData), array('multiple' => true));
+        return $this->getMongoCollection()->update($condition, array('$set' => $storageData), array('multiple' => true));
     }
 
     /**
@@ -252,9 +272,9 @@ class Mapper extends AbstractMapper
      */
     public function delete(ModelInterface $model)
     {
-        $query = $this->createQuery()->where(array('id' => $model->get('id')));
+        $condition = array('_id' => new \MongoId($model->get('id')));
 
-        $result = $this->getMongoCollection()->remove($query->getWhere(), array('safe' => true));
+        $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
         if ($result) {
             $model->markClean(false);
@@ -274,8 +294,9 @@ class Mapper extends AbstractMapper
     public function deleteByCondition(array $condition)
     {
         $query = $this->createQuery()->where($condition);
+        $condition = $this->transformModelDataForStorage($query->getWhere());
 
-        return $this->getMongoCollection()->remove($query->getWhere());
+        return $this->getMongoCollection()->remove($condition);
     }
 
     /**

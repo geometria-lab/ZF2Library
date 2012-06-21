@@ -2,7 +2,8 @@
 
 namespace GeometriaLab\Model\Persistent\Mapper;
 
-use GeometriaLab\Model\Persistent\Mapper\MapperInterface;
+use GeometriaLab\Model\Persistent\Mapper\MapperInterface,
+    GeometriaLab\Model\Schema\Manager as SchemaManager;
 
 class Query implements QueryInterface
 {
@@ -144,7 +145,7 @@ class Query implements QueryInterface
         if (!empty($where)) {
             $conditions = array();
             foreach($where as $field => $value) {
-                $conditions[$field] = $this->validateFieldValue($field, $value);
+                $conditions[$field] = $this->prepareFieldValue($field, $value);
             }
 
             if ($this->where === null) {
@@ -351,5 +352,17 @@ class Query implements QueryInterface
         }
 
         return $this->getModelSchema()->getProperty($field)->prepare($value);
+    }
+
+    /**
+     * Get model schema
+     *
+     * @return \GeometriaLab\Model\Persistent\Schema
+     */
+    protected function getModelSchema()
+    {
+        $schemas = SchemaManager::getInstance();
+
+        return $schemas->get($this->getMapper()->getModelClass());
     }
 }

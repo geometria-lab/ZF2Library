@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Mongo\Model;
 
-use GeometriaLab\Model\Persistent\Mapper\AbstractQuery,
+use GeometriaLab\Model\Persistent\Mapper\Query as AbstractQuery,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
     GeometriaLab\Model\Persistent\Mapper\MapperInterface;
 
@@ -13,13 +13,11 @@ class Query extends AbstractQuery
                                  '$nor', '$or', '$and', '$size', '$type',
                                  '$near', '$regex');
 
-
-
     /**
      * Add where condition
      *
      * @param array $where
-     * @return QueryInterface|Query
+     * @return AbstractQuery|QueryInterface|Query
      */
     public function where(array $where)
     {
@@ -48,36 +46,5 @@ class Query extends AbstractQuery
         }
 
         return $this;
-    }
-
-    /**
-     * Add sorting by field
-     *
-     * @param string $field
-     * @param boolean $ascending
-     * @return Query|QueryInterface
-     * @throws \InvalidArgumentException
-     */
-    public function sort($field, $ascending = true)
-    {
-        if (!$this->getModelSchema()->hasProperty($field)) {
-            throw new \InvalidArgumentException("Sorted field '$field' not present in model!");
-        }
-
-        $sort = array($field => $ascending ? 1 : -1);
-
-        if ($this->sort === null) {
-            $this->sort = $sort;
-        } else {
-            $this->sort = array_merge($this->sort, $sort);
-        }
-
-        return $this;
-    }
-
-    protected function getModelSchema()
-    {
-        $schemas = \GeometriaLab\Model\Schema\Manager::getInstance();
-        return $schemas->get($this->getMapper()->getModelClass());
     }
 }
