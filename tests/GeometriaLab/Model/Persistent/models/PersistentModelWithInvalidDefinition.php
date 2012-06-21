@@ -1,5 +1,7 @@
 <?php
 
+namespace GeometriaLabTest\Model\Persistent\Models;
+
 /**
  * @property boolean                                      $booleanProperty
  * @property float                                        $floatProperty

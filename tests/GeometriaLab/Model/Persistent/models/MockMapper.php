@@ -1,115 +1,70 @@
 <?php
 
-namespace GeometriaLab\Model\Persistent\Models;
+namespace GeometriaLabTest\Model\Persistent\Models;
 
-use GeometriaLab\Model\Persistent\Mapper\AbstractMapper;
-
+use GeometriaLab\Model\Persistent\ModelInterface,
+    GeometriaLab\Model\Persistent\Mapper\AbstractMapper,
+    GeometriaLab\Model\Persistent\Mapper\QueryInterface;
 
 class MockMapper extends AbstractMapper
 {
     /**
-     * @var array
+     * @var ModelInterface[]
      */
     protected $data;
 
-    /**
-     * @param array $condition
-     * @return integer
-     */
     public function count(array $condition = array())
     {
-        if (!empty($condition)) {
-            $condition = $this->createQuery()->where($condition)->getWhere();
-        }
-
-        return $this->getMongoCollection()->count($condition);
+        throw new \RuntimeException('Not implemented');
     }
 
-    /**
-     * Get model by primary key
-     *
-     * @param integer $id
-     * @return ModelInterface
-     */
     public function get($id)
     {
-        // TODO: Implement get() method.
+        return $this->data[$id];
     }
 
-    /**
-     * Get model by condition
-     *
-     * @param array $condition
-     * @return ModelInterface
-     */
     public function getByCondition(array $condition)
     {
-        // TODO: Implement getByCondition() method.
+        throw new \RuntimeException('Not implemented');
     }
 
-    /**
-     * Get models collection by query
-     *
-     * @param QueryInterface $query
-     * @return CollectionInterface
-     */
     public function getAll(QueryInterface $query = null)
     {
-        // TODO: Implement getAll() method.
+        throw new \RuntimeException('Not implemented');
     }
 
-    /**
-     * @param ModelInterface $model
-     * @return boolean
-     */
     public function create(ModelInterface $model)
     {
-        // TODO: Implement create() method.
+        if ($model->id === null) {
+            $model->id = count($this->data) + 1;
+        }
+
+        $this->data[$model->id] = $model;
     }
 
-    /**
-     * @param ModelInterface $model
-     * @return boolean
-     */
     public function update(ModelInterface $model)
     {
-        // TODO: Implement update() method.
+        $this->data[$model->id] = $model;
     }
 
-    /**
-     * @param array $data
-     * @param array $condition
-     * @return boolean
-     */
     public function updateByCondition(array $data, array $condition)
     {
-        // TODO: Implement updateByCondition() method.
+        throw new \RuntimeException('Not implemented');
     }
 
-    /**
-     * @param ModelInterface $model
-     * @return boolean
-     */
     public function delete(ModelInterface $model)
     {
-        // TODO: Implement delete() method.
+        if (isset($this->data[$model->id])) {
+            unset($this->data[$model->id]);
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    /**
-     * @param array $condition
-     * @return boolean
-     */
     public function deleteByCondition(array $condition)
     {
-        // TODO: Implement deleteByCondition() method.
+        throw new \RuntimeException('Not implemented');
     }
-
-    /**
-     * @return QueryInterface
-     */
-    public function createQuery()
-    {
-        // TODO: Implement createQuery() method.
-    }
-
 }

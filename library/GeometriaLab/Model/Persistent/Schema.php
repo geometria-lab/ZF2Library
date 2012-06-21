@@ -123,14 +123,16 @@ class Schema extends \GeometriaLab\Model\Schema
     protected function parseMethodTag(MethodTag $tag)
     {
         if ($tag->getMethodName() === 'getMapper()') {
-            if (!$tag->isStatic() || !class_exists($tag->getReturnType()) || $tag->getParams() === array()) {
-                throw new \InvalidArgumentException('Invalid mapper method tag in docblock!');
+            if (!$tag->isStatic()) {
+                throw new \InvalidArgumentException('Mapper method tag in docblock must be static!');
+            }
+
+            if (!class_exists($tag->getReturnType())) {
+                throw new \InvalidArgumentException('Invalid mapper class in mapper method tag in docblock!');
             }
 
             $this->setMapperClass($tag->getReturnType());
             $this->setMapperOptions($tag->getParams());
         }
     }
-
-
 }

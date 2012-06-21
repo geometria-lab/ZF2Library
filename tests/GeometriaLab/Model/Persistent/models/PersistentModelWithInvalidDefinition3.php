@@ -3,19 +3,19 @@
 namespace GeometriaLabTest\Model\Persistent\Models;
 
 /**
- * @property integer                                      $id
+ * @property boolean                                      $booleanProperty
  * @property float                                        $floatProperty
  * @property integer                                      $integerProperty
  * @property string                                       $stringProperty   {"defaultValue" : "default"}
- * @property \GeometriaLabTest\Model\Models\SubModel      $subTest
+ * @property \GeometriaLabTest\Model\TestModels\SubModel   $subTest
  * @property integer[]                                    $arrayOfInteger   {"defaultValue" : [1, 2, 3, 4,
  *                                                                                             5, 6, 7, 8]}
  * @property string[]                                     $arrayOfString
- * @property \GeometriaLabTest\Model\Models\SubModel[]    $arrayOfSubTest
+ * @property \GeometriaLabTest\Model\TestModels\SubModel[] $arrayOfSubTest
  *
- * @method static \GeometriaLabTest\Model\Persistent\Models\MockMapper getMapper()
+ * @method PersistentModel getMapper()  {"collectionName" : "test"}
  */
-class PersistentModel extends \GeometriaLab\Model\Persistent\Model
+class PersistentModelWithInvalidDefinition3 extends \GeometriaLab\Model\Persistent\Model
 {
 
 }
