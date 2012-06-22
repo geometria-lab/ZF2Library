@@ -12,89 +12,75 @@ use GeometriaLabTest\Model\Persistent\Models\PersistentModel,
 
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * Save model to storage
-     *
-     * @return boolean
-     */
-    public function save();
+    public function testSaveWithNew()
+    {
+        $model = new PersistentModel();
 
-    /**
-     * Delete model from storage
-     *
-     * @return boolean
-     */
-    public function delete();
+        $model->populate($this->getData());
 
-    /**
-     * Is not saved model
-     *
-     * @return boolean
-     */
-    public function isNew();
+        $this->assertNull($model->id);
+        $this->assertTrue($model->save());
+        $this->assertNotNull($model->id);
 
-    /**
-     * Is model changed
-     *
-     * @return boolean
-     */
-    public function isChanged();
+        $newModel = $model::getMapper()->get($model->id);
+
+        $this->assertEquals($newModel, $model);
+    }
+
+    public function testSaveWithChanged()
+    {
+
+    }
+
+    public function testSaveUnchanged()
+    {
+
+    }
+
+    public function testDelete()
+    {
+
+    }
+
+    public function testDeleteNotSaved()
+    {
+
+    }
+
+    public function testIsNew()
+    {
+
+    }
+
+    public function testIsChanged()
+    {
+
+    }
 
     /**
      * Is property changed
      *
      * @param string $name
      * @return boolean
-     */
+     *
     public function isPropertyChanged($name);
 
-    /**
-     * Get changed property
-     *
-     * @return array
-     */
+
     public function getChangedProperties();
 
-    /**
-     * Get property change
-     *
-     * @param string $name
-     * @return array
-     */
+
     public function getChange($name);
 
-    /**
-     * Get model changes
-     *
-     * @return array
-     */
+
     public function getChanges();
 
-    /**
-     * Get clean property value
-     *
-     * @param string $name
-     * @return mixed
-     */
+
     public function getClean($name);
 
-    /**
-     * Mark model as clean
-     *
-     * @param boolean $flag
-     * @return ModelInterface
-     */
+
     public function markClean($flag = true);
 
-    /**
-     * Get mapper
-     *
-     * @static
-     * @return Mapper\MapperInterface
-     */
-    static public function getMapper();
-
-
+    */
 
 
     public function testGetMapper()
@@ -130,7 +116,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     protected function getData()
     {
         return array(
-            'booleanProperty' => true,
             'floatProperty'   => 3.4,
             'integerProperty' => 10,
             'stringProperty'  => 'test',
