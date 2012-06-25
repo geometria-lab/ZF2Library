@@ -3,7 +3,7 @@
 namespace GeometriaLabTest\Model\Persistent\Models;
 
 /**
- * @property integer                                      $id
+ * @property integer                                      $id               { "primary" : true }
  * @property float                                        $floatProperty
  * @property integer                                      $integerProperty
  * @property string                                       $stringProperty   {"defaultValue" : "default"}

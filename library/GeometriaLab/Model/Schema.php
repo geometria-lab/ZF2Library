@@ -3,8 +3,7 @@
 namespace GeometriaLab\Model;
 
 use GeometriaLab\Code\Reflection\DocBlock\Tag\PropertyTag,
-    GeometriaLab\Model\Schema\Property\PropertyInterface,
-    GeometriaLab\Model\Schema\Property\ModelProperty;
+    GeometriaLab\Model\Schema\Property\PropertyInterface;
 
 use Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
@@ -33,17 +32,24 @@ class Schema
     static protected $tagManager;
 
     /**
-     * Properties class map
+     * Regular properties class map
      *
      * @var array
      */
-    static protected $propertiesClassMap = array(
+    static protected $regularPropertiesClassMap = array(
         'string'  => 'GeometriaLab\Model\Schema\Property\StringProperty',
         'array'   => 'GeometriaLab\Model\Schema\Property\ArrayProperty',
         'boolean' => 'GeometriaLab\Model\Schema\Property\BooleanProperty',
         'float'   => 'GeometriaLab\Model\Schema\Property\FloatProperty',
         'integer' => 'GeometriaLab\Model\Schema\Property\IntegerProperty',
     );
+
+    /**
+     * Model property class name
+     *
+     * @var string
+     */
+    static protected $modelPropertyClass = '\GeometriaLab\Model\Schema\Property\ModelProperty';
 
     /**
      * Protected constructor
@@ -143,12 +149,12 @@ class Schema
      */
     static public function createProperty($type, array $params = array())
     {
-        if (isset(static::$propertiesClassMap[$type])) {
-            $className = static::$propertiesClassMap[$type];
-            $property = new $className($params);
+        if (isset(static::$regularPropertiesClassMap[$type])) {
+            $property = new static::$regularPropertiesClassMap[$type]($params);
         } else if (class_exists($type)) {
             $params['modelClass'] = $type;
-            $property = new ModelProperty($params);
+
+            $property = new static::$modelPropertyClass($params);
         } else {
             throw new \InvalidArgumentException("Invalid property type '$type'");
         }

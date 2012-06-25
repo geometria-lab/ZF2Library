@@ -22,17 +22,24 @@ class Schema extends \GeometriaLab\Model\Schema
     protected $mapperOptions = array();
 
     /**
-     * Properties class map
+     * Regular properties class map
      *
      * @var array
      */
-    static protected $propertiesClassMap = array(
+    static protected $regularPropertiesClassMap = array(
         'string'  => 'GeometriaLab\Model\Persistent\Schema\Property\StringProperty',
         'array'   => 'GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty',
         'boolean' => 'GeometriaLab\Model\Persistent\Schema\Property\BooleanProperty',
         'float'   => 'GeometriaLab\Model\Persistent\Schema\Property\FloatProperty',
         'integer' => 'GeometriaLab\Model\Persistent\Schema\Property\IntegerProperty',
     );
+
+    /**
+     * Model property class name
+     *
+     * @var string
+     */
+    static protected $modelPropertyClass = '\GeometriaLab\Model\Persistent\Schema\Property\ModelProperty';
 
     /**
      * Protected constructor

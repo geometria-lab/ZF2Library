@@ -40,11 +40,15 @@ class MockMapper extends AbstractMapper
         }
 
         $this->data[$model->id] = $model;
+
+        return true;
     }
 
     public function update(ModelInterface $model)
     {
         $this->data[$model->id] = $model;
+
+        return true;
     }
 
     public function updateByCondition(array $data, array $condition)

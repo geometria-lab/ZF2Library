@@ -12,12 +12,13 @@ use GeometriaLabTest\Model\Persistent\Models\PersistentModel,
 
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSaveWithNew()
+    public function testSave()
     {
         $model = new PersistentModel();
 
         $model->populate($this->getData());
 
+        // create if new
         $this->assertNull($model->id);
         $this->assertTrue($model->save());
         $this->assertNotNull($model->id);
@@ -25,16 +26,18 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $newModel = $model::getMapper()->get($model->id);
 
         $this->assertEquals($newModel, $model);
-    }
 
-    public function testSaveWithChanged()
-    {
+        // update if changed
+        $model->set('integerProperty', 11);
 
-    }
+        $this->assertTrue($model->save());
 
-    public function testSaveUnchanged()
-    {
+        $newModel = $model::getMapper()->get($model->id);
 
+        $this->assertEquals($newModel, $model);
+
+        // no changes - nothing to do
+        $this->assertFalse($model->save());
     }
 
     public function testDelete()
@@ -119,7 +122,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'floatProperty'   => 3.4,
             'integerProperty' => 10,
             'stringProperty'  => 'test',
-            'subTest'         => new PersistentModel(array('id' => 1, 'title' => 'Hello')),
+            'subTest'         => new SubModel(array('id' => 1, 'title' => 'Hello')),
             'arrayOfInteger'  => array(9, 10, 11, 12, 13),
             'arrayOfString'   => array('string1', 'string2'),
             'arrayOfSubTest'  => array(new SubModel(array('id' => 1, 'title' => 'Hello')), new SubModel(array('id' => 2, 'title' => 'Hello2')))
