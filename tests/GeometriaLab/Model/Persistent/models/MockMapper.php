@@ -20,7 +20,9 @@ class MockMapper extends AbstractMapper
 
     public function get($id)
     {
-        return $this->data[$id];
+        if (isset($this->data[$id])) {
+            return $this->data[$id];
+        }
     }
 
     public function getByCondition(array $condition)
@@ -41,12 +43,16 @@ class MockMapper extends AbstractMapper
 
         $this->data[$model->id] = $model;
 
+        $model->markClean();
+
         return true;
     }
 
     public function update(ModelInterface $model)
     {
         $this->data[$model->id] = $model;
+
+        $model->markClean();
 
         return true;
     }
@@ -61,10 +67,10 @@ class MockMapper extends AbstractMapper
         if (isset($this->data[$model->id])) {
             unset($this->data[$model->id]);
 
-            return true;
-        } else {
-            return false;
+            $model->markClean(false);
         }
+
+        return true;
     }
 
     public function deleteByCondition(array $condition)

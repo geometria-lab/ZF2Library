@@ -42,22 +42,54 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testDelete()
     {
+        $model = new PersistentModel();
 
+        $model->populate($this->getData());
+
+        // create if new
+        $this->assertNull($model->id);
+        $this->assertTrue($model->save());
+        $this->assertNotNull($model->id);
+
+        $newModel = $model::getMapper()->get($model->id);
+
+        $this->assertEquals($newModel, $model);
+
+        $this->assertTrue($newModel->delete());
+
+        $this->assertTrue($newModel->isNew());
+
+        $this->assertNull($model::getMapper()->get($newModel->id));
     }
 
     public function testDeleteNotSaved()
     {
+        $model = new PersistentModel();
 
+        $model->populate($this->getData());
+        $this->assertFalse($model->delete());
     }
 
     public function testIsNew()
     {
+        $model = new PersistentModel();
 
+        $model->populate($this->getData());
+        $this->assertTrue($model->isNew());
+        $this->assertTrue($model->save());
+        $this->assertFalse($model->isNew());
     }
 
     public function testIsChanged()
     {
+        $model = new PersistentModel();
 
+        $model->populate($this->getData());
+        $this->assertTrue($model->isChanged());
+        $this->assertTrue($model->save());
+        $this->assertFalse($model->isChanged());
+        $model->set('integerProperty', 11);
+        $this->assertTrue($model->isChanged());
     }
 
     /**
@@ -89,7 +121,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testGetMapper()
     {
         $mapper = PersistentModel::getMapper();
-        $this->assertInstanceOf('\GeometriaLab\Model\Persistent\Models\MockMapper', $mapper);
+        $this->assertInstanceOf('\GeometriaLabTest\Model\Persistent\Models\MockMapper', $mapper);
     }
 
     public function testGetMapperWithoutDefinition()

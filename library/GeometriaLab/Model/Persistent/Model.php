@@ -37,7 +37,11 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function delete()
     {
-        return static::getMapper()->delete($this);
+        if (!$this->isNew()) {
+            return static::getMapper()->delete($this);
+        } else {
+            return false;
+        }
     }
 
     /**

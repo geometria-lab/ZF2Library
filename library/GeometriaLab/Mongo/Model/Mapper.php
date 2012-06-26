@@ -240,6 +240,10 @@ class Mapper extends AbstractMapper
             $id = $model->get('id');
         }
 
+        if ($id === null) {
+            throw new \InvalidArgumentException('Cant update model - primary property id is empty');
+        }
+
         $this->getMongoCollection()->update(array('_id' => new \MongoId($id)), array('$set' => $data));
 
         $model->markClean();
@@ -272,7 +276,13 @@ class Mapper extends AbstractMapper
      */
     public function delete(ModelInterface $model)
     {
-        $condition = array('_id' => new \MongoId($model->get('id')));
+        $id = $model->get('id');
+
+        if ($id === null) {
+            throw new \InvalidArgumentException('Cant delete model - primary property id is empty');
+        }
+
+        $condition = array('_id' => new \MongoId($id));
 
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
