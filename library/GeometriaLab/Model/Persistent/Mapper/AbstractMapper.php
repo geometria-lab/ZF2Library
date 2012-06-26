@@ -4,8 +4,6 @@ namespace GeometriaLab\Model\Persistent\Mapper;
 
 use \GeometriaLab\Model\ModelInterface;
 
-use \Zend\Stdlib\Options as ZendOptions;
-
 abstract class AbstractMapper implements MapperInterface
 {
     /**
@@ -171,6 +169,6 @@ abstract class AbstractMapper implements MapperInterface
      */
     public function createQuery()
     {
-        return Query($this);
+        return new Query($this);
     }
 }

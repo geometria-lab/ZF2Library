@@ -14,9 +14,18 @@ class ModelProperty extends AbstractProperty
      *
      * @param string $modelClass
      * @return ModelProperty
+     * @throws \InvalidArgumentException
      */
     public function setModelClass($modelClass)
     {
+        $reflect = new \ReflectionClass($modelClass);
+        $implementsSchemaless = $reflect->implementsInterface('\GeometriaLab\Model\Schemaless\ModelInterface');
+        $implementsPersistent = $reflect->implementsInterface('\GeometriaLab\Model\Persistent\ModelInterface');
+
+        if (!$implementsSchemaless || $implementsPersistent) {
+            throw new \InvalidArgumentException('Invalid model class, must be implements GeometriaLab\Model\Schemaless\ModelInterface');
+        }
+
         $this->modelClass = $modelClass;
 
         return $this;

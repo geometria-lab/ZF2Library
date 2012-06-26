@@ -6,7 +6,9 @@ use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\ModelInterface,
     GeometriaLab\Model\Persistent\CollectionInterface,
     GeometriaLab\Model\Persistent\Mapper\AbstractMapper,
-    GeometriaLab\Model\Persistent\Mapper\QueryInterface;
+    GeometriaLab\Model\Persistent\Mapper\QueryInterface,
+    GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\ModelProperty;
 
 class Mapper extends AbstractMapper
 {
@@ -343,6 +345,14 @@ class Mapper extends AbstractMapper
             if ($property->isPersistent()) {
                 if (!$changed || $model->isPropertyChanged($name)) {
                     $data[$name] = $model->get($name);
+
+                    if ($property instanceof ModelProperty) {
+                        $data[$name] = $data[$name]->toArray(-1);
+                    } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
+                        foreach($data[$name] as &$item) {
+                            $item = $item->toArray(-1);
+                        }
+                    }
                 }
                 if ($property->isPrimary()) {
                     $primary[] = $name;

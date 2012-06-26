@@ -44,22 +44,14 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $model = new PersistentModel();
 
-        $model->populate($this->getData());
+        $model->populate($this->getData())
+              ->save();
 
-        // create if new
-        $this->assertNull($model->id);
-        $this->assertTrue($model->save());
-        $this->assertNotNull($model->id);
+        $this->assertTrue($model->delete());
 
-        $newModel = $model::getMapper()->get($model->id);
+        $this->assertTrue($model->isNew());
 
-        $this->assertEquals($newModel, $model);
-
-        $this->assertTrue($newModel->delete());
-
-        $this->assertTrue($newModel->isNew());
-
-        $this->assertNull($model::getMapper()->get($newModel->id));
+        $this->assertNull($model::getMapper()->get($model->id));
     }
 
     public function testDeleteNotSaved()
@@ -76,7 +68,9 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         $model->populate($this->getData());
         $this->assertTrue($model->isNew());
-        $this->assertTrue($model->save());
+
+        $model->save();
+
         $this->assertFalse($model->isNew());
     }
 
@@ -86,37 +80,82 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
         $model->populate($this->getData());
         $this->assertTrue($model->isChanged());
-        $this->assertTrue($model->save());
+
+        $model->save();
+
         $this->assertFalse($model->isChanged());
+
         $model->set('integerProperty', 11);
+
         $this->assertTrue($model->isChanged());
     }
 
-    /**
-     * Is property changed
-     *
-     * @param string $name
-     * @return boolean
-     *
-    public function isPropertyChanged($name);
+    public function testIsPropertyChanged()
+    {
+        $model = new PersistentModel();
+
+        $model->populate($this->getData())
+              ->save();
+
+        $this->assertFalse($model->isPropertyChanged('integerProperty'));
+
+        $model->set('integerProperty', 11);
+
+        $this->assertTrue($model->isPropertyChanged('integerProperty'));
+    }
+
+    public function testGetChangedProperties()
+    {
+        $model = new PersistentModel();
+
+        $model->populate($this->getData())
+              ->save();
+
+        $model->set('floatProperty', 11.0);
+        $model->set('integerProperty', 11);
 
 
-    public function getChangedProperties();
+        $this->assertEquals(array('floatProperty', 'integerProperty'), $model->getChangedProperties());
+    }
 
+    public function testGetChange()
+    {
+        $model = new PersistentModel();
 
-    public function getChange($name);
+        $model->populate($this->getData())
+            ->save();
 
+        $model->set('integerProperty', 11);
 
-    public function getChanges();
+        $this->assertEquals(array(10, 11), $model->getChange('integerProperty'));
+    }
 
+    public function testGetChanges()
+    {
+        $model = new PersistentModel();
 
-    public function getClean($name);
+        $model->populate($this->getData())
+            ->save();
 
+        $model->set('integerProperty', 11);
+        $model->set('floatProperty', 11.0);
 
-    public function markClean($flag = true);
+        $changes = array('integerProperty' => array(10, 11), 'floatProperty' => array(3.4, 11.0));
 
-    */
+        $this->assertEquals($changes, $model->getChanges());
+    }
 
+    public function testGetClean()
+    {
+        $model = new PersistentModel();
+
+        $model->populate($this->getData())
+              ->save();
+
+        $model->set('integerProperty', 11);
+
+        $this->assertEquals(10, $model->getClean('integerProperty'));
+    }
 
     public function testGetMapper()
     {

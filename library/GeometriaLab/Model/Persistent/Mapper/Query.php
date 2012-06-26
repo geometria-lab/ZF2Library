@@ -56,7 +56,7 @@ class Query implements QueryInterface
      */
     public function __construct(MapperInterface $mapper)
     {
-        $this->mapper = $mapper;
+        $this->setMapper($mapper);
     }
 
     /**
@@ -72,10 +72,10 @@ class Query implements QueryInterface
     /**
      * Set mapper
      *
-     * @param $mapper
+     * @param MapperInterface $mapper
      * @return Query
      */
-    public function setMapper($mapper)
+    public function setMapper(MapperInterface $mapper)
     {
         $this->mapper = $mapper;
 
@@ -91,7 +91,7 @@ class Query implements QueryInterface
      */
     public function select(array $fields)
     {
-        foreach($fields as $field => $include) {
+        foreach($fields as $field) {
             if (!$this->getModelSchema()->hasProperty($field)) {
                 throw new \InvalidArgumentException("Selected field '$field' not present in model!");
             }

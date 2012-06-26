@@ -14,6 +14,26 @@ class Query extends AbstractQuery
                                  '$near', '$regex');
 
     /**
+     * Set selected fields
+     *
+     * @param array $fields
+     * @return QueryInterface|Query|AbstractQuery
+     * @throws \InvalidArgumentException
+     */
+    public function select(array $fields)
+    {
+        foreach($fields as $field => $include) {
+            if (!$this->getModelSchema()->hasProperty($field)) {
+                throw new \InvalidArgumentException("Selected field '$field' not present in model!");
+            }
+        }
+
+        $this->select = $fields;
+
+        return $this;
+    }
+
+    /**
      * Add where condition
      *
      * @param array $where
@@ -28,13 +48,13 @@ class Query extends AbstractQuery
                     $keys = array_intersect(array_keys($value), $this->mongoKeys);
                     if (!empty($keys)) {
                         foreach ($value as $serviceKey => $data) {
-                            $conditions[$field][$serviceKey] = $this->validateFieldValue($field, $data);
+                            $conditions[$field][$serviceKey] = $this->prepareFieldValue($field, $data);
                         }
                     } else {
-                        $conditions[$field]['$in'] = $this->validateFieldValue($field, $value);
+                        $conditions[$field]['$in'] = $this->prepareFieldValue($field, $value);
                     }
                 } else {
-                    $conditions[$field] = $this->validateFieldValue($field, $value);
+                    $conditions[$field] = $this->prepareFieldValue($field, $value);
                 }
             }
 

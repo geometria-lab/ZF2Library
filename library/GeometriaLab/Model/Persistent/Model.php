@@ -107,17 +107,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function getChange($name)
     {
-        if (!$this->getSchema()->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property '$name' does not exists");
-        }
-
-        $change = array(null, $this->get($name));
-
-        if (isset($this->cleanPropertyValues[$name])) {
-            return $change[0] = $this->cleanPropertyValues[$name];
-        }
-
-        return $change;
+        return array($this->getClean($name), $this->get($name));
     }
 
     /**
