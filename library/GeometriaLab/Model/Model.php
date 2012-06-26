@@ -4,6 +4,9 @@ namespace GeometriaLab\Model;
 
 use GeometriaLab\Model\Schema;
 
+/**
+ *
+ */
 class Model extends Schemaless\Model implements ModelInterface
 {
     /**
