@@ -108,9 +108,10 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * To array
      *
-     * @return ModelInterface[]
+     * @param integer $depth
+     * @return array
      */
-    public function toArray();
+    public function toArray($depth = 0);
 
     /**
      * Get models by condition or callback

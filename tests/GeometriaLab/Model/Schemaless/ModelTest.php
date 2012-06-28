@@ -115,11 +115,32 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $array = array(
             'test1' => 1,
-            'test2' => 2
+            'test2' => 2,
+            'test3' => new Model(array('test1' => 1))
         );
         $m = new Model();
         $m->populate($array);
         $this->assertEquals($array, $m->toArray());
+    }
+
+    public function testToArrayWithDepth()
+    {
+        $array = array(
+            'test1' => 1,
+            'test2' => 2,
+            'test3' => new Model(array('test1' => 1))
+        );
+
+        $m = new Model();
+        $m->populate($array);
+
+        $resultArray = array(
+            'test1' => 1,
+            'test2' => 2,
+            'test3' => array('test1' => 1)
+        );
+
+        $this->assertEquals($resultArray, $m->toArray(-1));
     }
 
     public function testIterator()

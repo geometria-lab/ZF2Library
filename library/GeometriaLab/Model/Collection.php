@@ -36,7 +36,7 @@ class Collection implements CollectionInterface
      * Add model or models to the end of a collection
      *
      * @param mixed $data
-     * @return Collection
+     * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
     public function push($data)
@@ -70,7 +70,7 @@ class Collection implements CollectionInterface
      * Add model or models at the beginning of a collection
      *
      * @param mixed $data
-     * @return Collection
+     * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
     public function unshift($data)
@@ -103,7 +103,7 @@ class Collection implements CollectionInterface
      *
      * @param integer $offset
      * @param ModelInterface $model
-     * @return Collection
+     * @return CollectionInterface|Collection
      */
     public function set($offset, ModelInterface $model)
     {
@@ -116,7 +116,7 @@ class Collection implements CollectionInterface
      * Remove model from collection
      *
      * @param ModelInterface $model
-     * @return Collection
+     * @return CollectionInterface|Collection
      */
     public function remove(ModelInterface $model)
     {
@@ -167,13 +167,15 @@ class Collection implements CollectionInterface
      */
     public function getLast()
     {
-        return end($this->models);
+        $model = end($this->models);
+
+        return $model !== false ? $model : null;
     }
 
     /**
      * Shuffle collection
      *
-     * @return Collection
+     * @return CollectionInterface|Collection
      */
     public function shuffle()
     {
@@ -187,7 +189,7 @@ class Collection implements CollectionInterface
     /**
      * Reverse collection
      *
-     * @return Collection
+     * @return CollectionInterface|Collection
      */
     public function reverse()
     {
@@ -201,7 +203,7 @@ class Collection implements CollectionInterface
     /**
      * Clear collection
      *
-     * @return Collection
+     * @return CollectionInterface|Collection
      */
     public function clear()
     {
@@ -225,11 +227,21 @@ class Collection implements CollectionInterface
     /**
      * To array
      *
+     * @param integer $depth
      * @return array
      */
-    public function toArray()
+    public function toArray($depth = 0)
     {
-        return $this->models;
+        $array = array();
+        foreach($this->models as $model) {
+            if ($depth !== 0) {
+                $array[] = $model->toArray($depth === -1 ? -1 : $depth - 1);
+            } else {
+                $array[] = $model;
+            }
+        }
+
+        return $array;
     }
 
     /**

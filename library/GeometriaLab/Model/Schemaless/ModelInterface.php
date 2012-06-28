@@ -37,4 +37,12 @@ interface ModelInterface extends \Countable
      * @return bool
      */
     public function has($name);
+
+    /**
+     * Convert model to array
+     *
+     * @param integer $depth
+     * @return array
+     */
+    public function toArray($depth = 0);
 }

@@ -96,7 +96,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->model->arrayOfSubTest = array(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), array('tsa' => 123));
     }
 
-    public function setArrayToModelProperty()
+    public function testSetArrayToModelProperty()
     {
         $this->model->subTest = array('id' => 1, 'title' => 'Hello');
         $this->assertEquals(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), $this->model->subTest);

@@ -59,8 +59,7 @@ class Schema
     public function __construct($className = null)
     {
         if ($className !== null) {
-            $this->className = $className;
-
+            $this->setClassName($className);
             $this->parseDocblock($className);
         }
     }

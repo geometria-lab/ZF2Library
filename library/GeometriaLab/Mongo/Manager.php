@@ -54,10 +54,19 @@ class Manager
      */
     public function get($name)
     {
-        if (!isset($this->mongoDbInstatnces[$name])) {
+        if (!$this->has($name)) {
             throw new \InvalidArgumentException("Instance '$name' is not present");
         }
 
         return $this->mongoDbInstatnces[$name];
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return isset($this->mongoDbInstatnces[$name]);
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+defined('TESTS_MONGO_MAPPER_CONNECTION_SERVER') || define('TESTS_MONGO_MAPPER_CONNECTION_SERVER', "mongodb://localhost");
+defined('TESTS_MONGO_MAPPER_CONNECTION_DB') || define('TESTS_MONGO_MAPPER_CONNECTION_DB', "geometriaLabZF2LibraryTests");
+
 /**
  * PHPUnit Code Coverage / Test Report
  */

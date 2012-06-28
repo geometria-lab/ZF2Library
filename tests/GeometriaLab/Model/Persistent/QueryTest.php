@@ -49,7 +49,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->query->hasSelect());
     }
 
-    public function resetSelect()
+    public function testResetSelect()
     {
         $this->query->select(array('floatProperty', 'integerProperty'));
 
@@ -107,46 +107,74 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testSort()
     {
-        $this->markTestIncomplete();
+        $this->query->sort('floatProperty');
+        $this->query->sort('integerProperty', false);
+
+        $result = array('floatProperty' => true, 'integerProperty' => false);
+
+        $this->assertEquals($result, $this->query->getSort());
+    }
+
+    public function testSortWithUndefinedFields()
+    {
+        $this->setExpectedException('\InvalidArgumentException');
+        $this->query->sort('undefinedProperty');
     }
 
     public function testHasSort()
     {
-        $this->markTestIncomplete();
+        $this->assertFalse($this->query->hasSort());
+        $this->query->sort('floatProperty');
+        $this->assertTrue($this->query->hasSort());
     }
 
     public function testResetSort()
     {
-        $this->markTestIncomplete();
+        $this->query->sort('floatProperty');
+        $this->assertTrue($this->query->hasSort());
+        $this->query->resetSort();
+        $this->assertFalse($this->query->hasSort());
     }
 
     public function testLimit()
     {
-        $this->markTestIncomplete();
+        $this->query->limit(1);
+        $this->assertEquals(1, $this->query->getLimit());
     }
 
     public function testHasLimit()
     {
-        $this->markTestIncomplete();
+        $this->assertFalse($this->query->hasLimit());
+        $this->query->limit(1);
+        $this->assertTrue($this->query->hasLimit());
     }
 
     public function testResetLimit()
     {
-        $this->markTestIncomplete();
+        $this->query->limit(1);
+        $this->assertTrue($this->query->hasLimit());
+        $this->query->resetLimit();
+        $this->assertFalse($this->query->hasLimit());
     }
 
     public function testOffset()
     {
-        $this->markTestIncomplete();
+        $this->query->offset(1);
+        $this->assertEquals(1, $this->query->getOffset());
     }
 
     public function testHasOffset()
     {
-        $this->markTestIncomplete();
+        $this->assertFalse($this->query->hasOffset());
+        $this->query->offset(1);
+        $this->assertTrue($this->query->hasOffset());
     }
 
     public function testResetOffset()
     {
-        $this->markTestIncomplete();
+        $this->query->offset(1);
+        $this->assertTrue($this->query->hasOffset());
+        $this->query->resetOffset();
+        $this->assertFalse($this->query->hasOffset());
     }
 }

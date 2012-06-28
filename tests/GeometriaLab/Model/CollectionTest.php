@@ -23,6 +23,14 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testEmptyCollection()
+    {
+        $c = new Collection();
+        $this->assertNull($c->current());
+        $this->assertNull($c->getFirst());
+        $this->assertNull($c->getLast());
+    }
+
     public function testPopulateOnConstruct()
     {
         $c = new Collection($this->models);
@@ -236,6 +244,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $c = new Collection($this->models);
         $c[0] = $this->models[4];
         $this->assertEquals($this->models[4], $c->get(0));
+
+        $model =  new Model(array('test' => 6));
+        $c[] = $model;
+
+        $this->assertEquals($model, $c->get(5));
     }
 
     public function testOffsetUnset()
@@ -243,5 +256,26 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $c = new Collection($this->models);
         unset($c[4]);
         $this->assertEquals(4, count($c));
+    }
+
+    public function testToArray()
+    {
+        $c = new Collection($this->models);
+        $this->assertEquals($this->models, $c->toArray());
+    }
+
+    public function testToArrayWithDepth()
+    {
+        $c = new Collection($this->models);
+
+        $result = array(
+            array('test' => 1),
+            array('test' => 2),
+            array('test' => 3),
+            array('test' => 4),
+            array('test' => 5)
+        );
+
+        $this->assertEquals($result, $c->toArray(-1));
     }
 }
