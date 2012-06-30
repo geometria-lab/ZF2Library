@@ -2,11 +2,11 @@
 
 namespace GeometriaLabTest\Model\Persistent;
 
-use GeometriaLabTest\Model\Persistent\Models\PersistentModel,
-    GeometriaLabTest\Model\Persistent\Models\PersistentModelWithInvalidDefinition,
-    GeometriaLabTest\Model\Persistent\Models\PersistentModelWithInvalidDefinition2,
-    GeometriaLabTest\Model\Persistent\Models\PersistentModelWithInvalidDefinition3,
-    GeometriaLabTest\Model\Persistent\Models\PersistentModelWithoutDefinition,
+use GeometriaLabTest\Model\Persistent\Models\Model,
+    GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition,
+    GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition2,
+    GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition3,
+    GeometriaLabTest\Model\Persistent\Models\ModelWithoutDefinition,
     GeometriaLabTest\Model\Models\SubModel;
 
 
@@ -14,7 +14,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 {
     public function testSave()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData());
 
@@ -42,7 +42,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testDelete()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData())
               ->save();
@@ -56,7 +56,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteNotSaved()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData());
         $this->assertFalse($model->delete());
@@ -64,7 +64,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNew()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData());
         $this->assertTrue($model->isNew());
@@ -76,7 +76,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testIsChanged()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData());
         $this->assertTrue($model->isChanged());
@@ -92,7 +92,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testIsPropertyChanged()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData())
               ->save();
@@ -106,7 +106,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChangedProperties()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData())
               ->save();
@@ -120,7 +120,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChange()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData())
             ->save();
@@ -132,7 +132,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChanges()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData())
             ->save();
@@ -147,7 +147,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClean()
     {
-        $model = new PersistentModel();
+        $model = new Model();
 
         $model->populate($this->getData())
               ->save();
@@ -159,32 +159,26 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMapper()
     {
-        $mapper = PersistentModel::getMapper();
+        $mapper = Model::getMapper();
         $this->assertInstanceOf('\GeometriaLabTest\Model\Persistent\Models\MockMapper', $mapper);
     }
 
     public function testGetMapperWithoutDefinition()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        PersistentModelWithoutDefinition::getMapper();
+        ModelWithoutDefinition::getMapper();
     }
 
     public function testGetMapperWithInvalidDefinition()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        PersistentModelWithInvalidDefinition::getMapper();
+        ModelWithInvalidDefinition::getMapper();
     }
 
     public function testGetMapperWithInvalidDefinition2()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        PersistentModelWithInvalidDefinition2::getMapper();
-    }
-
-    public function testGetMapperWithInvalidDefinition3()
-    {
-        $this->setExpectedException('\InvalidArgumentException');
-        PersistentModelWithInvalidDefinition3::getMapper();
+        ModelWithInvalidDefinition2::getMapper();
     }
 
     protected function getData()

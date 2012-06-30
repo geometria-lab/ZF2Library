@@ -2,8 +2,10 @@
 
 namespace GeometriaLabTest\Mongo\Model;
 
-use GeometriaLab\Mongo\Model\Mapper,
-    GeometriaLab\Mongo\Manager;
+use GeometriaLabTest\Mongo\Model\Models\Model;
+
+use GeometriaLab\Mongo\Manager,
+    GeometriaLab\Mongo\Model\Mapper;
 
 class MapperTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,10 +23,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
             $manager->set('default', $mongoDb);
         }
 
-        $this->mapper = new Mapper();
-        $this->mapper->setCollectionName('test');
-        $this->mapper->setMongoInstanceName('default');
-        $this->mapper->setModelClass('GeometriaLabTest\Model\Persistent\Models\PersistentModel');
+        $this->mapper = Model::getMapper();
     }
 
     public function tearDown()

@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Model\Persistent;
 
-use GeometriaLabTest\Model\Persistent\Models\PersistentModel;
+use GeometriaLabTest\Model\Persistent\Models\Model;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->query = PersistentModel::getMapper()->createQuery();
+        $this->query = Model::getMapper()->createQuery();
     }
 
     public function testQueryInstance()
@@ -23,7 +23,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMapper()
     {
-        $this->assertEquals($this->query->getMapper(), PersistentModel::getMapper());
+        $this->assertEquals($this->query->getMapper(), Model::getMapper());
     }
 
     public function testSelect()

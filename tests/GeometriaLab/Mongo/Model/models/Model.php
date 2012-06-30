@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Model\Persistent\Models;
+namespace GeometriaLabTest\Mongo\Model\Models;
 
 /**
  * @property integer                                      $id               { "primary" : true }
@@ -13,9 +13,9 @@ namespace GeometriaLabTest\Model\Persistent\Models;
  * @property string[]                                     $arrayOfString
  * @property \GeometriaLabTest\Model\Models\SubModel[]    $arrayOfSubTest
  *
- * @method static \GeometriaLabTest\Model\Persistent\Models\MockMapper getMapper()
+ * @method static \GeometriaLab\Mongo\Model\Mapper getMapper() { "mongoInstanceName" : "default", "collectionName" : "test" }
  */
-class PersistentModel extends \GeometriaLab\Model\Persistent\Model
+class Model extends \GeometriaLab\Model\Persistent\Model
 {
 
 }
