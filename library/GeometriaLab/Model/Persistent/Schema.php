@@ -2,8 +2,9 @@
 
 namespace GeometriaLab\Model\Persistent;
 
-use GeometriaLab\Code\Reflection\DocBlock\Tag\MethodTag,
-    GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface;
+use GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface;
+
+use Zend\Code\Reflection\DocBlock\Tag\MethodTag as ZendMethodTag;
 
 class Schema extends \GeometriaLab\Model\Schema
 {
@@ -40,20 +41,6 @@ class Schema extends \GeometriaLab\Model\Schema
      * @var string
      */
     static protected $modelPropertyClass = '\GeometriaLab\Model\Persistent\Schema\Property\ModelProperty';
-
-    /**
-     * Protected constructor
-     *
-     * @param string $className
-     */
-    public function __construct($className = null)
-    {
-        if (!static::getTagManager()->hasTag('method')) {
-            static::getTagManager()->addTagPrototype(new MethodTag());
-        }
-
-        parent::__construct($className);
-    }
 
     /**
      * Set mapper class
@@ -124,10 +111,10 @@ class Schema extends \GeometriaLab\Model\Schema
     /**
      * Parse method tag
      *
-     * @param MethodTag $tag
+     * @param ZendMethodTag $tag
      * @throws \InvalidArgumentException
      */
-    protected function parseMethodTag(MethodTag $tag)
+    protected function parseMethodTag(ZendMethodTag $tag)
     {
         if ($tag->getMethodName() === 'getMapper()') {
             if (!$tag->isStatic()) {
@@ -138,8 +125,10 @@ class Schema extends \GeometriaLab\Model\Schema
                 throw new \InvalidArgumentException('Invalid mapper class in mapper method tag in docblock!');
             }
 
+            $params = $this->getParamsFromTag($tag);
+
             $this->setMapperClass($tag->getReturnType());
-            $this->setMapperOptions($tag->getParams());
+            $this->setMapperOptions($params);
         }
     }
 }

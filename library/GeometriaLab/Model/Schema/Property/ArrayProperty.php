@@ -59,7 +59,7 @@ class ArrayProperty extends AbstractProperty
      */
     public function getItemProperty()
     {
-        if ($this->itemProperty === null) {
+        if ($this->itemProperty === null && $this->getItemType() !== null) {
             $this->itemProperty = Schema::createProperty($this->getItemType());
         }
 
@@ -79,7 +79,9 @@ class ArrayProperty extends AbstractProperty
             throw new \InvalidArgumentException("must be array");
         }
 
-        $value = array_map(array($this->getItemProperty(), 'prepare'), $value);
+        if ($this->getItemProperty() !== null) {
+            $value = array_map(array($this->getItemProperty(), 'prepare'), $value);
+        }
 
         return $value;
     }

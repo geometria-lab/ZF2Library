@@ -2,13 +2,13 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Code\Reflection\DocBlock\Tag\PropertyTag,
-    GeometriaLab\Model\Schema\Property\PropertyInterface;
+use GeometriaLab\Model\Schema\Property\PropertyInterface;
 
-use Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
+use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ZendTagInterface,
+    Zend\Code\Reflection\DocBlock\Tag\PropertyTag as ZendPropertyTag,
+    Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
-    Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection,
-    Zend\Code\Reflection\DocBlock\TagManager as ZendTagManager;
+    Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection;
 
 class Schema
 {
@@ -25,11 +25,6 @@ class Schema
      * @var PropertyInterface[]
      */
     protected $properties = array();
-
-    /**
-     * @var ZendTagManager
-     */
-    static protected $tagManager;
 
     /**
      * Regular properties class map
@@ -172,7 +167,7 @@ class Schema
         $classReflection = new ZendClassReflection($className);
 
         try {
-            $docblock = new ZendDocBlockReflection($classReflection, static::getTagManager());
+            $docblock = new ZendDocBlockReflection($classReflection);
         } catch (ZendInvalidArgumentException $e) {
             throw new \InvalidArgumentException('Docblock not present');
         }
@@ -191,42 +186,48 @@ class Schema
     /**
      * Parse property tag
      *
-     * @param PropertyTag $tag
+     * @param ZendPropertyTag $tag
      * @throws \InvalidArgumentException
      */
-    protected function parsePropertyTag(PropertyTag $tag)
+    protected function parsePropertyTag(ZendPropertyTag $tag)
     {
         $name = substr($tag->getPropertyName(), 1);
-
-        if ($tag->getDescription() !== null) {
-            throw new \InvalidArgumentException("Not valid JSON params for property '$name'");
-        }
 
         if ($this->hasProperty($name)) {
             throw new \InvalidArgumentException("Property with name '$name' already exists");
         }
 
-        $params = $tag->getParams();
+        $params = $this->getParamsFromTag($tag);
         $params['name'] = $name;
 
-        $property = static::createProperty($tag->getType(), $params);
+        $type = $tag->getType();
+
+        if (strpos($type, '[]') === strlen($type) - 2) {
+            $params['itemType'] = substr($type, 0, strlen($type) - 2);
+            $type = 'array';
+        }
+
+        $property = static::createProperty($type, $params);
 
         $this->setProperty($property);
     }
 
-    /**
-     * Get tag manager
-     *
-     * @static
-     * @return ZendTagManager
-     */
-    static protected function getTagManager()
+    protected function getParamsFromTag(ZendTagInterface $tag)
     {
-        if (static::$tagManager === null) {
-            static::$tagManager = new ZendTagManager(ZendTagManager::USE_DEFAULT_PROTOTYPES);
-            static::$tagManager->addTagPrototype(new PropertyTag());
+        $description = $tag->getDescription();
+
+        if ($description == '') {
+            return array();
         }
 
-        return static::$tagManager;
+        $description = preg_replace('#\s+#m', ' ', $description);
+        $params = json_decode($description, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($params)) {
+            $name = substr($tag->getPropertyName(), 1);
+            throw new \InvalidArgumentException("Not valid JSON params for property '$name'");
+        }
+
+        return $params;
     }
 }
