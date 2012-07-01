@@ -126,11 +126,14 @@ class Mapper extends AbstractMapper
         $collection = new $collectionClass();
 
         foreach($cursor as $document) {
+            $data = $this->transformStorageDataForModel($document);
+
             /**
              * @var ModelInterface $model
              */
-            $model = new $modelClass($document);
-            $model->populate($document);
+            $model = new $modelClass();
+            $model->populate($data);
+            $model->markClean();
 
             $collection->push($model);
         }
@@ -217,7 +220,7 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->insert($data, array('safe' => true));
 
         if ($result) {
-            $model->set('id', $data['_id']);
+            $model->set('id', $data['_id']->{'$id'});
             $model->markClean();
 
             return true;
@@ -367,14 +370,36 @@ class Mapper extends AbstractMapper
         return $this->transformModelDataForStorage($data);
     }
 
+    /**
+     * Transform model data for storage
+     *
+     * @param array $data
+     * @return array
+     */
     protected function transformModelDataForStorage(array $data)
     {
         $data = parent::transformModelDataForStorage($data);
 
         if (isset($data['id'])) {
             $data['_id'] = new \MongoId($data['id']);
-            unset($data['id']);
         }
+        unset($data['id']);
+
+        return $data;
+    }
+
+    /**
+     * Transform storage data for model
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function transformStorageDataForModel(array $data)
+    {
+        $data = parent::transformStorageDataForModel($data);
+
+        $data['id'] = $data['_id']->{'$id'};
+        unset($data['_id']);
 
         return $data;
     }

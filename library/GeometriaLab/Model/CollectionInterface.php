@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Schemaless\ModelInterface;
+use GeometriaLab\Model\Schemaless\ModelInterface as SchemalessModelInterface;
 
 interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
 {
@@ -18,7 +18,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Remove and return last model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function pop();
 
@@ -34,7 +34,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Remove and return first model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function shift();
 
@@ -42,38 +42,38 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
      * Set model to collection by offset
      *
      * @param integer $offset
-     * @param ModelInterface $model
+     * @param SchemalessModelInterface $model
      * @return CollectionInterface
      */
-    public function set($offset, ModelInterface $model);
+    public function set($offset, SchemalessModelInterface $model);
 
     /**
      * Remove model from collection
      *
-     * @param ModelInterface $model
+     * @param SchemalessModelInterface $model
      * @return CollectionInterface
      */
-    public function remove(ModelInterface $model);
+    public function remove(SchemalessModelInterface $model);
 
     /**
      * Get model from collection by offset
      *
      * @param integer $offset
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function get($offset);
 
     /**
      * Get first model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function getFirst();
 
     /**
      * Get last model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function getLast();
 

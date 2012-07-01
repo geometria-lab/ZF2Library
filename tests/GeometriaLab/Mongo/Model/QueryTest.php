@@ -42,9 +42,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($where, $this->query->getWhere());
 
-        $this->query->where(array('id' => array('$in' => array(1,2,3))));
+        $where['id'] = array('$in' => array("1dsad234","1dsad234","1dsad234"));
 
-        $where['id'] = array('$in' => array(1,2,3));
+        $this->query->where(array('id' => $where['id']));
 
         $this->assertEquals($where, $this->query->getWhere());
     }

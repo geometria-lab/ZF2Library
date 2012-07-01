@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Schemaless\ModelInterface;
+use GeometriaLab\Model\Schemaless\ModelInterface as SchemalessModelInterface;
 
 class Collection implements CollectionInterface
 {
@@ -41,7 +41,7 @@ class Collection implements CollectionInterface
      */
     public function push($data)
     {
-        if ($data instanceof ModelInterface) {
+        if ($data instanceof SchemalessModelInterface) {
             array_push($this->models, $data);
         } else if (is_array($data) || $data instanceof \Traversable) {
             // TODO: Create models?
@@ -59,7 +59,7 @@ class Collection implements CollectionInterface
     /**
      * Remove and return last model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function pop()
     {
@@ -75,7 +75,7 @@ class Collection implements CollectionInterface
      */
     public function unshift($data)
     {
-        if ($data instanceof ModelInterface) {
+        if ($data instanceof SchemalessModelInterface) {
             array_unshift($this->models, $data);
         } else if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $model) {
@@ -91,7 +91,7 @@ class Collection implements CollectionInterface
     /**
      * Remove and return first model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function shift()
     {
@@ -102,10 +102,10 @@ class Collection implements CollectionInterface
      * Set model to collection by offset
      *
      * @param integer $offset
-     * @param ModelInterface $model
+     * @param SchemalessModelInterface $model
      * @return CollectionInterface|Collection
      */
-    public function set($offset, ModelInterface $model)
+    public function set($offset, SchemalessModelInterface $model)
     {
         $this->models[$offset] = $model;
 
@@ -115,10 +115,10 @@ class Collection implements CollectionInterface
     /**
      * Remove model from collection
      *
-     * @param ModelInterface $model
+     * @param SchemalessModelInterface $model
      * @return CollectionInterface|Collection
      */
-    public function remove(ModelInterface $model)
+    public function remove(SchemalessModelInterface $model)
     {
         $offset = array_search($model, $this->models, true);
 
@@ -135,7 +135,7 @@ class Collection implements CollectionInterface
      * Get model from collection by offset
      *
      * @param integer $offset
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function get($offset)
     {
@@ -149,7 +149,7 @@ class Collection implements CollectionInterface
     /**
      * Get first model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function getFirst()
     {
@@ -163,7 +163,7 @@ class Collection implements CollectionInterface
     /**
      * Get last model
      *
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function getLast()
     {
@@ -259,9 +259,9 @@ class Collection implements CollectionInterface
 
         if (count($this)) {
             if (!is_callable($condition)) {
-                $callback = function(ModelInterface $model) use ($condition) {
+                $callback = function(SchemalessModelInterface $model) use ($condition) {
                     /**
-                     * @var ModelInterface $model
+                     * @var SchemalessModelInterface $model
                      */
                     foreach ($condition as $name => $value) {
                         if ($model->get($name) != $value) {
@@ -322,7 +322,7 @@ class Collection implements CollectionInterface
     */
 
     /**
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function current()
     {
@@ -382,7 +382,7 @@ class Collection implements CollectionInterface
 
     /**
      * @param integer $offset
-     * @return ModelInterface|null
+     * @return SchemalessModelInterface|null
      */
     public function offsetGet($offset)
     {

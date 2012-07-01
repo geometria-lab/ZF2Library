@@ -5,7 +5,6 @@ namespace GeometriaLabTest\Model\Persistent;
 use GeometriaLabTest\Model\Persistent\Models\Model,
     GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition,
     GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition2,
-    GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition3,
     GeometriaLabTest\Model\Persistent\Models\ModelWithoutDefinition,
     GeometriaLabTest\Model\Models\SubModel;
 

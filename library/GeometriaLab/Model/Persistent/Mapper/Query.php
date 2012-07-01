@@ -351,7 +351,13 @@ class Query implements QueryInterface
             throw new \InvalidArgumentException("Field in where '$field' not present in model!");
         }
 
-        return $this->getModelSchema()->getProperty($field)->prepare($value);
+        try {
+            $value = $this->getModelSchema()->getProperty($field)->prepare($value);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException("Invalid value for field '$field': " . $e->getMessage());
+        }
+
+        return $value;
     }
 
     /**

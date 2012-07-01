@@ -3,12 +3,12 @@
 namespace GeometriaLabTest\Mongo\Model\Models;
 
 /**
- * @property integer                                      $id               { "primary" : true }
+ * @property string                                       $id               { "primary" : true }
  * @property float                                        $floatProperty
  * @property integer                                      $integerProperty
- * @property string                                       $stringProperty   {"defaultValue" : "default"}
+ * @property string                                       $stringProperty   { "defaultValue" : "default"}
  * @property \GeometriaLabTest\Model\Models\SubModel      $subTest
- * @property integer[]                                    $arrayOfInteger   {"defaultValue" : [1, 2, 3, 4,
+ * @property integer[]                                    $arrayOfInteger   { "defaultValue" : [1, 2, 3, 4,
  *                                                                                             5, 6, 7, 8]}
  * @property string[]                                     $arrayOfString
  * @property \GeometriaLabTest\Model\Models\SubModel[]    $arrayOfSubTest
