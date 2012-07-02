@@ -347,14 +347,18 @@ class Mapper extends AbstractMapper
         foreach($model->getSchema()->getProperties() as $name => $property) {
             if ($property->isPersistent()) {
                 if (!$changed || $model->isPropertyChanged($name)) {
-                    $data[$name] = $model->get($name);
+                    $value = $model->get($name);
 
-                    if ($property instanceof ModelProperty) {
-                        $data[$name] = $data[$name]->toArray(-1);
-                    } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
-                        foreach($data[$name] as &$item) {
-                            $item = $item->toArray(-1);
+                    if ($value !== null) {
+                        if ($property instanceof ModelProperty) {
+                            $value = $value->toArray(-1);
+                        } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
+                            foreach($value as &$item) {
+                                $item = $item->toArray(-1);
+                            }
                         }
+
+                        $data[$name] = $value;
                     }
                 }
                 if ($property->isPrimary()) {
