@@ -105,9 +105,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $model->integerProperty = 1;
         $model->save();
 
-        $fetchedModel = Model::getMapper()->getByCondition(array('integerProperty' => 1));
-
-        $this->assertEquals($model, $fetchedModel);
+        $this->assertModelByCondition($model, array('integerProperty' => 1));
     }
 
     public function testGetAllByString()
@@ -116,11 +114,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $model->stringProperty = "test";
         $model->save();
 
-        $condition = array('stringProperty' => "test");
-
-        $fetchedModel = Model::getMapper()->getByCondition($condition);
-
-        $this->assertEquals($model, $fetchedModel);
+        $this->assertModelByCondition($model, array('stringProperty' => "test"));
     }
 
     public function testGetAllByIntegerInArray()
@@ -129,11 +123,8 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $model->arrayOfInteger = array(1, 2, 3);
         $model->save();
 
-        $condition = array('arrayOfInteger' => array('$in' => array(2)));
-
-        $fetchedModel = Model::getMapper()->getByCondition($condition);
-
-        $this->assertEquals($model, $fetchedModel);
+        $this->assertModelByCondition($model, array('arrayOfInteger' => 1));
+        $this->assertModelByCondition($model, array('arrayOfInteger' => array('$in' => array(2))));
     }
 
     public function testGetAllByStringInArray()
@@ -143,10 +134,9 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $model->save();
 
         $condition = array('arrayOfString' => array('$in' => array('dasdsadas', 'aaaa')));
+        $this->assertModelByCondition($model, $condition);
 
-        $fetchedModel = Model::getMapper()->getByCondition($condition);
-
-        $this->assertEquals($model, $fetchedModel);
+        $this->assertModelByCondition($model, array('arrayOfString' => 'dasd'));
     }
 
     public function testGetAllBySubModel()
@@ -155,18 +145,27 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $model->subTest = new SubModel(array('id' => 1, 'title' => 'Hello'));
         $model->save();
 
-        $condition = array('subTest.id' => 1);
-        $fetchedModel = Model::getMapper()->getByCondition($condition);
-        $this->assertEquals($model, $fetchedModel);
-
         $condition = array('subTest' => array('id' => 1, 'title' => 'Hello'));
-        $fetchedModel = Model::getMapper()->getByCondition($condition);
-        $this->assertEquals($model, $fetchedModel);
+        $this->assertModelByCondition($model, $condition);
+
+        $this->assertModelByCondition($model, array('subTest.id' => 1));
     }
 
     public function testGetAllBySubModelInArray()
     {
-        $this->markTestIncomplete();
+        $model = new Model();
+        $model->arrayOfSubTest = array(
+            new SubModel(array('id' => 1, 'title' => 'Hello')),
+            new SubModel(array('id' => 2, 'title' => 'Hello2')),
+            new SubModel(array('id' => 2, 'title' => 'Hello3')),
+        );
+        $model->save();
+
+        $condition = array('arrayOfSubTest' => array('id' => 1, 'title' => 'Hello'));
+        $this->assertModelByCondition($model, $condition);
+
+        $this->assertModelByCondition($model, array('arrayOfSubTest.0.id' => 1));
+        $this->assertModelByCondition($model, array('arrayOfSubTest.id' => 1));
     }
 
     public function testCount()
@@ -211,6 +210,12 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     public function testDeleteByCondition()
     {
         $this->markTestIncomplete();
+    }
+
+    protected function assertModelByCondition(Model $model, array $condition)
+    {
+        $fetchedModel = Model::getMapper()->getByCondition($condition);
+        $this->assertEquals($model, $fetchedModel);
     }
 
     protected function getData()

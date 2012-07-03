@@ -4,7 +4,11 @@ namespace GeometriaLab\Mongo\Model;
 
 use GeometriaLab\Model\Persistent\Mapper\Query as AbstractQuery,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
-    GeometriaLab\Model\Persistent\Mapper\MapperInterface;
+    GeometriaLab\Model\Persistent\Mapper\MapperInterface,
+    GeometriaLab\Model\Schema as ModelSchema,
+    GeometriaLab\Model\Schema\Manager as SchemaManager,
+    GeometriaLab\Model\Schema\Property\ArrayProperty,
+    GeometriaLab\Model\Schema\Property\ModelProperty;
 
 class Query extends AbstractQuery
 {
@@ -91,5 +95,92 @@ class Query extends AbstractQuery
         }
 
         return $this;
+    }
+
+    /**
+     * Prepare field value
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
+    protected function prepareFieldValue($field, $value)
+    {
+        return $this->prepareModelFieldValue($this->getModelSchema(), $field, $field, $value);
+    }
+
+    /**
+     * Prepare field value for sepcified model
+     *
+     * @todo Refactor!
+     *
+     * @param ModelSchema $modelSchema
+     * @param $fullField
+     * @param $field
+     * @param $value
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
+    protected function prepareModelFieldValue(ModelSchema $modelSchema, $fullField, $field, $value)
+    {
+        $hasDotNotation = strpos($field, '.') !== false;
+
+        if ($hasDotNotation) {
+            list($field, $subFields) = explode('.', $field, 2);
+        }
+
+        if (!$modelSchema->hasProperty($field)) {
+            throw new \InvalidArgumentException("Field in where '$fullField' not present in model!");
+        }
+
+        $property = $modelSchema->getProperty($field);
+
+        if ($hasDotNotation) {
+            if ($property instanceof ArrayProperty) {
+                $subProperty = $property->getItemProperty();
+
+                if ($subProperty === null) {
+                    return $value;
+                }
+
+                if (strpos($subFields, '.') !== false) {
+                    list($subField, $subSubFields) = explode('.', $subFields, 2);
+                    if (is_numeric($subField)) {
+                        $subFields = $subSubFields;
+                    }
+                }
+
+                if ($subProperty instanceof ModelProperty) {
+                    $manager = SchemaManager::getInstance();
+                    $schema = $manager->get($subProperty->getModelClass());
+
+                    return $this->prepareModelFieldValue($schema, $fullField, $subFields, $value);
+                } else {
+                    throw new \InvalidArgumentException("Invalid field '$fullField' not present in model!");
+                }
+            } else if ($property instanceof ModelProperty) {
+                $manager = SchemaManager::getInstance();
+                $schema = $manager->get($property->getModelClass());
+
+                return $this->prepareModelFieldValue($schema, $fullField, $subFields, $value);
+            } else {
+                throw new \InvalidArgumentException("Invalid field '$fullField' not present in model!");
+            }
+        } else if ($property instanceof ArrayProperty) {
+            if ($property->getItemProperty() === null) {
+                return $value;
+            }
+
+            $property = $property->getItemProperty();
+        }
+
+        try {
+            $value = $property->prepare($value);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException("Invalid value for field '$field': " . $e->getMessage());
+        }
+
+        return $value;
     }
 }

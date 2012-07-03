@@ -2,11 +2,8 @@
 
 namespace GeometriaLab\Model\Persistent\Mapper;
 
-use GeometriaLab\Model\Schema as ModelSchema,
-    GeometriaLab\Model\Schema\Manager as SchemaManager,
-    GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\ModelProperty,
-    GeometriaLab\Model\Persistent\Mapper\MapperInterface;
+use GeometriaLab\Model\Persistent\Mapper\MapperInterface,
+GeometriaLab\Model\Schema\Manager as SchemaManager;
 
 class Query implements QueryInterface
 {
@@ -350,43 +347,11 @@ class Query implements QueryInterface
      */
     protected function prepareFieldValue($field, $value)
     {
-        return $this->prepareModelFieldValue($this->getModelSchema(), $field, $field, $value);
-    }
-
-    protected function prepareModelFieldValue(ModelSchema $modelSchema, $fullField, $field, $value)
-    {
-        $hasDotNotation = strpos($field, '.') !== false;
-
-        if ($hasDotNotation) {
-            list($field, $subFields) = explode('.', $field, 2);
+        if (!$this->getModelSchema()->hasProperty($field)) {
+            throw new \InvalidArgumentException("Field in where '$field' not present in model!");
         }
 
-        if (!$modelSchema->hasProperty($field)) {
-            throw new \InvalidArgumentException("Field in where '$fullField' not present in model!");
-        }
-
-        $property = $modelSchema->getProperty($field);
-
-        if ($property instanceof ArrayProperty) {
-            $property = $property->getItemProperty();
-        } else if ($hasDotNotation) {
-            if ($property instanceof ModelProperty) {
-                $manager = SchemaManager::getInstance();
-                $schema = $manager->get($property->getModelClass());
-
-                return $this->prepareModelFieldValue($schema, $fullField, $subFields, $value);
-            } else {
-                throw new \InvalidArgumentException("Invalid field '$fullField' not present in model!");
-            }
-        }
-
-        try {
-            $value = $property->prepare($value);
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException("Invalid value for field '$field': " . $e->getMessage());
-        }
-
-        return $value;
+        return $this->getModelSchema()->getProperty($field)->prepare($value);
     }
 
     /**
