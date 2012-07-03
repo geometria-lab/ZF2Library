@@ -71,9 +71,9 @@ class Query extends AbstractQuery
                                 foreach($operatorValue as &$item) {
                                     $item = $this->prepareFieldValue($field, $item);
                                 }
+                            } else if ($this->operators[$operator] === self::OPERATOR_ACCEPTS_ARRAY) {
+                                $operatorValue = $this->prepareFieldValue($field, $operatorValue);
                             }
-                        } else if ($this->operators[$operator] === self::OPERATOR_ACCEPTS_ARRAY) {
-                            $operatorValue = $this->prepareFieldValue($field, $operatorValue);
                         }
 
                         $conditions[$field][$operator] = $operatorValue;
