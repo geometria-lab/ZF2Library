@@ -54,25 +54,10 @@ interface MapperInterface
 
     /**
      * @abstract
-     * @param array $data
-     * @param array $condition
-     * @return boolean
-     */
-    public function updateByCondition(array $data, array $condition);
-
-    /**
-     * @abstract
      * @param ModelInterface $model
      * @return boolean
      */
     public function delete(ModelInterface $model);
-
-    /**
-     * @abstract
-     * @param array $condition
-     * @return boolean
-     */
-    public function deleteByCondition(array $condition);
 
     /**
      * @abstract

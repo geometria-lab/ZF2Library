@@ -209,19 +209,18 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($model, $fetchedModel);
     }
 
-    public function testUpdateByCondition()
-    {
-        $this->markTestIncomplete();
-    }
-
     public function testDelete()
     {
-        $this->markTestIncomplete();
-    }
+        $model = new Model();
+        $model->floatProperty = 1.0;
+        $model->integerProperty = 1;
+        $model->save();
 
-    public function testDeleteByCondition()
-    {
-        $this->markTestIncomplete();
+        $id = $model->id;
+
+        $this->assertTrue(Model::getMapper()->delete($model));
+
+        $this->assertNull(Model::getMapper()->get($id));
     }
 
     protected function assertModelByCondition(Model $model, array $condition)

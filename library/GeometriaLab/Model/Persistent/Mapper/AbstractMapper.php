@@ -28,13 +28,6 @@ abstract class AbstractMapper implements MapperInterface
     protected $primaryKeyGenerator;
 
     /**
-     * Property names map
-     *
-     * @var array
-     */
-    protected $propertyNamesMap = array();
-
-    /**
      * Constructor
      *
      * @param array $options
@@ -128,38 +121,6 @@ abstract class AbstractMapper implements MapperInterface
     public function getPrimaryKeyGenerator()
     {
         return $this->primaryKeyGenerator;
-    }
-
-    /**
-     * Transform model data for storage
-     *
-     * @param array $data
-     * @return array
-     */
-    protected function transformModelDataForStorage(array $data)
-    {
-        foreach($this->propertyNamesMap as $model => $storage) {
-            $data[$storage] = $data[$model];
-            unset($data[$model]);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Transform storage data for model
-     *
-     * @param array $data
-     * @return array
-     */
-    protected function transformStorageDataForModel(array $data)
-    {
-        foreach($this->propertyNamesMap as $model => $storage) {
-            $data[$model] = $data[$storage];
-            unset($data[$storage]);
-        }
-
-        return $data;
     }
 
     /**

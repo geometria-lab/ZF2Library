@@ -260,22 +260,15 @@ class Mapper extends AbstractMapper
         return true;
     }
 
-    /**
-     * Update by condition
-     *
-     * @param array $data
-     * @param array $condition
-     * @return boolean
-     */
-    public function updateByCondition(array $data, array $condition)
-    {
-        $query = $this->createQuery()->where($condition);
-        $condition = $this->transformModelDataForStorage($query->getWhere());
+    const UPDATE_OPERATOR_ACCEPTS_VALUE = 1;
+    const UPDATE_OPERATOR_ACCEPTS_ARRAY = 2;
 
-        $storageData = $this->transformModelDataForStorage($data);
-
-        return $this->getMongoCollection()->update($condition, array('$set' => $storageData), array('multiple' => true));
-    }
+    protected $updateOperators = array(
+        '$inc'     => self::UPDATE_OPERATOR_ACCEPTS_VALUE,
+        '$set'     => self::UPDATE_OPERATOR_ACCEPTS_VALUE,
+        '$pull'    => self::UPDATE_OPERATOR_ACCEPTS_ARRAY,
+        '$pullAll' => self::UPDATE_OPERATOR_ACCEPTS_ARRAY
+    );
 
     /**
      * Delete model
@@ -302,20 +295,6 @@ class Mapper extends AbstractMapper
         } else {
             return false;
         }
-    }
-
-    /**
-     * Delete by condition
-     *
-     * @param array $condition
-     * @return boolean|mixed
-     */
-    public function deleteByCondition(array $condition)
-    {
-        $query = $this->createQuery()->where($condition);
-        $condition = $this->transformModelDataForStorage($query->getWhere());
-
-        return $this->getMongoCollection()->remove($condition);
     }
 
     /**
@@ -386,8 +365,6 @@ class Mapper extends AbstractMapper
      */
     protected function transformModelDataForStorage(array $data)
     {
-        $data = parent::transformModelDataForStorage($data);
-
         if (isset($data['id'])) {
             $data['_id'] = new \MongoId($data['id']);
         }
@@ -404,8 +381,6 @@ class Mapper extends AbstractMapper
      */
     protected function transformStorageDataForModel(array $data)
     {
-        $data = parent::transformStorageDataForModel($data);
-
         $data['id'] = $data['_id']->{'$id'};
         unset($data['_id']);
 
