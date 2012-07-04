@@ -194,7 +194,19 @@ class MapperTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdate()
     {
-        $this->markTestIncomplete();
+        $model = new Model();
+        $model->floatProperty = 1.0;
+        $model->integerProperty = 1;
+        $model->save();
+
+        $this->assertFalse(Model::getMapper()->update($model));
+
+        $model->integerProperty = 2;
+
+        $this->assertTrue(Model::getMapper()->update($model));
+
+        $fetchedModel = Model::getMapper()->get($model->id);
+        $this->assertEquals($model, $fetchedModel);
     }
 
     public function testUpdateByCondition()
@@ -216,18 +228,5 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     {
         $fetchedModel = Model::getMapper()->getByCondition($condition);
         $this->assertEquals($model, $fetchedModel);
-    }
-
-    protected function getData()
-    {
-        return array(
-            'floatProperty'   => 3.4,
-            'integerProperty' => 10,
-            'stringProperty'  => 'test',
-            'subTest'         => new SubModel(array('id' => 1, 'title' => 'Hello')),
-            'arrayOfInteger'  => array(9, 10, 11, 12, 13),
-            'arrayOfString'   => array('string1', 'string2'),
-            'arrayOfSubTest'  => array(new SubModel(array('id' => 1, 'title' => 'Hello')), new SubModel(array('id' => 2, 'title' => 'Hello2')))
-        );
     }
 }

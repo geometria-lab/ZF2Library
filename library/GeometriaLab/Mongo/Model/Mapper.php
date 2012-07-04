@@ -239,7 +239,11 @@ class Mapper extends AbstractMapper
     {
         $data = $this->getModelDataForStorage($model, true);
 
-        if ($data['_id']) {
+        if (empty($data)) {
+            return false;
+        }
+
+        if (isset($data['_id'])) {
             $id = $model->getClean('id');
         } else {
             $id = $model->get('id');

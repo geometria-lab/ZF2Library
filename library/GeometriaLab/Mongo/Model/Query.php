@@ -113,7 +113,7 @@ class Query extends AbstractQuery
     /**
      * Prepare field value for sepcified model
      *
-     * @todo Refactor!
+     * @todo Refactor and optimize!
      *
      * @param ModelSchema $modelSchema
      * @param $fullField
