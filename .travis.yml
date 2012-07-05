@@ -3,7 +3,12 @@ php:
   - 5.3
   - 5.4
 before_script:
-  - ./.travis/install-composer.sh
-  - ./.travis/install-mongo.sh
-  - ./.travis/configure-tests.sh
-script: cd ./tests && phpunit --coverage-text
+  # Composer
+  - curl -s http://getcomposer.org/installer | php
+  - php composer.phar install --dev
+  # Mongo
+  - wget http://pecl.php.net/get/mongo-1.2.10.tgz
+  - tar -xzf mongo-1.2.10.tgz
+  - sh -c "cd mongo-1.2.10 && phpize && ./configure && sudo make install"
+  - echo "extension=mongo.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+script: cd ./tests && phpunit

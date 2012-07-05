@@ -1,7 +1,11 @@
 <?php
 
-defined('TESTS_MONGO_MAPPER_CONNECTION_SERVER') || define('TESTS_MONGO_MAPPER_CONNECTION_SERVER', "mongodb://localhost");
-defined('TESTS_MONGO_MAPPER_CONNECTION_DB') || define('TESTS_MONGO_MAPPER_CONNECTION_DB', "geometriaLabZF2LibraryTests");
+/**
+ * MongoDb
+ */
+
+defined('TESTS_MONGO_MAPPER_CONNECTION_SERVER') || define('TESTS_MONGO_MAPPER_CONNECTION_SERVER', "127.0.0.1");
+defined('TESTS_MONGO_MAPPER_CONNECTION_DB') || define('TESTS_MONGO_MAPPER_CONNECTION_DB', "geometria-lab-zf2-library-tests");
 
 /**
  * PHPUnit Code Coverage / Test Report
