@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Model\Persistent\Models;
+namespace GeometriaLabTest\Model\Persistent\TestModels;
 
 use GeometriaLab\Model\Persistent\ModelInterface,
     GeometriaLab\Model\Persistent\Mapper\AbstractMapper,

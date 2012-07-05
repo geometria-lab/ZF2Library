@@ -2,16 +2,19 @@
 
 namespace GeometriaLabTest\Model;
 
+use GeometriaLabTest\Model\TestModels\Model,
+    GeometriaLabTest\Model\TestModels\SubModel;
+
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \GeometriaLabTest\Model\TestModels\Model
+     * @var Model
      */
     protected $model;
 
     public function setUp()
     {
-        $this->model = new Models\Model();
+        $this->model = new Model();
     }
 
     public function testPropertyDefaultValue()
@@ -93,13 +96,13 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testSetInvalidDataToArrayOfSubTest()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        $this->model->arrayOfSubTest = array(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), array('tsa' => 123));
+        $this->model->arrayOfSubTest = array(new SubModel(array('id' => 1, 'title' => 'Hello')), array('tsa' => 123));
     }
 
     public function testSetArrayToModelProperty()
     {
         $this->model->subTest = array('id' => 1, 'title' => 'Hello');
-        $this->assertEquals(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), $this->model->subTest);
+        $this->assertEquals(new SubModel(array('id' => 1, 'title' => 'Hello')), $this->model->subTest);
     }
 
     public function testSettersAndGetters()
@@ -116,10 +119,10 @@ class ModelTest extends \PHPUnit_Framework_TestCase
             'floatProperty'   => 3.4,
             'integerProperty' => 10,
             'stringProperty'  => 'test',
-            'subTest'         => new Models\SubModel(array('id' => 1, 'title' => 'Hello')),
+            'subTest'         => new SubModel(array('id' => 1, 'title' => 'Hello')),
             'arrayOfInteger'  => array(9, 10, 11, 12, 13),
             'arrayOfString'   => array('string1', 'string2'),
-            'arrayOfSubTest'  => array(new Models\SubModel(array('id' => 1, 'title' => 'Hello')), new Models\SubModel(array('id' => 2, 'title' => 'Hello2')))
+            'arrayOfSubTest'  => array(new SubModel(array('id' => 1, 'title' => 'Hello')), new SubModel(array('id' => 2, 'title' => 'Hello2')))
         );
     }
 }

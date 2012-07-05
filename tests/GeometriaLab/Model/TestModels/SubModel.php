@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Model\Models;
+namespace GeometriaLabTest\Model\TestModels;
 
 /**
  * @property integer $id

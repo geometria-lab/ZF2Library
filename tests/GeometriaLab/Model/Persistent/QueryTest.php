@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Model\Persistent;
 
-use GeometriaLabTest\Model\Persistent\Models\Model;
+use GeometriaLabTest\Model\Persistent\TestModels\Model;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {

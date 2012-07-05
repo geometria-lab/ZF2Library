@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Mongo\Model;
 
-use GeometriaLabTest\Mongo\Model\Models\Model;
+use GeometriaLabTest\Mongo\Model\TestModels\Model;
 
 use GeometriaLab\Mongo\Model\Query;
 

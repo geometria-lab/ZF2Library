@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Model\Models;
+namespace GeometriaLabTest\Model\TestModels;
 
 /**
  * @property boolean                                       $booleanProperty
@@ -8,11 +8,11 @@ namespace GeometriaLabTest\Model\Models;
  * @property float                                         $floatProperty
  * @property integer                                       $integerProperty
  * @property string                                        $stringProperty   {"defaultValue" : "default"}
- * @property \GeometriaLabTest\Model\Models\SubModel       $subTest
+ * @property \GeometriaLabTest\Model\TestModels\SubModel       $subTest
  * @property integer[]                                     $arrayOfInteger   {"defaultValue" : [1, 2, 3, 4,
  *                                                                                             5, 6, 7, 8]}
  * @property string[]                                      $arrayOfString
- * @property \GeometriaLabTest\Model\Models\SubModel[]     $arrayOfSubTest
+ * @property \GeometriaLabTest\Model\TestModels\SubModel[]     $arrayOfSubTest
  */
 class Model extends \GeometriaLab\Model\Model
 {

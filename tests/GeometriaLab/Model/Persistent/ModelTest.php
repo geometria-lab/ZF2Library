@@ -2,11 +2,11 @@
 
 namespace GeometriaLabTest\Model\Persistent;
 
-use GeometriaLabTest\Model\Persistent\Models\Model,
-    GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition,
-    GeometriaLabTest\Model\Persistent\Models\ModelWithInvalidDefinition2,
-    GeometriaLabTest\Model\Persistent\Models\ModelWithoutDefinition,
-    GeometriaLabTest\Model\Models\SubModel;
+use GeometriaLabTest\Model\Persistent\TestModels\Model,
+    GeometriaLabTest\Model\Persistent\TestModels\ModelWithInvalidDefinition,
+    GeometriaLabTest\Model\Persistent\TestModels\ModelWithInvalidDefinition2,
+    GeometriaLabTest\Model\Persistent\TestModels\ModelWithoutDefinition,
+    GeometriaLabTest\Model\TestModels\SubModel;
 
 
 class ModelTest extends \PHPUnit_Framework_TestCase
@@ -159,7 +159,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testGetMapper()
     {
         $mapper = Model::getMapper();
-        $this->assertInstanceOf('\GeometriaLabTest\Model\Persistent\Models\MockMapper', $mapper);
+        $this->assertInstanceOf('\GeometriaLabTest\Model\Persistent\TestModels\MockMapper', $mapper);
     }
 
     public function testGetMapperWithoutDefinition()

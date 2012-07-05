@@ -2,8 +2,8 @@
 
 namespace GeometriaLabTest\Mongo\Model;
 
-use GeometriaLabTest\Mongo\Model\Models\Model,
-    GeometriaLabTest\Model\Models\SubModel;
+use GeometriaLabTest\Mongo\Model\TestModels\Model,
+    GeometriaLabTest\Model\TestModels\SubModel;
 
 use GeometriaLab\Mongo\Manager,
     GeometriaLab\Mongo\Model\Mapper;
