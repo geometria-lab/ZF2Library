@@ -2,10 +2,8 @@ language: php
 php:
   - 5.3
   - 5.4
-env:
-  - TESTS_MONGO_MAPPER_CONNECTION_SERVER=mongodb://geometrialab:test@localhost
-  - TESTS_MONGO_MAPPER_CONNECTION_DB=geometriaLabZF2LibraryTests
 before_script:
   - ./.travis/install-composer.sh
   - ./.travis/install-mongo.sh
+  - ./.travis/configure-tests.sh
 script: cd ./tests && phpunit

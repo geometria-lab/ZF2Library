@@ -1,0 +1,1 @@
+echo '<?php define("TESTS_MONGO_MAPPER_CONNECTION_SERVER", "mongodb://geometrialab:test@localhost");require "configuration.php.dist";' >> tests/configuration.php
