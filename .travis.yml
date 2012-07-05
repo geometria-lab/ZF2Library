@@ -8,3 +8,4 @@ env:
 before_script:
   - ./.travis/install-composer.sh
   - ./.travis/install-mongo.sh
+script: cd ./tests && phpunit
