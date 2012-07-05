@@ -11,4 +11,21 @@ interface PrimaryKeyGeneratorInterface
      * @return mixed
      */
     public function generate();
+
+    /**
+     * Set mapper
+     *
+     * @abstract
+     * @param MapperInterface $mapper
+     * @return mixed
+     */
+    public function setMapper(MapperInterface $mapper);
+
+    /**
+     * Get mapper
+     *
+     * @abstract
+     * @return mixed
+     */
+    public function getMapper();
 }

@@ -109,6 +109,7 @@ abstract class AbstractMapper implements MapperInterface
         }
 
         $this->primaryKeyGenerator = $primaryKeyGenerator;
+        $this->primaryKeyGenerator->setMapper($this);
 
         return $this;
     }
