@@ -1,4 +1,4 @@
-mongo geometriaLabZF2LibraryTests --eval 'db.addUser("geometrialab", "test");'
+mongo mydb_test --eval 'db.addUser("travis", "test");'
 
 wget http://pecl.php.net/get/mongo-1.2.10.tgz
 tar -xzf mongo-1.2.10.tgz
