@@ -6,4 +6,4 @@ before_script:
   - ./.travis/install-composer.sh
   - ./.travis/install-mongo.sh
   - ./.travis/configure-tests.sh
-script: cd ./tests && phpunit
+script: cd ./tests && phpunit --coverage-text
