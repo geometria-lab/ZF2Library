@@ -11,8 +11,7 @@ function GeometriaLabTest_Autoloader($class)
         return false;
     }
 
-    // $segments = explode('\\', $class); // preg_split('#\\\\|_#', $class);//
-    $segments = preg_split('#[\\\\_]#', $class); // preg_split('#\\\\|_#', $class);//
+    $segments = explode('\\', $class);
     $ns       = array_shift($segments);
 
     switch ($ns) {
@@ -20,8 +19,6 @@ function GeometriaLabTest_Autoloader($class)
             $file = dirname(__DIR__) . '/library/GeometriaLab/';
             break;
         case 'GeometriaLabTest':
-            // temporary fix for ZendTest namespace until we can migrate files 
-            // into ZendTest dir
             $file = __DIR__ . '/GeometriaLab/';
             break;
         default:
@@ -34,21 +31,6 @@ function GeometriaLabTest_Autoloader($class)
         if (file_exists($file)) {
             return include_once $file;
         }
-    }
-
-    $segments = explode('_', $class);
-    $ns       = array_shift($segments);
-
-    switch ($ns) {
-        case 'GeometriaLab':
-            $file = dirname(__DIR__) . '/library/GeometriaLab/';
-            break;
-        default:
-            return false;
-    }
-    $file .= implode('/', $segments) . '.php';
-    if (file_exists($file)) {
-        return include_once $file;
     }
 
     return false;
