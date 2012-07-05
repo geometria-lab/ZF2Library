@@ -85,12 +85,4 @@ interface ModelInterface extends \GeometriaLab\Model\ModelInterface
      * @return Mapper\MapperInterface
      */
     static public function getMapper();
-
-    /**
-     * Create persistent model schema
-     *
-     * @static
-     * @return Schema
-     */
-    static public function createSchema();
 }
