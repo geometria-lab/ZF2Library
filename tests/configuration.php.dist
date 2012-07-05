@@ -1,10 +1,10 @@
 <?php
 
-defined('TESTS_MONGO_MAPPER_CONNECTION_SERVER') || define('TESTS_MONGO_MAPPER_CONNECTION_SERVER', "mongodb://localhost");
-defined('TESTS_MONGO_MAPPER_CONNECTION_DB') || define('TESTS_MONGO_MAPPER_CONNECTION_DB', "geometriaLabZF2LibraryTests");
+define('TESTS_MONGO_MAPPER_CONNECTION_SERVER', isset($_ENV['MONGO_MAPPER_CONNECTION_SERVER']) ? $_ENV['MONGO_MAPPER_CONNECTION_SERVER'] : "mongodb://localhost");
+define('TESTS_MONGO_MAPPER_CONNECTION_DB', isset($_ENV['MONGO_MAPPER_CONNECTION_DB']) ? $_ENV['MONGO_MAPPER_CONNECTION_DB'] : "geometriaLabZF2LibraryTests");
 
 /**
  * PHPUnit Code Coverage / Test Report
  */
-defined('TESTS_GENERATE_REPORT') || define('TESTS_GENERATE_REPORT', false);
-defined('TESTS_GENERATE_REPORT_TARGET') || define('TESTS_GENERATE_REPORT_TARGET', '/path/to/target');
+define('TESTS_GENERATE_REPORT', false);
+define('TESTS_GENERATE_REPORT_TARGET', '/path/to/target');
