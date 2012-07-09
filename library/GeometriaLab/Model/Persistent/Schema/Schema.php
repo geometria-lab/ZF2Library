@@ -1,12 +1,12 @@
 <?php
 
-namespace GeometriaLab\Model\Persistent;
+namespace GeometriaLab\Model\Persistent\Schema;
 
 use GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface;
 
 use Zend\Code\Reflection\DocBlock\Tag\MethodTag as ZendMethodTag;
 
-class Schema extends \GeometriaLab\Model\Schema
+class Schema extends \GeometriaLab\Model\Schema\Schema
 {
     /**
      * Mapper class

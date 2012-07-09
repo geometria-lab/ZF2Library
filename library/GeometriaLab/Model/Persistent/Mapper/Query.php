@@ -3,7 +3,8 @@
 namespace GeometriaLab\Model\Persistent\Mapper;
 
 use GeometriaLab\Model\Persistent\Mapper\MapperInterface,
-GeometriaLab\Model\Schema\Manager as SchemaManager;
+    GeometriaLab\Model\Schema\Schema,
+    GeometriaLab\Model\Schema\Manager as SchemaManager;
 
 class Query implements QueryInterface
 {
@@ -357,7 +358,7 @@ class Query implements QueryInterface
     /**
      * Get model schema
      *
-     * @return \GeometriaLab\Model\Persistent\Schema
+     * @return Schema
      */
     protected function getModelSchema()
     {
