@@ -8,7 +8,8 @@ use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ZendTagInterface,
     Zend\Code\Reflection\DocBlock\Tag\PropertyTag as ZendPropertyTag,
     Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
-    Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection;
+    Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection,
+    Zend\Serializer\Serializer as ZendSerializer;
 
 class Schema
 {
@@ -45,6 +46,13 @@ class Schema
      * @var string
      */
     static protected $modelPropertyClass = '\GeometriaLab\Model\Schema\Property\ModelProperty';
+
+    /**
+     * Params serializer adapter
+     *
+     * @var string
+     */
+    static protected $paramsSerializerAdapter = 'json';
 
     /**
      * Protected constructor
@@ -221,11 +229,12 @@ class Schema
         }
 
         $description = preg_replace('#\s+#m', ' ', $description);
-        $params = json_decode($description, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($params)) {
+        $params = ZendSerializer::unserialize($description, array('adapter' => static::$paramsSerializerAdapter));
+
+        if (!is_array($params)) {
             $name = substr($tag->getPropertyName(), 1);
-            throw new \InvalidArgumentException("Not valid JSON params for property '$name'");
+            throw new \InvalidArgumentException("Not valid params for property '$name'");
         }
 
         return $params;

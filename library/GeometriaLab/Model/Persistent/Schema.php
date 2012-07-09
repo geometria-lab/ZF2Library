@@ -36,6 +36,15 @@ class Schema extends \GeometriaLab\Model\Schema
     );
 
     /**
+     * Relations class map
+     *
+     * @var array
+     */
+    static protected $relationsClassMap = array(
+        'oneToOne'  => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\OneToOne'
+    );
+
+    /**
      * Model property class name
      *
      * @var string
@@ -106,6 +115,42 @@ class Schema extends \GeometriaLab\Model\Schema
         }
 
         throw new \InvalidArgumentException('Primary property (primary key) not present!');
+    }
+
+    /**
+     * Create property by type and params
+     *
+     * @static
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     * @throws \InvalidArgumentException
+     */
+    static public function createProperty($type, array $params = array())
+    {
+        if (isset(static::$regularPropertiesClassMap[$type])) {
+            $property = new static::$regularPropertiesClassMap[$type]($params);
+        } else if (class_exists($type)) {
+            if (isset($params['relation'])) {
+                if (!isset(static::$relationsClassMap[$params['relation']])) {
+                    throw new \InvalidArgumentException("Invalid relation '{$params['relation']}'");
+                }
+
+                $params['foreignModelClass'] = $type;
+
+                $className = static::$relationsClassMap[$params['relation']];
+            } else {
+                $params['modelClass'] = $type;
+
+                $className = static::$modelPropertyClass;
+            }
+
+            $property = new $className($params);
+        } else {
+            throw new \InvalidArgumentException("Invalid property type '$type'");
+        }
+
+        return $property;
     }
 
     /**

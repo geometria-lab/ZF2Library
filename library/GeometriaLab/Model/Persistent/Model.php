@@ -15,6 +15,48 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
     protected $cleanPropertyValues = array();
 
     /**
+     * Get property value
+     *
+     * @param $name
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
+    public function get($name)
+    {
+        $value = parent::get($name);
+
+        if ($value === null) {
+            $property = $this->getSchema()->getProperty($name);
+
+            if ($property instanceof \GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation) {
+                $value = $this->propertyValues[$name] = $property->getForeignModel($this);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Set property value
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return Model|ModelInterface
+     * @throws \InvalidArgumentException
+     */
+    public function set($name, $value)
+    {
+        parent::set($name, $value);
+
+        $property = $this->getSchema()->getProperty($name);
+        if ($property instanceof \GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation) {
+            $property->setForeignModel($this, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Save model to storage
      *
      * @return boolean
