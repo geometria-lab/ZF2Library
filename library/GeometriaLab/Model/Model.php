@@ -65,12 +65,14 @@ class Model extends Schemaless\Model implements ModelInterface
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
-        $property = $this->getSchema()->getProperty($name);
+        if ($value !== null) {
+            $property = $this->getSchema()->getProperty($name);
 
-        try {
-            $value = $property->prepare($value);
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            try {
+                $value = $property->prepare($value);
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            }
         }
 
         $method = "set{$name}";

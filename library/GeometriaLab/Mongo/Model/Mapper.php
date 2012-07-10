@@ -8,7 +8,8 @@ use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\Mapper\AbstractMapper,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
     GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\ModelProperty;
+    GeometriaLab\Model\Persistent\Schema\Property\ModelProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne;
 
 class Mapper extends AbstractMapper
 {
@@ -281,6 +282,12 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
         if ($result) {
+            foreach($model->getSchema()->getProperties() as $property) {
+                if ($property instanceof HasOne) {
+                    $property->removeForeignRelations($model);
+                }
+            }
+
             $model->markClean(false);
 
             return true;
@@ -324,7 +331,7 @@ class Mapper extends AbstractMapper
                 if (!$changed || $model->isPropertyChanged($name)) {
                     $value = $model->get($name);
 
-                    if ($value !== null) {
+                    if ($changed || $value !== null) {
                         if ($property instanceof ModelProperty) {
                             $value = $value->toArray(-1);
                         } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
@@ -378,6 +385,7 @@ class Mapper extends AbstractMapper
 
         return $data;
     }
+
 
     /**
      * Get MongoDB instance

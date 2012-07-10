@@ -18,10 +18,14 @@ class BelongsTo extends AbstractRelation
 
     public function setReferencedModel($foreignModel, $referencedModel)
     {
-        $referencedPropertyValue = $referencedModel->get($this->getReferencedProperty());
+        if ($referencedModel !== null) {
+            $referencedPropertyValue = $referencedModel->get($this->getReferencedProperty());
 
-        if ($referencedPropertyValue === null) {
-            throw new \InvalidArgumentException('Referenced property is null');
+            if ($referencedPropertyValue === null) {
+                throw new \InvalidArgumentException('Referenced property is null');
+            }
+        } else {
+            $referencedPropertyValue = null;
         }
 
         $foreignModel->set($this->getForeignProperty(), $referencedPropertyValue);

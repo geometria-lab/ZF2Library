@@ -137,9 +137,11 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
                     throw new \InvalidArgumentException("Invalid relation '{$params['relation']}'");
                 }
 
-                $params['foreignModelClass'] = $type;
+                $params['modelClass'] = $type;
 
                 $className = static::$relationsClassMap[$params['relation']];
+
+                unset($params['relation']);
             } else {
                 $params['modelClass'] = $type;
 

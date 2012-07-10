@@ -57,11 +57,6 @@ class MockMapper extends AbstractMapper
         return true;
     }
 
-    public function updateByCondition(array $data, array $condition)
-    {
-        throw new \RuntimeException('Not implemented');
-    }
-
     public function delete(ModelInterface $model)
     {
         if (isset($this->data[$model->id])) {
@@ -71,10 +66,5 @@ class MockMapper extends AbstractMapper
         }
 
         return true;
-    }
-
-    public function deleteByCondition(array $condition)
-    {
-        throw new \RuntimeException('Not implemented');
     }
 }

@@ -6,17 +6,11 @@ use GeometriaLab\Model\Schema\Property\AbstractProperty;
 
 abstract class AbstractRelation extends AbstractProperty
 {
-    CONST DELETE_NONE = 'none';
-    CONST DELETE_SET_NULL = 'setNull';
-    CONST DELETE_CASCADE = 'cascade';
-
     protected $referencedProperty = 'id';
 
     protected $foreignProperty;
 
     protected $modelClass;
-
-    protected $deleteMode;
 
     public function setModelClass($modelClass)
     {
@@ -28,18 +22,6 @@ abstract class AbstractRelation extends AbstractProperty
     public function getModelClass()
     {
         return $this->modelClass;
-    }
-
-    public function setDeleteMode($deleteMode)
-    {
-        $this->deleteMode = $deleteMode;
-
-        return $this;
-    }
-
-    public function getDeleteMode()
-    {
-        return $this->deleteMode;
     }
 
     public function setForeignProperty($propertyName)
@@ -64,5 +46,10 @@ abstract class AbstractRelation extends AbstractProperty
     public function getReferencedProperty()
     {
         return $this->referencedProperty;
+    }
+
+    public function isPersistent()
+    {
+        return false;
     }
 }

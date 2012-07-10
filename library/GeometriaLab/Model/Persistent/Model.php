@@ -137,6 +137,12 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function isPropertyChanged($name)
     {
+        if ($this->getSchema()->hasProperty($name)) {
+            $property = $this->getSchema()->getProperty($name);
+            if (!$property->isPersistent()) {
+                return false;
+            }
+        }
         return $this->getClean($name) !== $this->get($name);
     }
 
