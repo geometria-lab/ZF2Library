@@ -3,7 +3,9 @@
 namespace GeometriaLab\Model\Persistent;
 
 use GeometriaLab\Model\Schema\Manager as SchemaManager,
-    GeometriaLab\Model\Persistent\Mapper;
+    GeometriaLab\Model\Persistent\Mapper,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne;
 
 class Model extends \GeometriaLab\Model\Model implements ModelInterface
 {
@@ -28,9 +30,13 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         if ($value === null) {
             $property = $this->getSchema()->getProperty($name);
 
-            if ($property instanceof \GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation) {
-                $value = $this->propertyValues[$name] = $property->getForeignModel($this);
+            if ($property instanceof BelongsTo) {
+                $value = $property->getReferencedModel($this);
+            } else if ($property instanceof HasOne) {
+                $value = $property->getForeignModel($this);
             }
+
+            $this->propertyValues[$name] = $value;
         }
 
         return $value;
@@ -49,8 +55,16 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         parent::set($name, $value);
 
         $property = $this->getSchema()->getProperty($name);
-        if ($property instanceof \GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation) {
-            $property->setForeignModel($this, $value);
+
+        if ($property instanceof BelongsTo) {
+            $property->setReferencedModel($this, $value);
+        } else {
+            foreach(static::getSchema()->getProperties() as $property) {
+                // @todo If changed referenced key?
+                if ($property instanceof BelongsTo && $property->getForeignProperty() === $name) {
+                    $this->propertyValues[$property->getName()] = null;
+                }
+            }
         }
 
         return $this;

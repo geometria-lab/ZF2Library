@@ -260,21 +260,13 @@ class Mapper extends AbstractMapper
         return true;
     }
 
-    const UPDATE_OPERATOR_ACCEPTS_VALUE = 1;
-    const UPDATE_OPERATOR_ACCEPTS_ARRAY = 2;
-
-    protected $updateOperators = array(
-        '$inc'     => self::UPDATE_OPERATOR_ACCEPTS_VALUE,
-        '$set'     => self::UPDATE_OPERATOR_ACCEPTS_VALUE,
-        '$pull'    => self::UPDATE_OPERATOR_ACCEPTS_ARRAY,
-        '$pullAll' => self::UPDATE_OPERATOR_ACCEPTS_ARRAY
-    );
-
     /**
      * Delete model
      *
+     * @todo Delete relations
      * @param ModelInterface $model
      * @return boolean
+     * @throws \InvalidArgumentException
      */
     public function delete(ModelInterface $model)
     {

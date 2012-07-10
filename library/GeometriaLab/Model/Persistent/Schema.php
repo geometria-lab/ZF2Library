@@ -41,7 +41,8 @@ class Schema extends \GeometriaLab\Model\Schema
      * @var array
      */
     static protected $relationsClassMap = array(
-        'oneToOne'  => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\OneToOne'
+        'hasOne'    => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne',
+        'belongsTo' => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo'
     );
 
     /**

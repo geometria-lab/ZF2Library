@@ -10,7 +10,7 @@ abstract class AbstractRelation extends AbstractProperty
     CONST DELETE_SET_NULL = 'setNull';
     CONST DELETE_CASCADE = 'cascade';
 
-    protected $referencedProperty;
+    protected $referencedProperty = 'id';
 
     protected $foreignProperty;
 
