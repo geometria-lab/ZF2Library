@@ -2,7 +2,8 @@
 
 namespace GeometriaLab\Model\Persistent;
 
-use GeometriaLab\Model\Schema\Manager as SchemaManager,
+use GeometriaLab\Model\Persistent\Schema\Schema,
+    GeometriaLab\Model\Schema\Manager as SchemaManager,
     GeometriaLab\Model\Persistent\Mapper,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne;

@@ -1,3 +1,7 @@
 Geometria Lab library for ZF2
+======
 
-[![Build Status](https://secure.travis-ci.org/GeometriaLab/ZF2Library.png?branch=master,develop)](http://travis-ci.org/GeometriaLab/ZF2Library)
+Tests
+---
+* Master branch [![Master branch build status](https://secure.travis-ci.org/GeometriaLab/ZF2Library.png?branch=master)](http://travis-ci.org/GeometriaLab/ZF2Library)
+* Develop branch [![Develop branch build status](https://secure.travis-ci.org/GeometriaLab/ZF2Library.png?branch=develop)](http://travis-ci.org/GeometriaLab/ZF2Library)
