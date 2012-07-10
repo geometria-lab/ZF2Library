@@ -96,6 +96,19 @@ class Model extends Schemaless\Model implements ModelInterface
     }
 
     /**
+     * Set schema
+     *
+     * @param Schema $schema
+     * @return Model
+     */
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
+
+        return $this;
+    }
+
+    /**
      * Create model schema
      *
      * @return Schema

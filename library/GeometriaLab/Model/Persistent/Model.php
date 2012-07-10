@@ -36,7 +36,9 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
                 $value = $property->getForeignModel($this);
             }
 
-            $this->propertyValues[$name] = $value;
+            if ($value !== null) {
+                $this->propertyValues[$name] = $value;
+            }
         }
 
         return $value;
