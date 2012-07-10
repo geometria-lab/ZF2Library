@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Persistent\Schema\Property;
 
-use GeometriaLab\Model\Persistent\Schema;
+use GeometriaLab\Model\Persistent\Schema\Schema;
 
 class ArrayProperty extends \GeometriaLab\Model\Schema\Property\ArrayProperty implements PropertyInterface
 {

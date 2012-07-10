@@ -212,11 +212,14 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     protected function _iterate($c)
     {
         reset($this->models);
+        $count = 0;
         foreach($c as $key => $value) {
             $this->assertEquals(key($this->models), $key);
             $this->assertEquals(current($this->models), $value);
             next($this->models);
+            $count++;
         }
+        $this->assertEquals(count($this->models), $count);
     }
 
     public function testCount()

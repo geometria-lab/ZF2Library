@@ -2,11 +2,9 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Schema;
+use GeometriaLab\Model\Schema\Schema,
+    GeometriaLab\Model\Schema\Manager as SchemaManager;
 
-/**
- *
- */
 class Model extends Schemaless\Model implements ModelInterface
 {
     /**
@@ -115,7 +113,7 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     static public function createSchema()
     {
-        $schemas = Schema\Manager::getInstance();
+        $schemas = SchemaManager::getInstance();
 
         $className = get_called_class();
 

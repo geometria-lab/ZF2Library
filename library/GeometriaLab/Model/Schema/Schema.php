@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Model;
+namespace GeometriaLab\Model\Schema;
 
 use GeometriaLab\Model\Schema\Property\PropertyInterface;
 

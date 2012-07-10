@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Schema;
 
-use GeometriaLab\Model\Schema;
+use GeometriaLab\Model\Schema\Schema;
 
 class Manager implements \IteratorAggregate
 {

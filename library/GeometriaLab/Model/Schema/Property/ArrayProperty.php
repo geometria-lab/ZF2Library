@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
-use GeometriaLab\Model\Schema;
+use GeometriaLab\Model\Schema\Schema;
 
 class ArrayProperty extends AbstractProperty
 {
