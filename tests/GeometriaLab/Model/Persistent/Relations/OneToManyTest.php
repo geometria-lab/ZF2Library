@@ -8,7 +8,7 @@ use GeometriaLab\Mongo\Manager,
 use GeometriaLabTest\Model\Persistent\Relations\TestModels\Man,
     GeometriaLabTest\Model\Persistent\Relations\TestModels\Woman;
 
-class OneToOneTest extends \PHPUnit_Framework_TestCase
+class OneToManyTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Man
