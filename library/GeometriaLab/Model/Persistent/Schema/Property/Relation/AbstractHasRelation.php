@@ -54,9 +54,4 @@ abstract class AbstractHasRelation extends AbstractRelation
 
         return count($foreignModels);
     }
-
-    public function prepare($value)
-    {
-        throw new \InvalidArgumentException("can't set foreign model to 'has' relation");
-    }
 }

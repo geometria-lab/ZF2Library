@@ -3,6 +3,7 @@
 namespace GeometriaLab\Model;
 
 use GeometriaLab\Model\Schema\Schema,
+    GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
 class Model extends Schemaless\Model implements ModelInterface
@@ -135,7 +136,7 @@ class Model extends Schemaless\Model implements ModelInterface
 
         // Fill default values
         /**
-         * @var Schema\Property\PropertyInterface $property
+         * @var PropertyInterface $property
          */
         foreach($this->getProperties() as $name => $property) {
             if ($property->getDefaultValue() !== null) {
@@ -147,7 +148,7 @@ class Model extends Schemaless\Model implements ModelInterface
     /**
      * Get properties
      *
-     * @return Schema\Property\PropertyInterface[]
+     * @return PropertyInterface[]
      */
     protected function getProperties()
     {

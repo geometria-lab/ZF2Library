@@ -15,4 +15,13 @@ class HasOne extends AbstractHasRelation
         $foreignMapper = call_user_func(array($this->getModelClass(), 'getMapper'));
         return $foreignMapper->getByCondition(array($this->getForeignProperty() => $referencedPropertyValue));
     }
+
+    public function prepare($value)
+    {
+        if (!is_a($value, $this->getModelClass())) {
+            throw new \InvalidArgumentException("must be {$this->getModelClass()}");
+        }
+
+        return $value;
+    }
 }

@@ -10,7 +10,8 @@ use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty,
     GeometriaLab\Model\Persistent\Schema\Property\ModelProperty,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractHasRelation;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractHasRelation,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany;
 
 class Mapper extends AbstractMapper
 {
@@ -265,7 +266,6 @@ class Mapper extends AbstractMapper
     /**
      * Delete model
      *
-     * @todo Delete relations
      * @param ModelInterface $model
      * @return boolean
      * @throws \InvalidArgumentException
@@ -283,6 +283,7 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
         if ($result) {
+            // Remove foreign relations
             foreach($model->getSchema()->getProperties() as $property) {
                 if ($property instanceof AbstractHasRelation) {
                     $property->removeForeignRelations($model);
@@ -346,6 +347,19 @@ class Mapper extends AbstractMapper
                 }
                 if ($property->isPrimary()) {
                     $primary[] = $name;
+                }
+            } else if ($property instanceof AbstractRelation && $model->has($name)) {
+                $relation = $model->get($name);
+
+                if ($property instanceof HasMany) {
+                    foreach($relation as )
+                    $relation = $relation->getFirst();
+
+                    if ($relation && $relation->isNew()) {
+                        throw new \InvalidArgumentException("You must save relation models before");
+                    }
+                } else if ($relation->isNew()) {
+                    throw new \InvalidArgumentException("You must save relation models before");
                 }
             }
         }
