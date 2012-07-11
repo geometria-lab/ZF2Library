@@ -2,9 +2,11 @@
 
 namespace GeometriaLab\Model\Persistent\Schema\Property\Relation;
 
+use GeometriaLab\Model\Persistent\ModelInterface;
+
 class BelongsTo extends AbstractRelation
 {
-    public function getReferencedModel($foreignModel)
+    public function getReferencedModel(ModelInterface $foreignModel)
     {
         $foreignPropertyValue = $foreignModel->get($this->getForeignProperty());
 
@@ -16,7 +18,7 @@ class BelongsTo extends AbstractRelation
         return $foreignMapper->getByCondition(array($this->getReferencedProperty() => $foreignPropertyValue));
     }
 
-    public function setReferencedModel($foreignModel, $referencedModel)
+    public function setReferencedModel(ModelInterface $foreignModel, ModelInterface $referencedModel = null)
     {
         if ($referencedModel !== null) {
             $referencedPropertyValue = $referencedModel->get($this->getReferencedProperty());
@@ -28,7 +30,9 @@ class BelongsTo extends AbstractRelation
             $referencedPropertyValue = null;
         }
 
-        $foreignModel->set($this->getForeignProperty(), $referencedPropertyValue);
+        if ($foreignModel->get($this->getForeignProperty()) !== $referencedPropertyValue) {
+            $foreignModel->set($this->getForeignProperty(), $referencedPropertyValue);
+        }
 
         return $this;
     }

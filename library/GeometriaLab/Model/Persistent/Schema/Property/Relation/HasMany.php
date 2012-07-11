@@ -2,9 +2,9 @@
 
 namespace GeometriaLab\Model\Persistent\Schema\Property\Relation;
 
-class HasMany extends HasOne
+class HasMany extends AbstractHasRelation
 {
-    public function getForeignModel($referencedModel)
+    public function getForeignModels($referencedModel)
     {
         $foreignMapper = call_user_func(array($this->getModelClass(), 'getMapper'));
 
@@ -18,10 +18,5 @@ class HasMany extends HasOne
         $query->where(array($this->getForeignProperty() => $referencedPropertyValue));
 
         return $foreignMapper->getAll($query);
-    }
-
-    public function prepare($value)
-    {
-        throw new \InvalidArgumentException("can't set foreign model to has many relation");
     }
 }

@@ -362,8 +362,8 @@ class Query implements QueryInterface
      */
     protected function getModelSchema()
     {
-        $schemas = SchemaManager::getInstance();
+        $modelClass = $this->getMapper()->getModelClass();
 
-        return $schemas->get($this->getMapper()->getModelClass());
+        return $modelClass::createSchema();
     }
 }

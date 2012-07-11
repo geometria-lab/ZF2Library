@@ -69,4 +69,30 @@ class Manager
     {
         return isset($this->mongoDbInstatnces[$name]);
     }
+
+    /**
+     * @param $name
+     * @return Manager
+     * @throws \InvalidArgumentException
+     */
+    public function remove($name)
+    {
+        if (!$this->has($name)) {
+            throw new \InvalidArgumentException("Instance '$name' is not present");
+        }
+
+        unset($this->mongoDbInstatnces[$name]);
+
+        return $this;
+    }
+
+    /**
+     * @return Manager
+     */
+    public function removeAll()
+    {
+        $this->mongoDbInstatnces = array();
+
+        return $this;
+    }
 }

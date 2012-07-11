@@ -9,7 +9,8 @@ use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
     GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty,
     GeometriaLab\Model\Persistent\Schema\Property\ModelProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractHasRelation;
 
 class Mapper extends AbstractMapper
 {
@@ -283,7 +284,7 @@ class Mapper extends AbstractMapper
 
         if ($result) {
             foreach($model->getSchema()->getProperties() as $property) {
-                if ($property instanceof HasOne) {
+                if ($property instanceof AbstractHasRelation) {
                     $property->removeForeignRelations($model);
                 }
             }

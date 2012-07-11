@@ -56,7 +56,7 @@ class Manager implements \IteratorAggregate
      *
      * @param Schema $schema
      * @return Manager
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function add(Schema $schema)
     {
@@ -65,7 +65,7 @@ class Manager implements \IteratorAggregate
         $className = $this->filterClassName($className);
 
         if ($this->has($className)) {
-            throw new \Exception("Model '{$className}' schema already added");
+            throw new \InvalidArgumentException("Model '{$className}' schema already added");
         }
 
         return $this->schemas[$className] = $schema;
@@ -76,14 +76,14 @@ class Manager implements \IteratorAggregate
      *
      * @param string $modelClass
      * @return Schema
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function get($modelClass)
     {
         $modelClass = $this->filterClassName($modelClass);
 
         if (!$this->has($modelClass)) {
-            throw new \Exception("Model '$modelClass' schema not added");
+            throw new \InvalidArgumentException("Model '$modelClass' schema not present");
         }
 
         return $this->schemas[$modelClass];
@@ -117,7 +117,37 @@ class Manager implements \IteratorAggregate
      */
     public function getIterator()
     {
-        return $this->getAll();
+        return new \ArrayIterator($this->getAll());
+    }
+
+    /**
+     * Remove schema
+     *
+     * @param $modelClass
+     * @return Manager
+     * @throws \InvalidArgumentException
+     */
+    public function remove($modelClass)
+    {
+        if (!$this->has($modelClass)) {
+            throw new \InvalidArgumentException("Model '$modelClass' schema not present");
+        }
+
+        unset($this->schemas[$modelClass]);
+
+        return $this;
+    }
+
+    /**
+     * Remove all schema
+     *
+     * @return Manager
+     */
+    public function removeAll()
+    {
+        $this->schemas = array();
+
+        return $this;
     }
 
     /**

@@ -6,7 +6,8 @@ use GeometriaLab\Model\Persistent\Schema\Schema,
     GeometriaLab\Model\Schema\Manager as SchemaManager,
     GeometriaLab\Model\Persistent\Mapper,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany;
 
 class Model extends \GeometriaLab\Model\Model implements ModelInterface
 {
@@ -35,6 +36,8 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
                 $value = $property->getReferencedModel($this);
             } else if ($property instanceof HasOne) {
                 $value = $property->getForeignModel($this);
+            } else if ($property instanceof HasMany) {
+                $value = $property->getForeignModels($this);
             }
 
             if ($value !== null) {

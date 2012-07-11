@@ -1,12 +1,13 @@
 <?php
 
-namespace GeometriaLabTest\Model\Persistent\Relations;
+namespace GeometriaLabTest\Mongo\Model\Relations;
 
-use GeometriaLab\Mongo\Manager,
-    GeometriaLab\Mongo\Model\Mapper;
+use GeometriaLab\Mongo\Manager as MongoManager,
+    GeometriaLab\Mongo\Model\Mapper,
+    GeometriaLab\Model\Schema\Manager as SchemaManager;
 
-use GeometriaLabTest\Model\Persistent\Relations\TestModels\Man,
-    GeometriaLabTest\Model\Persistent\Relations\TestModels\Woman;
+use GeometriaLabTest\Mongo\Model\Relations\TestModels\Man,
+    GeometriaLabTest\Mongo\Model\Relations\TestModels\Woman;
 
 class OneToManyTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +23,7 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $manager = Manager::getInstance();
+        $manager = MongoManager::getInstance();
         if (!$manager->has('default')) {
             $mongo = new \Mongo(TESTS_MONGO_MAPPER_CONNECTION_SERVER);
             $mongoDb = $mongo->selectDB(TESTS_MONGO_MAPPER_CONNECTION_DB);
@@ -51,12 +52,15 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $manager = Manager::getInstance();
+        $manager = MongoManager::getInstance();
         $mongoDb = $manager->get('default');
         $mongoDb->drop();
+
+        $schemaManager = SchemaManager::getInstance();
+        $schemaManager->removeAll();
     }
 
-    public function testGetForeignModel()
+    public function testGetForeignModels()
     {
         $collection = $this->man->women;
         $this->assertInstanceOf('\GeometriaLab\Model\Persistent\Collection', $collection);
@@ -103,5 +107,16 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
         $woman = Woman::getMapper()->get($this->women['Alisa']->id);
 
         $this->assertEquals($id, $woman->manId);
+    }
+
+    public function testFetchRelations()
+    {
+        $women = Woman::getMapper()->getAll();
+
+        $this->assertFalse($women->getFirst()->has('man'));
+
+        $women->fetchRelations('man');
+
+        $this->assertTrue($women->getFirst()->has('man'));
     }
 }

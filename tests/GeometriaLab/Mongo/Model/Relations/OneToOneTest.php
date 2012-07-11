@@ -1,12 +1,13 @@
 <?php
 
-namespace GeometriaLabTest\Model\Persistent\Relations;
+namespace GeometriaLabTest\Mongo\Model\Relations;
 
-use GeometriaLab\Mongo\Manager,
-    GeometriaLab\Mongo\Model\Mapper;
+use GeometriaLab\Mongo\Manager as MongoManager,
+    GeometriaLab\Mongo\Model\Mapper,
+    GeometriaLab\Model\Schema\Manager as SchemaManager;
 
-use GeometriaLabTest\Model\Persistent\Relations\TestModels\Man,
-    GeometriaLabTest\Model\Persistent\Relations\TestModels\Dog;
+use GeometriaLabTest\Mongo\Model\Relations\TestModels\Man,
+    GeometriaLabTest\Mongo\Model\Relations\TestModels\Dog;
 
 class OneToOneTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +23,7 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $manager = Manager::getInstance();
+        $manager = MongoManager::getInstance();
         if (!$manager->has('default')) {
             $mongo = new \Mongo(TESTS_MONGO_MAPPER_CONNECTION_SERVER);
             $mongoDb = $mongo->selectDB(TESTS_MONGO_MAPPER_CONNECTION_DB);
@@ -41,9 +42,12 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $manager = Manager::getInstance();
+        $manager = MongoManager::getInstance();
         $mongoDb = $manager->get('default');
         $mongoDb->drop();
+
+        $schemaManager = SchemaManager::getInstance();
+        $schemaManager->removeAll();
     }
 
     public function testGetForeignModel()
@@ -156,5 +160,27 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
         $dog = Dog::getMapper()->get($this->dog->id);
 
         $this->assertEquals($id, $dog->manId);
+    }
+
+    public function testAutoFetchForeignRelation()
+    {
+        $this->man->getSchema()->getProperty('dog')->setAutoFetch(true);
+
+        $this->assertFalse($this->man->has('dog'));
+
+        $man = Man::getMapper()->get($this->man->id);
+
+        $this->assertTrue($man->has('dog'));
+    }
+
+    public function testAutoFetchReferencedRelation()
+    {
+        $this->dog->getSchema()->getProperty('man')->setAutoFetch(true);
+
+        $this->assertFalse($this->dog->has('man'));
+
+        $dog = Dog::getMapper()->get($this->dog->id);
+
+        $this->assertTrue($dog->has('man'));
     }
 }
