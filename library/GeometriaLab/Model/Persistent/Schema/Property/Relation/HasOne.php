@@ -22,7 +22,7 @@ class HasOne extends AbstractRelation
         return $this->onDelete;
     }
 
-    public function getForeignModel($referencedModel)
+    public function getForeignObject($referencedModel)
     {
         $referencedPropertyValue = $referencedModel->get($this->getReferencedProperty());
 

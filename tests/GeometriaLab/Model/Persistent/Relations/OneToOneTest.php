@@ -6,7 +6,7 @@ use GeometriaLab\Mongo\Manager,
     GeometriaLab\Mongo\Model\Mapper;
 
 use GeometriaLabTest\Model\Persistent\Relations\TestModels\Man,
-    GeometriaLabTest\Model\Persistent\Relations\TestModels\Woman;
+    GeometriaLabTest\Model\Persistent\Relations\TestModels\Dog;
 
 class OneToOneTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,9 +16,9 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
     protected $man;
 
     /**
-     * @var Woman
+     * @var Dog
      */
-    protected $woman;
+    protected $dog;
 
     public function setUp()
     {
@@ -30,13 +30,13 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->man = new Man();
-        $this->man->name = 'Adam';
+        $this->man->name = 'Ivan';
         $this->man->save();
 
-        $this->woman = new Woman();
-        $this->woman->name = 'Eva';
-        $this->woman->manId = $this->man->id;
-        $this->woman->save();
+        $this->dog = new Dog();
+        $this->dog->name = 'Lucky';
+        $this->dog->manId = $this->man->id;
+        $this->dog->save();
     }
 
     public function tearDown()
@@ -48,12 +48,12 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
 
     public function testGetForeignModel()
     {
-        $this->assertEquals($this->woman, $this->man->woman);
+        $this->assertEquals($this->dog, $this->man->dog);
     }
 
     public function testGetReferencedModel()
     {
-        $this->assertEquals($this->man, $this->woman->man);
+        $this->assertEquals($this->man, $this->dog->man);
     }
 
     public function testSetForeignModel()
@@ -62,17 +62,17 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
         $newMan->name = 'John';
         $newMan->save();
 
-        $this->woman->man = $newMan;
+        $this->dog->man = $newMan;
 
-        $this->assertEquals(array('manId' => array($this->man->id, $newMan->id)), $this->woman->getChanges());
+        $this->assertEquals(array('manId' => array($this->man->id, $newMan->id)), $this->dog->getChanges());
 
-        $this->assertEquals($newMan, $this->woman->man);
+        $this->assertEquals($newMan, $this->dog->man);
     }
 
     public function testSetForeignProperty()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        $this->man->woman = $this->woman;
+        $this->man->dog = $this->dog;
     }
 
     public function testSetReferencedModel()
@@ -81,41 +81,41 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
         $newMan->name = 'John';
         $newMan->save();
 
-        $this->woman->manId = $newMan->id;
+        $this->dog->manId = $newMan->id;
 
-        $this->assertEquals(array('manId' => array($this->man->id, $newMan->id)), $this->woman->getChanges());
+        $this->assertEquals(array('manId' => array($this->man->id, $newMan->id)), $this->dog->getChanges());
 
-        $this->assertEquals($newMan, $this->woman->man);
+        $this->assertEquals($newMan, $this->dog->man);
     }
 
     public function testSetNullToForeignProperty()
     {
-        $this->woman->manId = null;
+        $this->dog->manId = null;
 
-        $this->assertEquals(array('manId' => array($this->man->id, null)), $this->woman->getChanges());
+        $this->assertEquals(array('manId' => array($this->man->id, null)), $this->dog->getChanges());
 
-        $this->assertNull($this->woman->man);
+        $this->assertNull($this->dog->man);
 
-        $this->woman->save();
+        $this->dog->save();
 
-        $woman = Woman::getMapper()->get($this->woman->id);
+        $dog = Dog::getMapper()->get($this->dog->id);
 
-        $this->assertNull($woman->man);
+        $this->assertNull($dog->man);
     }
 
     public function testSetNullToForeignRelation()
     {
-        $this->woman->man = null;
+        $this->dog->man = null;
 
-        $this->assertEquals(array('manId' => array($this->man->id, null)), $this->woman->getChanges());
+        $this->assertEquals(array('manId' => array($this->man->id, null)), $this->dog->getChanges());
 
-        $this->assertNull($this->woman->man);
+        $this->assertNull($this->dog->man);
 
-        $this->woman->save();
+        $this->dog->save();
 
-        $woman = Woman::getMapper()->get($this->woman->id);
+        $dog = Dog::getMapper()->get($this->dog->id);
 
-        $this->assertNull($woman->man);
+        $this->assertNull($dog->man);
     }
 
     public function testSetModelWithoutReferencedPropertyToForeignRelation()
@@ -125,36 +125,36 @@ class OneToOneTest extends \PHPUnit_Framework_TestCase
         $newMan = new Man();
         $newMan->name = 'John';
 
-        $this->woman->man = $newMan;
+        $this->dog->man = $newMan;
     }
 
     public function testDeleteReferencedModelWithOnDeleteEqualsSetNull()
     {
         $this->man->delete();
 
-        $woman = Woman::getMapper()->get($this->woman->id);
+        $dog = Dog::getMapper()->get($this->dog->id);
 
-        $this->assertNull($woman->manId);
+        $this->assertNull($dog->manId);
     }
 
     public function testDeleteReferencedModelWithOnDeleteEqualsCascade()
     {
-        $this->man->getSchema()->getProperty('woman')->setOnDelete('cascade');
+        $this->man->getSchema()->getProperty('dog')->setOnDelete('cascade');
         $this->man->delete();
 
-        $woman = Woman::getMapper()->get($this->woman->id);
+        $dog = Dog::getMapper()->get($this->dog->id);
 
-        $this->assertNull($woman);
+        $this->assertNull($dog);
     }
 
     public function testDeleteReferencedModelWithOnDeleteEqualsNone()
     {
-        $this->man->getSchema()->getProperty('woman')->setOnDelete('none');
+        $this->man->getSchema()->getProperty('dog')->setOnDelete('none');
         $id = $this->man->id;
         $this->man->delete();
 
-        $woman = Woman::getMapper()->get($this->woman->id);
+        $dog = Dog::getMapper()->get($this->dog->id);
 
-        $this->assertEquals($id, $woman->manId);
+        $this->assertEquals($id, $dog->manId);
     }
 }

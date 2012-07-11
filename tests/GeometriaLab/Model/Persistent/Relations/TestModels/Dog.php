@@ -10,9 +10,9 @@ use GeometriaLab\Model\Persistent\Model;
  * @property string                                                       $manId
  * @property \GeometriaLabTest\Model\Persistent\Relations\TestModels\Man  $man { "relation" : "belongsTo", "foreignProperty" : "manId" }
  *
- * @method static \GeometriaLab\Mongo\Model\Mapper getMapper() {"mongoInstanceName" : "default", "collectionName" : "women"}
+ * @method static \GeometriaLab\Mongo\Model\Mapper getMapper() {"mongoInstanceName" : "default", "collectionName" : "dogs"}
  */
-class Woman extends Model
+class Dog extends Model
 {
 
 }

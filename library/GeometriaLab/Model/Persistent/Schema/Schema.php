@@ -42,7 +42,8 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
      */
     static protected $relationsClassMap = array(
         'hasOne'    => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne',
-        'belongsTo' => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo'
+        'hasMany'   => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany',
+        'belongsTo' => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo',
     );
 
     /**
@@ -137,7 +138,9 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
                     throw new \InvalidArgumentException("Invalid relation '{$params['relation']}'");
                 }
 
-                $params['modelClass'] = $type;
+                if (!isset($params['modelClass']) && $params['relation'] !== 'hasMany') {
+                    $params['modelClass'] = $type;
+                }
 
                 $className = static::$relationsClassMap[$params['relation']];
 
