@@ -151,6 +151,8 @@ class Manager implements \IteratorAggregate
     }
 
     /**
+     *
+     * @todo Do as ZF2
      * @param $className
      * @return string
      */

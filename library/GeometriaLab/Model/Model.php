@@ -118,6 +118,9 @@ class Model extends Schemaless\Model implements ModelInterface
     {
         $schemas = SchemaManager::getInstance();
 
+        /**
+         * @todo If iam instance Model and set schema this is not working
+         */
         $className = get_called_class();
 
         if (!$schemas->has($className)) {

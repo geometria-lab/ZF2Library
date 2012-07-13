@@ -4,6 +4,10 @@ namespace GeometriaLab\Model;
 
 use GeometriaLab\Model\Schemaless\ModelInterface as SchemalessModelInterface;
 
+/**
+ * @todo Get array of field and associative array of field pairs
+ * @todo Delete by cond
+ */
 class Collection implements CollectionInterface
 {
     /**
@@ -35,6 +39,7 @@ class Collection implements CollectionInterface
     /**
      * Add model or models to the end of a collection
      *
+     * @todo Validate if array or Traversable, items must be SchemalessModelInterface
      * @param mixed $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
@@ -44,8 +49,6 @@ class Collection implements CollectionInterface
         if ($data instanceof SchemalessModelInterface) {
             array_push($this->models, $data);
         } else if (is_array($data) || $data instanceof \Traversable) {
-            // TODO: Create models?
-
             foreach ($data as $model) {
                 $this->push($model);
             }
@@ -69,6 +72,7 @@ class Collection implements CollectionInterface
     /**
      * Add model or models at the beginning of a collection
      *
+     * @todo Validate if array or Traversable, items must be SchemalessModelInterface
      * @param mixed $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
@@ -306,6 +310,7 @@ class Collection implements CollectionInterface
     /**
      * Sort collection by callback
      *
+     * @todo Sort by fields and collback like getByCondition
      * @param mixed $callback
      * @return Collection
      */

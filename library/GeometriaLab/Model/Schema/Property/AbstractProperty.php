@@ -26,6 +26,7 @@ abstract class AbstractProperty implements PropertyInterface
      */
     public function __construct(array $options = array())
     {
+        // @todo Move to setOptions
         foreach($options as $option => $value) {
             $method = "set$option";
             if (method_exists($this, $method)) {

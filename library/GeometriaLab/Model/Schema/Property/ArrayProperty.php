@@ -69,6 +69,7 @@ class ArrayProperty extends AbstractProperty
     /**
      * Prepare value
      *
+     * @todo Separate validation and filter
      * @param array $value
      * @return array
      * @throws \InvalidArgumentException

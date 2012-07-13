@@ -333,6 +333,7 @@ class Mapper extends AbstractMapper
                 if (!$changed || $model->isPropertyChanged($name)) {
                     $value = $model->get($name);
 
+                    // @todo: Unset nulled fields on update
                     if ($changed || $value !== null) {
                         if ($property instanceof ModelProperty) {
                             $value = $value->toArray(-1);
@@ -352,7 +353,9 @@ class Mapper extends AbstractMapper
                 $relation = $model->get($name);
 
                 if ($property instanceof HasMany) {
-                    foreach($relation as )
+                    foreach($relation as $relat) {
+
+                    }
                     $relation = $relation->getFirst();
 
                     if ($relation && $relation->isNew()) {

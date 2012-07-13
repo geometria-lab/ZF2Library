@@ -167,6 +167,7 @@ class Schema
     /**
      * Parse class docblock
      *
+     * @todo Move from schema to standalone class (Zend/Code/.../Annotations?)
      * @param string $className
      * @throws \InvalidArgumentException
      */
@@ -211,6 +212,7 @@ class Schema
         $type = $tag->getType();
 
         if (strpos($type, '[]') === strlen($type) - 2) {
+            // @todo Create property object
             $params['itemType'] = substr($type, 0, strlen($type) - 2);
             $type = 'array';
         }
