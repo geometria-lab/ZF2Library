@@ -112,6 +112,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->models[2], $models[1]);
     }
 
+    public function testRemoveByCondition()
+    {
+
+    }
+
     public function testGet()
     {
         $c = new Collection($this->models);

@@ -94,14 +94,27 @@ class Mapper extends AbstractMapper
     }
 
     /**
-     * Get model by condition
+     * Get model by query
      *
-     * @param array $condition
+     * @param QueryInterface $query
      * @return ModelInterface
+     * @throws \InvalidArgumentException
      */
-    public function getByCondition(array $condition)
+    public function getOne(QueryInterface $query = null)
     {
-        $query = $this->createQuery()->where($condition)->limit(1);
+        if ($query === null) {
+            $query = $this->createQuery();
+        }
+
+        if (!$query instanceof Query) {
+            throw new \InvalidArgumentException('Query must be GeometriaLab\Mongo\Model\Query');
+        }
+
+        if (!$query->hasLimit()) {
+            $query->limit(1);
+        } else if ($query->getLimit() !== 1) {
+            throw new \InvalidArgumentException('getOne accepts query with limit 1');
+        }
 
         return $this->getAll($query)->getFirst();
     }
@@ -116,6 +129,10 @@ class Mapper extends AbstractMapper
     {
         if ($query === null) {
             $query = $this->createQuery();
+        }
+
+        if (!$query instanceof Query) {
+            throw new \InvalidArgumentException('Query must be GeometriaLab\Mongo\Model\Query');
         }
 
         $cursor = $this->find($query);
@@ -208,13 +225,49 @@ class Mapper extends AbstractMapper
     /**
      * Create model in storage
      *
+     * @todo Refactor
      * @param ModelInterface $model
      * @return boolean
      * @throws \InvalidArgumentException
      */
     public function create(ModelInterface $model)
     {
-        $data = $this->getModelDataForStorage($model);
+        if (!is_a($model, $this->getModelClass())) {
+            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
+        }
+
+        $data = array();
+        $primary = array();
+
+        /**
+         * @var \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface $property
+         */
+        foreach($model->getSchema()->getProperties() as $name => $property) {
+            if ($property->isPersistent()) {
+                $value = $model->get($name);
+
+                if ($value !== null) {
+                    if ($property instanceof ModelProperty) {
+                        $value = $value->toArray(-1);
+                    } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
+                        foreach($value as &$item) {
+                            $item = $item->toArray(-1);
+                        }
+                    }
+
+                    $data[$name] = $value;
+                }
+                if ($property->isPrimary()) {
+                    $primary[] = $name;
+                }
+            }
+        }
+
+        if (count($primary) !== 1 || $primary[0] !== 'id') {
+            throw new \InvalidArgumentException("Mongo mapper support only one primary key 'id'");
+        }
+
+        $data = $this->transformModelDataForStorage($data);
 
         if (!isset($data['_id']) && $this->getPrimaryKeyGenerator()) {
             $data['_id'] = new \MongoId($this->getPrimaryKeyGenerator()->generate());
@@ -235,14 +288,57 @@ class Mapper extends AbstractMapper
     /**
      * Update model
      *
+     * @todo Refactor
      * @param ModelInterface $model
      * @return bool
+     * @throws \InvalidArgumentException
      */
     public function update(ModelInterface $model)
     {
-        $data = $this->getModelDataForStorage($model, true);
+        if (!is_a($model, $this->getModelClass())) {
+            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
+        }
 
-        if (empty($data)) {
+        $setData = array();
+        $unsetData = array();
+        $primaryProperties = array();
+
+        /**
+         * @var \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface $property
+         */
+        foreach($model->getSchema()->getProperties() as $name => $property) {
+            if ($property->isPersistent()) {
+                if ($model->isPropertyChanged($name)) {
+                    $value = $model->get($name);
+
+                    if ($value === null) {
+                        $unsetData[$name] = 1;
+                    } else {
+                        if ($property instanceof ModelProperty) {
+                            $value = $value->toArray(-1);
+                        } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
+                            foreach($value as &$item) {
+                                $item = $item->toArray(-1);
+                            }
+                        }
+
+                        $setData[$name] = $value;
+                    }
+                }
+                if ($property->isPrimary()) {
+                    $primary[] = $name;
+                }
+            }
+        }
+
+        if (count($primaryProperties) !== 1 || $primaryProperties[0] !== 'id') {
+            throw new \InvalidArgumentException("Mongo mapper support only one primary key 'id'");
+        }
+
+        $setData = $this->transformModelDataForStorage($setData);
+        $unsetData = $this->transformModelDataForStorage($unsetData);
+
+        if (!empty($setData) && empty($unsetData)) {
             return false;
         }
 
@@ -256,7 +352,15 @@ class Mapper extends AbstractMapper
             throw new \InvalidArgumentException('Cant update model - primary property id is empty');
         }
 
-        $this->getMongoCollection()->update(array('_id' => new \MongoId($id)), array('$set' => $data));
+        if (!empty($data)) {
+            $data['$set'] = $setData;
+        }
+
+        if (!empty($unsetData)) {
+            $data['$unset'] = $unsetData;
+        }
+
+        $this->getMongoCollection()->update(array('_id' => new \MongoId($id)), $data);
 
         $model->markClean();
 
@@ -306,72 +410,6 @@ class Mapper extends AbstractMapper
     public function createQuery()
     {
         return new Query($this);
-    }
-
-    /**
-     * Get and validate model data for storage
-     *
-     * @param ModelInterface $model
-     * @param boolean $changed
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    protected function getModelDataForStorage(ModelInterface $model, $changed = false)
-    {
-        if (!is_a($model, $this->getModelClass())) {
-            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
-        }
-
-        $data = array();
-        $primary = array();
-
-        /**
-         * @var \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface $property
-         */
-        foreach($model->getSchema()->getProperties() as $name => $property) {
-            if ($property->isPersistent()) {
-                if (!$changed || $model->isPropertyChanged($name)) {
-                    $value = $model->get($name);
-
-                    // @todo: Unset nulled fields on update
-                    if ($changed || $value !== null) {
-                        if ($property instanceof ModelProperty) {
-                            $value = $value->toArray(-1);
-                        } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
-                            foreach($value as &$item) {
-                                $item = $item->toArray(-1);
-                            }
-                        }
-
-                        $data[$name] = $value;
-                    }
-                }
-                if ($property->isPrimary()) {
-                    $primary[] = $name;
-                }
-            } else if ($property instanceof AbstractRelation && $model->has($name)) {
-                $relation = $model->get($name);
-
-                if ($property instanceof HasMany) {
-                    foreach($relation as $relat) {
-
-                    }
-                    $relation = $relation->getFirst();
-
-                    if ($relation && $relation->isNew()) {
-                        throw new \InvalidArgumentException("You must save relation models before");
-                    }
-                } else if ($relation->isNew()) {
-                    throw new \InvalidArgumentException("You must save relation models before");
-                }
-            }
-        }
-
-        if (count($primary) !== 1 || $primary[0] !== 'id') {
-            throw new \InvalidArgumentException("Mongo mapper support only one primary key 'id'");
-        }
-
-        return $this->transformModelDataForStorage($data);
     }
 
     /**

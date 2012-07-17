@@ -98,13 +98,12 @@ class Model implements ModelInterface
     /**
      * Has property
      *
-     * @todo: Rename to isSet, but?
      * @param string $name
      * @return bool
      */
     public function has($name)
     {
-        return isset($this->propertyValues[$name]);
+        return array_key_exists($name, $this->propertyValues);
     }
 
     /**

@@ -120,6 +120,30 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
     }
 
     /**
+     * Parse method tag
+     *
+     * @param ZendMethodTag $tag
+     * @throws \InvalidArgumentException
+     */
+    protected function parseMethodTag(ZendMethodTag $tag)
+    {
+        if ($tag->getMethodName() === 'getMapper()') {
+            if (!$tag->isStatic()) {
+                throw new \InvalidArgumentException('Mapper method tag in docblock must be static!');
+            }
+
+            if (!class_exists($tag->getReturnType())) {
+                throw new \InvalidArgumentException('Invalid mapper class in mapper method tag in docblock!');
+            }
+
+            $params = $this->getParamsFromTag($tag);
+
+            $this->setMapperClass($tag->getReturnType());
+            $this->setMapperOptions($params);
+        }
+    }
+
+    /**
      * Create property by type and params
      *
      * @static
@@ -128,7 +152,7 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
      * @return PropertyInterface
      * @throws \InvalidArgumentException
      */
-    static public function createProperty($type, array $params = array())
+    static protected function createProperty($type, array $params = array())
     {
         if (isset(static::$regularPropertiesClassMap[$type])) {
             $property = new static::$regularPropertiesClassMap[$type]($params);
@@ -157,29 +181,5 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
         }
 
         return $property;
-    }
-
-    /**
-     * Parse method tag
-     *
-     * @param ZendMethodTag $tag
-     * @throws \InvalidArgumentException
-     */
-    protected function parseMethodTag(ZendMethodTag $tag)
-    {
-        if ($tag->getMethodName() === 'getMapper()') {
-            if (!$tag->isStatic()) {
-                throw new \InvalidArgumentException('Mapper method tag in docblock must be static!');
-            }
-
-            if (!class_exists($tag->getReturnType())) {
-                throw new \InvalidArgumentException('Invalid mapper class in mapper method tag in docblock!');
-            }
-
-            $params = $this->getParamsFromTag($tag);
-
-            $this->setMapperClass($tag->getReturnType());
-            $this->setMapperOptions($params);
-        }
     }
 }

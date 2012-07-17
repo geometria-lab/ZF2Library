@@ -87,6 +87,17 @@ class Model extends Schemaless\Model implements ModelInterface
     }
 
     /**
+     * Has property?
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return $this->getSchema()->hasProperty($name);
+    }
+
+    /**
      * Get schema
      *
      * @return Schema
@@ -94,19 +105,6 @@ class Model extends Schemaless\Model implements ModelInterface
     public function getSchema()
     {
         return $this->schema;
-    }
-
-    /**
-     * Set schema
-     *
-     * @param Schema $schema
-     * @return Model
-     */
-    public function setSchema(Schema $schema)
-    {
-        $this->schema = $schema;
-
-        return $this;
     }
 
     /**
@@ -118,9 +116,6 @@ class Model extends Schemaless\Model implements ModelInterface
     {
         $schemas = SchemaManager::getInstance();
 
-        /**
-         * @todo If iam instance Model and set schema this is not working
-         */
         $className = get_called_class();
 
         if (!$schemas->has($className)) {

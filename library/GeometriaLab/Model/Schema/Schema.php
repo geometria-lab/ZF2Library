@@ -141,30 +141,6 @@ class Schema
     }
 
     /**
-     * Create property by type and params
-     *
-     * @static
-     * @param string $type
-     * @param array $params
-     * @return PropertyInterface
-     * @throws \InvalidArgumentException
-     */
-    static public function createProperty($type, array $params = array())
-    {
-        if (isset(static::$regularPropertiesClassMap[$type])) {
-            $property = new static::$regularPropertiesClassMap[$type]($params);
-        } else if (class_exists($type)) {
-            $params['modelClass'] = $type;
-
-            $property = new static::$modelPropertyClass($params);
-        } else {
-            throw new \InvalidArgumentException("Invalid property type '$type'");
-        }
-
-        return $property;
-    }
-
-    /**
      * Parse class docblock
      *
      * @todo Move from schema to standalone class (Zend/Code/.../Annotations?)
@@ -212,9 +188,8 @@ class Schema
         $type = $tag->getType();
 
         if (strpos($type, '[]') === strlen($type) - 2) {
-            // @todo Create property object
-            $params['itemType'] = substr($type, 0, strlen($type) - 2);
-            $type = 'array';
+            $itemPropertyType = substr($type, 0, strlen($type) - 2);
+            $params['itemProperty'] = static::createProperty($itemPropertyType);
         }
 
         $property = static::createProperty($type, $params);
@@ -222,6 +197,13 @@ class Schema
         $this->setProperty($property);
     }
 
+    /**
+     * Get params from tag
+     *
+     * @param \Zend\Code\Reflection\DocBlock\Tag\TagInterface $tag
+     * @return array|mixed
+     * @throws \InvalidArgumentException
+     */
     protected function getParamsFromTag(ZendTagInterface $tag)
     {
         $description = $tag->getDescription();
@@ -240,5 +222,29 @@ class Schema
         }
 
         return $params;
+    }
+
+    /**
+     * Create property by type and params
+     *
+     * @static
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     * @throws \InvalidArgumentException
+     */
+    static protected function createProperty($type, array $params = array())
+    {
+        if (isset(static::$regularPropertiesClassMap[$type])) {
+            $property = new static::$regularPropertiesClassMap[$type]($params);
+        } else if (class_exists($type)) {
+            $params['modelClass'] = $type;
+
+            $property = new static::$modelPropertyClass($params);
+        } else {
+            throw new \InvalidArgumentException("Invalid property type '$type'");
+        }
+
+        return $property;
     }
 }

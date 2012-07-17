@@ -167,32 +167,6 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
     }
 
     /**
-     * Get property change
-     *
-     * @param string $name
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    public function getChange($name)
-    {
-        return array($this->getClean($name), $this->get($name));
-    }
-
-    /**
-     * Get model changes
-     *
-     * @return array
-     */
-    public function getChanges()
-    {
-        $changes = array();
-        foreach($this->getChangedProperties() as $name) {
-            $changes[$name] = $this->getChange($name);
-        }
-        return $changes;
-    }
-
-    /**
      * Get clean property value
      *
      * @param string $name

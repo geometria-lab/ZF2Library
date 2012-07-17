@@ -4,6 +4,9 @@ namespace GeometriaLab\Model\Schema;
 
 use GeometriaLab\Model\Schema\Schema;
 
+/**
+ * @todo Use ZF2 Service Manager?
+ */
 class Manager implements \IteratorAggregate
 {
     /**
@@ -151,8 +154,6 @@ class Manager implements \IteratorAggregate
     }
 
     /**
-     *
-     * @todo Do as ZF2
      * @param $className
      * @return string
      */

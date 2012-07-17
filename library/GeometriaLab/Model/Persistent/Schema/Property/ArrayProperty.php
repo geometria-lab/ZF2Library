@@ -2,8 +2,6 @@
 
 namespace GeometriaLab\Model\Persistent\Schema\Property;
 
-use GeometriaLab\Model\Persistent\Schema\Schema;
-
 class ArrayProperty extends \GeometriaLab\Model\Schema\Property\ArrayProperty implements PropertyInterface
 {
     /**
@@ -64,19 +62,5 @@ class ArrayProperty extends \GeometriaLab\Model\Schema\Property\ArrayProperty im
     public function isPrimary()
     {
         return $this->isPrimary;
-    }
-
-    /**
-     * Get item property
-     *
-     * @return PropertyInterface|\GeometriaLab\Model\Schema\Property\PropertyInterface
-     */
-    public function getItemProperty()
-    {
-        if ($this->itemProperty === null) {
-            $this->itemProperty = Schema::createProperty($this->getItemType());
-        }
-
-        return $this->itemProperty;
     }
 }
