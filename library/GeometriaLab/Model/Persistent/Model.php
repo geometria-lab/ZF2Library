@@ -4,11 +4,20 @@ namespace GeometriaLab\Model\Persistent;
 
 use GeometriaLab\Model\Persistent\Schema\Schema,
     GeometriaLab\Model\Schema\Manager as SchemaManager,
-    GeometriaLab\Model\Persistent\Mapper,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany;
+    GeometriaLab\Model\Persistent\Mapper;
 
+use GeometriaLab\Model\Persistent\Relation\BelongsTo,
+    GeometriaLab\Model\Persistent\Relation\HasOne,
+    GeometriaLab\Model\Persistent\Relation\HasMany;
+
+use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo        as BelongsToProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne           as HasOneProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany          as HasManyProperty;
+
+/**
+ * @todo Abstract?
+ */
 class Model extends \GeometriaLab\Model\Model implements ModelInterface
 {
     /**
@@ -29,20 +38,21 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
     {
         $value = parent::get($name);
 
-        if ($value === null) {
-            $property = $this->getSchema()->getProperty($name);
-
-            if ($property instanceof BelongsTo) {
-                $value = $property->getReferencedModel($this);
-            } else if ($property instanceof HasOne) {
-                $value = $property->getForeignModel($this);
-            } else if ($property instanceof HasMany) {
-                $value = $property->getForeignModels($this);
-            }
-
-            if ($value !== null) {
-                $this->propertyValues[$name] = $value;
-            }
+        if ($value instanceof BelongsTo) {
+            /**
+             * @var BelongsTo $value
+             */
+            return $value->getReferencedModel();
+        } else if ($value instanceof HasOne) {
+            /**
+             * @var HasOne $value
+             */
+            return $value->getForeignModel();
+        } else if ($value instanceof HasMany) {
+            /**
+             * @var HasMany $value
+             */
+            return $value->getForeignModels();
         }
 
         return $value;
@@ -62,8 +72,12 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
 
         $property = $this->getSchema()->getProperty($name);
 
-        if ($property instanceof BelongsTo) {
-            $property->setReferencedModel($this, $value);
+        if ($property instanceof BelongsToProperty) {
+            $this->propertyValues[$name]->setReferencedModel($value);
+        } else if ($property instanceof HasOneProperty) {
+            $this->propertyValues[$name]->setForeignModel($value);
+        } else if ($property instanceof HasManyProperty) {
+            $this->propertyValues[$name]->setForeignModels($value);
         } else {
             foreach(static::getSchema()->getProperties() as $property) {
                 // @todo If changed referenced key?
@@ -255,5 +269,27 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         }
 
         return $schemas->get($className);
+    }
+
+    /**
+     * Setup model
+     */
+    protected function setup()
+    {
+        $this->schema = static::createSchema();
+
+        // Create relations and fill default values
+
+        /**
+         * @var \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface $property
+         */
+        foreach($this->getProperties() as $name => $property) {
+            if ($property instanceof AbstractRelationProperty) {
+                $relationClassName = $property->getRelationClass();
+                $this->propertyValues[$name] = $relationClassName($this, $property);
+            } else if ($property->getDefaultValue() !== null) {
+                $this->set($name, $property->getDefaultValue());
+            }
+        }
     }
 }

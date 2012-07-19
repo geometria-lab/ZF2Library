@@ -45,27 +45,68 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
         }
 
         // Fetch relations and set to models
-        foreach($this->models as $model) {
-            foreach($relationProperties as $name => $property) {
-                $relation = null;
-                if ($property instanceof BelongsTo) {
+        foreach($relationProperties as $property) {
+            if ($property instanceof BelongsTo) {
+                $this->_setForeign
 
-
-                    $relation = $property->getReferencedModel($model);
-                } else if ($property instanceof HasOne) {
-
-
-                    $relation = $property->getForeignModel($model);
-                } else if ($property instanceof HasMany) {
-
-
-                    $relation = $property->getForeignModels($model);
-                }
-
-                $model->set($name, $relation);
+                /**
+                 * @var BelongsTo $value
+                 */
+                return $value->getReferencedModel();
+            } else if ($property instanceof HasOne) {
+                /**
+                 * @var HasOne $value
+                 */
+                return $value->getForeignModel();
+            } else if ($property instanceof HasMany) {
+                /**
+                 * @var HasMany $value
+                 */
+                return $value->getForeignModels();
             }
         }
 
         return $this;
+    }
+
+
+    public function setReferencedModelToCollection(CollectionInterface $collection, $refresh = false)
+    {
+        $foreignPropertyValues = array();
+        foreach($collection as $model) {
+            $foreignPropertyValue = $model->get($this->getForeignProperty());
+            if ($foreignPropertyValue !== null && ($refresh || )) {
+                $foreignPropertyValues[$this->getForeignProperty()][] = $model;
+            }
+        }
+
+
+
+
+        // collect foregn keys values
+        $localModels = array();
+        foreach ($collection as $model) {
+            // check that key is set in model
+            // TODO 0 value will not pass check, should it ?
+            if ($model->{$this->_localKey}) {
+                if ($refresh || !$this->_issetModelForeignObject($model)) {
+                    $localModels[$model->{$this->_localKey}][] = $model;
+                    $model->getRelation($this->_relationName)->setForeignObjectNotFound();
+                }
+            }
+        }
+
+        // fetch foreign models
+        $fetchParams = array($this->_foreignKey => array_keys($localModels));
+        $foreignObjects = $this->_getForeignMapper()->fetchAll($fetchParams);
+        if ($foreignObjects instanceof Geometria_Model_Collection_ExtendedInterface) {
+            $foreignObjects->onFetchAsRelation($foreignObjectContext);
+        }
+        // set foreign objects in collection models
+        foreach ($foreignObjects as $foreignObject) {
+            foreach ($localModels[$foreignObject->{$this->_foreignKey}] as $localModel) {
+                $localModel->{$this->_relationName} = $foreignObject;
+            }
+        }
     }
 }

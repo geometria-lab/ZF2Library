@@ -10,6 +10,8 @@ abstract class AbstractHasRelation extends AbstractRelation
     CONST DELETE_SET_NULL = 'setNull';
     CONST DELETE_CASCADE  = 'cascade';
 
+    protected $foreignModelClass;
+
     protected $onDelete = 'setNull';
 
     public function setOnDelete($deleteMode)
@@ -24,34 +26,15 @@ abstract class AbstractHasRelation extends AbstractRelation
         return $this->onDelete;
     }
 
-    public function removeForeignRelations(ModelInterface $referencedModel)
+    public function setForeignModelClass($foreignModelClass)
     {
-        $onDelete = $this->getOnDelete();
+        $this->foreignModelClass = $foreignModelClass;
 
-        if ($onDelete == static::DELETE_NONE) {
-            return 0;
-        }
+        return $this;
+    }
 
-        $foreignMapper = call_user_func(array($this->getModelClass(), 'getMapper'));
-
-        $referencedPropertyValue = $referencedModel->get($this->getReferencedProperty());
-
-        $query = $foreignMapper->createQuery();
-        $query->where(array($this->getForeignProperty() => $referencedPropertyValue));
-
-        $foreignModels = $foreignMapper->getAll($query);
-
-        foreach($foreignModels as $foreignModel) {
-            if ($onDelete === static::DELETE_CASCADE) {
-                $foreignModel->delete();
-            } else if ($onDelete === static::DELETE_SET_NULL) {
-                $foreignModel->set($this->getForeignProperty(), null);
-                $foreignModel->save();
-            } else {
-                throw new \RuntimeException("Invalid relation '{$this->getName()}' delete mode");
-            }
-        }
-
-        return count($foreignModels);
+    public function getForeignModelClass()
+    {
+        return $this->foreignModelClass;
     }
 }

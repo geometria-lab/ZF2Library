@@ -6,6 +6,9 @@ use GeometriaLab\Model\Schema\Schema,
     GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
+/**
+ * @todo Abstract?
+ */
 class Model extends Schemaless\Model implements ModelInterface
 {
     /**

@@ -10,20 +10,6 @@ abstract class AbstractRelation extends AbstractProperty
 
     protected $foreignProperty;
 
-    protected $modelClass;
-
-    public function setModelClass($modelClass)
-    {
-        $this->modelClass = $modelClass;
-
-        return $this;
-    }
-
-    public function getModelClass()
-    {
-        return $this->modelClass;
-    }
-
     public function setForeignProperty($propertyName)
     {
         $this->foreignProperty = $propertyName;
@@ -51,5 +37,10 @@ abstract class AbstractRelation extends AbstractProperty
     public function isPersistent()
     {
         return false;
+    }
+
+    public function setDefaultValue($value)
+    {
+        throw new \RuntimeException('You can\'t set default value for relation');
     }
 }
