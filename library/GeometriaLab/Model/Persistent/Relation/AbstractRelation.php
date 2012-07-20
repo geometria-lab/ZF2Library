@@ -15,51 +15,17 @@ abstract class AbstractRelation
     /**
      * @var ModelInterface
      */
-    protected $foreignModel;
+    protected $originModel;
 
     /**
-     * @var ModelInterface
+     * @param ModelInterface $model
+     * @param AbstractRelationProperty $property
      */
-    protected $referencedModel;
-
-    /**
-     * @param ModelInterface $foreignModel
-     * @return BelongsTo
-     */
-    public function setForeignModel(ModelInterface $foreignModel)
+    public function __construct(ModelInterface $originModel, AbstractRelationProperty $property)
     {
-        $this->foreignModel = $foreignModel;
-
-        return $this;
+        $this->setOriginModel($originModel);
+        $this->setProperty($property);
     }
-
-    /**
-     * @return ModelInterface
-     */
-    public function getForeignModel()
-    {
-        return $this->foreignModel;
-    }
-
-    /**
-     * @param ModelInterface $referencedModel
-     * @return AbstractRelation
-     */
-    public function setReferencedModel($referencedModel)
-    {
-        $this->referencedModel = $referencedModel;
-
-        return $this;
-    }
-
-    /**
-     * @return ModelInterface
-     */
-    public function getReferencedModel()
-    {
-        return $this->referencedModel;
-    }
-
 
     /**
      * @param AbstractRelationProperty $property
@@ -78,5 +44,24 @@ abstract class AbstractRelation
     public function getProperty()
     {
         return $this->property;
+    }
+
+    /**
+     * @param ModelInterface $model
+     * @return AbstractRelation
+     */
+    public function setOriginModel(ModelInterface $model)
+    {
+        $this->originModel = $model;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOriginModel()
+    {
+        return $this->originModel;
     }
 }

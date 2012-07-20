@@ -25,7 +25,7 @@ class MockMapper extends AbstractMapper
         }
     }
 
-    public function getByCondition(array $condition)
+    public function getOne(QueryInterface $query = null)
     {
         throw new \RuntimeException('Not implemented');
     }

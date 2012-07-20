@@ -60,7 +60,7 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
         $schemaManager->removeAll();
     }
 
-    public function testGetForeignModels()
+    public function testGetWomenFromMan()
     {
         $collection = $this->man->women;
         $this->assertInstanceOf('\GeometriaLab\Model\Persistent\Collection', $collection);
@@ -68,18 +68,18 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Woman::getMapper()->getAll(), $this->man->women);
     }
 
-    public function testGetReferencedModel()
+    public function testGetManFromWoman()
     {
         $this->assertEquals($this->man, $this->women['Ulyana']->man);
     }
 
-    public function testSetForeignProperty()
+    public function testSetWomanToMan()
     {
         $this->setExpectedException('\InvalidArgumentException');
         $this->man->woman = $this->women['Ulyana'];
     }
 
-    public function testDeleteReferencedModelWithOnDeleteEqualsSetNull()
+    public function testDeleteManWithOnDeleteEqualsSetNull()
     {
         $this->man->delete();
 
@@ -88,7 +88,7 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($woman->manId);
     }
 
-    public function testDeleteReferencedModelWithOnDeleteEqualsCascade()
+    public function testDeleteManWithOnDeleteEqualsCascade()
     {
         $this->man->getSchema()->getProperty('women')->setOnDelete('cascade');
         $this->man->delete();
@@ -98,7 +98,7 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($woman);
     }
 
-    public function testDeleteReferencedModelWithOnDeleteEqualsNone()
+    public function testDeleteManWithOnDeleteEqualsNone()
     {
         $this->man->getSchema()->getProperty('women')->setOnDelete('none');
         $id = $this->man->id;
@@ -107,16 +107,5 @@ class OneToManyTest extends \PHPUnit_Framework_TestCase
         $woman = Woman::getMapper()->get($this->women['Alisa']->id);
 
         $this->assertEquals($id, $woman->manId);
-    }
-
-    public function testFetchRelations()
-    {
-        $women = Woman::getMapper()->getAll();
-
-        $this->assertFalse($women->getFirst()->has('man'));
-
-        $women->fetchRelations('man');
-
-        $this->assertTrue($women->getFirst()->has('man'));
     }
 }

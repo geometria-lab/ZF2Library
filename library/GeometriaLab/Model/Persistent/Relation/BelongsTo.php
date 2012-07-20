@@ -2,60 +2,67 @@
 
 namespace GeometriaLab\Model\Persistent\Relation;
 
-use GeometriaLab\Model\Persistent\ModelInterface,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo as BelongsToProperty;
+use GeometriaLab\Model\Persistent\ModelInterface;
 
-class BelongsTo
+class BelongsTo extends AbstractRelation
 {
-    public function __construct(ModelInterface $foreignModel, BelongsToProperty $property)
-    {
-        $this->setForeignModel($foreignModel);
-        $this->setProperty($property);
-    }
+    /**
+     * @var ModelInterface
+     */
+    protected $targetModel;
 
-    public function getReferencedModel()
+    /**
+     * @return ModelInterface|null
+     * @throws \RuntimeException
+     */
+    public function getTargetModel()
     {
-        if ($this->referencedModel === null) {
-            $foreignPropertyValue = $this->getForeignModel()->get($this->getProperty()->getForeignProperty());
+        if ($this->targetModel === null) {
+            $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
-            if ($foreignPropertyValue === null) {
+            if ($originPropertyValue === null) {
                 return null;
             }
 
             /**
-             * @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $foreignMapper
+             * @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper
              */
-            $referencedMapper = call_user_func(array($this->getProperty()->getReferencedModelClass(), 'getMapper'));
+            $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
 
-            $condition = array($this->getProperty()->getReferencedProperty() => $foreignPropertyValue);
-            $query = $referencedMapper->createQuery()->where($condition);
+            $condition = array($this->getProperty()->getTargetProperty() => $originPropertyValue);
+            $query = $targetMapper->createQuery()->where($condition);
 
-            $this->referencedModel = $referencedMapper->getOne($query);
+            $this->targetModel = $targetMapper->getOne($query);
 
-            if ($this->referencedModel === null) {
-                throw new \RuntimeException('Invalid referenced model with: ' . json_encode($condition));
+            if ($this->targetModel === null) {
+                throw new \RuntimeException('Invalid target model with: ' . json_encode($condition));
             }
         }
 
-        return $this->referencedModel;
+        return $this->targetModel;
     }
 
-    public function setReferencedModel(ModelInterface $referencedModel = null)
+    /**
+     * @param ModelInterface $targetModel
+     * @return BelongsTo
+     * @throws \InvalidArgumentException
+     */
+    public function setTargetModel(ModelInterface $targetModel = null)
     {
-        if ($referencedModel !== null) {
-            $referencedPropertyValue = $referencedModel->get($this->getProperty()->getReferencedProperty());
+        if ($targetModel !== null) {
+            $targetPropertyValue = $targetModel->get($this->getProperty()->getTargetProperty());
 
-            if ($referencedPropertyValue === null) {
+            if ($targetPropertyValue === null) {
                 throw new \InvalidArgumentException('Referenced property is null');
             }
         } else {
-            $referencedPropertyValue = null;
+            $targetPropertyValue = null;
         }
 
-        $foreignPropertyName = $this->getProperty()->getForeignProperty();
+        $originPropertyName = $this->getProperty()->getOriginProperty();
 
-        if ($this->getForeignModel()->get($foreignPropertyName) !== $referencedPropertyValue) {
-            $this->getForeignModel()->set($foreignPropertyName, $referencedPropertyValue);
+        if ($this->getForeignModel()->get($originPropertyName) !== $targetPropertyValue) {
+            $this->getForeignModel()->set($originPropertyName, $targetPropertyValue);
         }
 
         return $this;

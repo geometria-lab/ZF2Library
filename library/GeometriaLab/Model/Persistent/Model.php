@@ -47,12 +47,12 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
             /**
              * @var HasOne $value
              */
-            return $value->getForeignModel();
+            return $value->getTargetModel();
         } else if ($value instanceof HasMany) {
             /**
              * @var HasMany $value
              */
-            return $value->getForeignModels();
+            return $value->getTargetModels();
         }
 
         return $value;
@@ -286,7 +286,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         foreach($this->getProperties() as $name => $property) {
             if ($property instanceof AbstractRelationProperty) {
                 $relationClassName = $property->getRelationClass();
-                $this->propertyValues[$name] = $relationClassName($this, $property);
+                $this->propertyValues[$name] = new $relationClassName($this, $property);
             } else if ($property->getDefaultValue() !== null) {
                 $this->set($name, $property->getDefaultValue());
             }

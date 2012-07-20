@@ -225,7 +225,8 @@ class MapperTest extends \PHPUnit_Framework_TestCase
 
     protected function assertModelByCondition(Model $model, array $condition)
     {
-        $fetchedModel = Model::getMapper()->getByCondition($condition);
+        $query = Model::getMapper()->createQuery()->where($condition);
+        $fetchedModel = Model::getMapper()->getOne($query);
         $this->assertEquals($model, $fetchedModel);
     }
 }

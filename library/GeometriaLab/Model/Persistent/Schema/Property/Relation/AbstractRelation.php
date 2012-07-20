@@ -6,32 +6,51 @@ use GeometriaLab\Model\Schema\Property\AbstractProperty;
 
 abstract class AbstractRelation extends AbstractProperty
 {
-    protected $referencedProperty = 'id';
+    protected $targetModelClass;
 
-    protected $foreignProperty;
+    protected $originProperty;
 
-    public function setForeignProperty($propertyName)
+    protected $targetProperty;
+
+    public function setTargetModelClass($referencedModelClass)
     {
-        $this->foreignProperty = $propertyName;
+        $this->targetModelClass = $referencedModelClass;
 
         return $this;
     }
 
-    public function getForeignProperty()
+    public function getTargetModelClass()
     {
-        return $this->foreignProperty;
+        return $this->targetModelClass;
     }
 
-    public function setReferencedProperty($propertyName)
+    public function setTargetProperty($propertyName)
     {
-        $this->referencedProperty = $propertyName;
+        $this->targetProperty = $propertyName;
 
         return $this;
     }
 
-    public function getReferencedProperty()
+    public function getTargetProperty()
     {
-        return $this->referencedProperty;
+        return $this->targetProperty;
+    }
+
+    public function setOriginProperty($propertyName)
+    {
+        $this->originProperty = $propertyName;
+
+        return $this;
+    }
+
+    public function getOriginProperty()
+    {
+        return $this->originProperty;
+    }
+
+    public function getRelationClass()
+    {
+        return $this->relationClass;
     }
 
     public function isPersistent()

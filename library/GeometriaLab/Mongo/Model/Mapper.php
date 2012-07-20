@@ -90,7 +90,9 @@ class Mapper extends AbstractMapper
      */
     public function get($id)
     {
-        return $this->getByCondition(array('id' => $id));
+        $query = $this->createQuery()->where(array('id' => $id));
+
+        return $this->getOne($query);
     }
 
     /**
@@ -326,7 +328,7 @@ class Mapper extends AbstractMapper
                     }
                 }
                 if ($property->isPrimary()) {
-                    $primary[] = $name;
+                    $primaryProperties[] = $name;
                 }
             }
         }
@@ -338,7 +340,7 @@ class Mapper extends AbstractMapper
         $setData = $this->transformModelDataForStorage($setData);
         $unsetData = $this->transformModelDataForStorage($unsetData);
 
-        if (!empty($setData) && empty($unsetData)) {
+        if (empty($setData) && empty($unsetData)) {
             return false;
         }
 
@@ -352,7 +354,7 @@ class Mapper extends AbstractMapper
             throw new \InvalidArgumentException('Cant update model - primary property id is empty');
         }
 
-        if (!empty($data)) {
+        if (!empty($setData)) {
             $data['$set'] = $setData;
         }
 

@@ -10,12 +10,18 @@ abstract class AbstractHasRelation extends AbstractRelation
     CONST DELETE_SET_NULL = 'setNull';
     CONST DELETE_CASCADE  = 'cascade';
 
-    protected $foreignModelClass;
-
     protected $onDelete = 'setNull';
+
+    protected $originProperty = 'id';
 
     public function setOnDelete($deleteMode)
     {
+        if ($deleteMode !== static::DELETE_NONE &&
+            $deleteMode !== static::DELETE_SET_NULL &&
+            $deleteMode !== static::DELETE_CASCADE) {
+            throw new \InvalidArgumentException("Invalid onDelete '$deleteMode' mode");
+        }
+
         $this->onDelete = $deleteMode;
 
         return $this;
@@ -24,17 +30,5 @@ abstract class AbstractHasRelation extends AbstractRelation
     public function getOnDelete()
     {
         return $this->onDelete;
-    }
-
-    public function setForeignModelClass($foreignModelClass)
-    {
-        $this->foreignModelClass = $foreignModelClass;
-
-        return $this;
-    }
-
-    public function getForeignModelClass()
-    {
-        return $this->foreignModelClass;
     }
 }

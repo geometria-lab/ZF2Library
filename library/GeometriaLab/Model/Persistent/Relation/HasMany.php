@@ -4,36 +4,69 @@ namespace GeometriaLab\Model\Persistent\Relation;
 
 use GeometriaLab\Model\Persistent\CollectionInterface;
 
-class HasMany extends AbstractHasRelation
+class HasMany extends AbstractRelation
 {
-    public function getForeignModels($referencedModel)
+    /**
+     * @var CollectionInterface
+     */
+    protected $targetModels;
+
+    /**
+     * @return CollectionInterface
+     */
+    public function getTargetModels()
     {
-        $foreignMapper = call_user_func(array($this->getModelClass(), 'getMapper'));
+        if ($this->targetModels === null) {
+            $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
 
-        $referencedPropertyValue = $referencedModel->get($this->getReferencedProperty());
+            $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
-        if ($referencedPropertyValue === null) {
-            return new $foreignMapper->getCollectionClass();
+            if ($originPropertyValue === null) {
+                $this->targetModels = $targetMapper->getCollectionClass();
+            } else {
+                $query = $targetMapper->createQuery();
+                $query->where(array($this->getProperty()->getTargetProperty() => $originPropertyValue));
+
+                $this->targetModels = $targetMapper->getAll($query);
+            }
         }
 
-        $query = $foreignMapper->createQuery();
-        $query->where(array($this->getForeignProperty() => $referencedPropertyValue));
-
-        return $foreignMapper->getAll($query);
+        return $this->targetModels;
     }
 
-    public function prepare($value)
+    /**
+     * @param CollectionInterface|null $collection
+     * @return HasMany
+     */
+    public function setTargetModels(CollectionInterface $collection = null)
     {
-        if (!$value instanceof CollectionInterface) {
-            throw new \InvalidArgumentException("must be collection");
+        $this->targetModels = $collection;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function clearRelations()
+    {
+        $onDelete = $this->getProperty()->getOnDelete();
+
+        $targetModels = $this->getTargetModels();
+
+        if ($onDelete === HasOneProperty::DELETE_NONE || $targetModels->isEmpty()) {
+            return 0;
         }
 
-        $model = $value->getFirst();
-
-        if ($model && !is_a($model, $this->getModelClass())) {
-            throw new \InvalidArgumentException("must be collection of {$this->getModelClass()}");
+        foreach($targetModels as $targetModel) {
+            if ($onDelete === HasOneProperty::DELETE_CASCADE) {
+                $targetModel->delete();
+            } else if ($onDelete === HasOneProperty::DELETE_SET_NULL) {
+                $targetModel->set($this->getProperty()->getTargetProperty(), null);
+                $targetModel->save();
+            }
         }
 
-        return $value;
+        return count($targetModels);
     }
 }

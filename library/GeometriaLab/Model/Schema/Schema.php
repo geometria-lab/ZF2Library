@@ -190,6 +190,7 @@ class Schema
         if (strpos($type, '[]') === strlen($type) - 2) {
             $itemPropertyType = substr($type, 0, strlen($type) - 2);
             $params['itemProperty'] = static::createProperty($itemPropertyType);
+            $type = 'array';
         }
 
         $property = static::createProperty($type, $params);

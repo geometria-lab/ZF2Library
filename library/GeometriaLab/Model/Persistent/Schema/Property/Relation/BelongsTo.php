@@ -6,19 +6,9 @@ use GeometriaLab\Model\Persistent\ModelInterface;
 
 class BelongsTo extends AbstractRelation
 {
-    protected $referencedModelClass;
+    protected $targetProperty = 'id';
 
-    public function setReferencedModelClass($referencedModelClass)
-    {
-        $this->referencedModelClass = $referencedModelClass;
-
-        return $this;
-    }
-
-    public function getReferencedModelClass()
-    {
-        return $this->referencedModelClass;
-    }
+    protected $relationClass = '\GeometriaLab\Model\Persistent\Relation\BelongsTo';
 
     public function prepare($value)
     {

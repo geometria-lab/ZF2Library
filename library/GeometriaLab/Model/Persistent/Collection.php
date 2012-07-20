@@ -18,6 +18,8 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
      */
     public function fetchRelations(array $propertyNames = array())
     {
+        throw new \RuntimeException('Not implemented yet!');
+
         if ($this->isEmpty()) {
             return $this;
         }
@@ -47,8 +49,6 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
         // Fetch relations and set to models
         foreach($relationProperties as $property) {
             if ($property instanceof BelongsTo) {
-                $this->_setForeign
-
                 /**
                  * @var BelongsTo $value
                  */
@@ -68,9 +68,9 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
 
         return $this;
     }
+/*
 
-
-    public function setReferencedModelToCollection(CollectionInterface $collection, $refresh = false)
+    protected function setReferencedModelToCollection(CollectionInterface $collection, $refresh = false)
     {
         $foreignPropertyValues = array();
         foreach($collection as $model) {
@@ -109,4 +109,5 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
             }
         }
     }
+*/
 }

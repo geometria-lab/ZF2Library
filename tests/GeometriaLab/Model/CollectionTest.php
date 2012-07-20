@@ -112,11 +112,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->models[2], $models[1]);
     }
 
-    public function testRemoveByCondition()
-    {
-
-    }
-
     public function testGet()
     {
         $c = new Collection($this->models);
@@ -173,12 +168,17 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $c2 = $c->getByCondition(array('test' => 1));
 
         $this->assertEquals(array($this->models[0]), $c2->toArray());
+    }
 
-        $c3 = $c->getByCondition(function($model) {
+    public function testGetByCallback()
+    {
+        $c = new Collection($this->models);
+
+        $c2 = $c->getByCallback(function($model) {
             return $model->test === 2;
         });
 
-        $this->assertEquals(array($this->models[1]), $c3->toArray());
+        $this->assertEquals(array($this->models[1]), $c2->toArray());
     }
 
     public function testGetSlice()
@@ -189,7 +189,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($this->models[2], $this->models[3]), $c2->toArray());
     }
 
-    public function testSort()
+    public function testSortByCallback()
     {
         $sortCallback = function($model1, $model2) {
             if ($model1->test > $model2->test) {
@@ -200,8 +200,24 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         };
 
         $c = new Collection($this->models);
-        $c->sort($sortCallback);
+        $c->sortByCallback($sortCallback);
 
+        usort($this->models, $sortCallback);
+        $this->assertEquals($this->models, $c->toArray());
+    }
+
+    public function testSort()
+    {
+        $c = new Collection($this->models);
+        $c->sort(array('test' => false));
+
+        $sortCallback = function($model1, $model2) {
+            if ($model1->test > $model2->test) {
+                return -1;
+            } else {
+                return 1;
+            }
+        };
         usort($this->models, $sortCallback);
         $this->assertEquals($this->models, $c->toArray());
     }

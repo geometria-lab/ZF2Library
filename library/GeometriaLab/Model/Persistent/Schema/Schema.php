@@ -162,8 +162,8 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
                     throw new \InvalidArgumentException("Invalid relation '{$params['relation']}'");
                 }
 
-                if (!isset($params['modelClass']) && $params['relation'] !== 'hasMany') {
-                    $params['modelClass'] = $type;
+                if (!isset($params['targetModelClass']) && $params['relation'] !== 'hasMany') {
+                    $params['targetModelClass'] = $type;
                 }
 
                 $className = static::$relationsClassMap[$params['relation']];

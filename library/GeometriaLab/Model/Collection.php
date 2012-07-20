@@ -250,6 +250,9 @@ class Collection implements CollectionInterface
     {
         $result = array();
 
+        /**
+         * @var SchemalessModelInterface $model
+         */
         foreach($this->models as $model) {
             $result[$model->get($keyPropertyName)] = $model->get($valuePropertyName);
         }
@@ -384,6 +387,10 @@ class Collection implements CollectionInterface
     public function toArray($depth = 0)
     {
         $array = array();
+
+        /**
+         * @var SchemalessModelInterface $model
+         */
         foreach($this->models as $model) {
             if ($depth !== 0) {
                 $array[] = $model->toArray($depth === -1 ? -1 : $depth - 1);
@@ -412,7 +419,7 @@ class Collection implements CollectionInterface
     /**
      * Sort collection
      *
-     * @param mixed $callback
+     * @param array $propertyNames
      * @return Collection
      */
     public function sort(array $propertyNames)
@@ -424,6 +431,8 @@ class Collection implements CollectionInterface
                     return $comparison * ($direction ? 1 : -1);
                 }
             }
+
+            return 0;
         };
 
         return $this->sortByCallback($callback);
