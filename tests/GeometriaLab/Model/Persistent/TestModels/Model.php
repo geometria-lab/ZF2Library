@@ -13,7 +13,7 @@ namespace GeometriaLabTest\Model\Persistent\TestModels;
  * @property string[]                                     $arrayOfString
  * @property \GeometriaLabTest\Model\TestModels\SubModel[]    $arrayOfSubTest
  *
- * @method static \GeometriaLabTest\Model\Persistent\TestModels\MockMapper getMapper()
+ * @method static \GeometriaLab\Model\Persistent\Mapper\Mock getMapper()
  */
 class Model extends \GeometriaLab\Model\Persistent\Model
 {
