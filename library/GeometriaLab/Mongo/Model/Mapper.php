@@ -126,6 +126,7 @@ class Mapper extends AbstractMapper
      *
      * @param QueryInterface $query
      * @return CollectionInterface
+     * @throws \InvalidArgumentException
      */
     public function getAll(QueryInterface $query = null)
     {

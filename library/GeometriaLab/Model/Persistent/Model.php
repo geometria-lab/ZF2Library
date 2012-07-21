@@ -42,7 +42,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
             /**
              * @var BelongsTo $value
              */
-            return $value->getReferencedModel();
+            return $value->getTargetModel();
         } else if ($value instanceof HasOne) {
             /**
              * @var HasOne $value
@@ -73,15 +73,15 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         $property = $this->getSchema()->getProperty($name);
 
         if ($property instanceof BelongsToProperty) {
-            $this->propertyValues[$name]->setReferencedModel($value);
+            $this->propertyValues[$name]->setTargetModel($value);
         } else if ($property instanceof HasOneProperty) {
-            $this->propertyValues[$name]->setForeignModel($value);
+            $this->propertyValues[$name]->setTargetModel($value);
         } else if ($property instanceof HasManyProperty) {
-            $this->propertyValues[$name]->setForeignModels($value);
+            $this->propertyValues[$name]->setTargetModels($value);
         } else {
             foreach(static::getSchema()->getProperties() as $property) {
                 // @todo If changed referenced key?
-                if ($property instanceof BelongsTo && $property->getForeignProperty() === $name) {
+                if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
                     $this->propertyValues[$property->getName()] = null;
                 }
             }
