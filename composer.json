@@ -23,7 +23,7 @@
             "dev-master": "master"
         }
     },
-    "require-dev" : {
+    "require" : {
         "zendframework/zendframework" : "dev-master"
     }
 }

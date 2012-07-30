@@ -53,27 +53,4 @@ class HasOne extends AbstractRelation
 
         return $this;
     }
-
-    /**
-     * @return int
-     */
-    public function clearRelation()
-    {
-        $onDelete = $this->getProperty()->getOnDelete();
-
-        $targetModel = $this->getTargetModel();
-
-        if ($onDelete === HasOneProperty::DELETE_NONE || $targetModel === null) {
-            return 0;
-        }
-
-        if ($onDelete === HasOneProperty::DELETE_CASCADE) {
-            $targetModel->delete();
-        } else if ($onDelete === HasOneProperty::DELETE_SET_NULL) {
-            $targetModel->set($this->getProperty()->getTargetProperty(), null);
-            $targetModel->save();
-        }
-
-        return 1;
-    }
 }

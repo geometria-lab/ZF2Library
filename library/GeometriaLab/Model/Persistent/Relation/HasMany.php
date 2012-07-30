@@ -44,29 +44,4 @@ class HasMany extends AbstractRelation
 
         return $this;
     }
-
-    /**
-     * @return int
-     */
-    public function clearRelations()
-    {
-        $onDelete = $this->getProperty()->getOnDelete();
-
-        $targetModels = $this->getTargetModels();
-
-        if ($onDelete === HasOneProperty::DELETE_NONE || $targetModels->isEmpty()) {
-            return 0;
-        }
-
-        foreach($targetModels as $targetModel) {
-            if ($onDelete === HasOneProperty::DELETE_CASCADE) {
-                $targetModel->delete();
-            } else if ($onDelete === HasOneProperty::DELETE_SET_NULL) {
-                $targetModel->set($this->getProperty()->getTargetProperty(), null);
-                $targetModel->save();
-            }
-        }
-
-        return count($targetModels);
-    }
 }

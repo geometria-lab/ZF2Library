@@ -17,6 +17,7 @@ class BelongsToTest extends \PHPUnit_Framework_TestCase
     {
         $dog = new Dog(array('name' => 'Lucky'));
         $man = new Man(array('name' => 'Lucky'));
+        $man->save();
         $dog->man = $man;
         $this->assertEquals($man, $dog->man);
     }

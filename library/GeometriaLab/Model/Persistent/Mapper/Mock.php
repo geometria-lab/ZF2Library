@@ -18,7 +18,9 @@ class Mock extends AbstractMapper
     {
         parent::__construct($options);
 
-        $this->data = new $this->getCollectionClass();
+        $collectionClass = $this->getCollectionClass();
+
+        $this->data = new $collectionClass;
     }
 
     /**
@@ -91,6 +93,8 @@ class Mock extends AbstractMapper
         if (!is_a($model, $this->getModelClass())) {
             throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
         }
+
+        // @todo check model has one integer id
 
         if ($model->id === null) {
             $model->id = count($this->data) + 1;

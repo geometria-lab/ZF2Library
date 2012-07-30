@@ -81,10 +81,10 @@ class Model extends Schemaless\Model implements ModelInterface
 
         $method = "set{$name}";
         if (method_exists($this, $method)) {
-            return call_user_func(array($this, $method), $value);
+            call_user_func(array($this, $method), $value);
+        } else {
+            $this->propertyValues[$name] = $value;
         }
-
-        $this->propertyValues[$name] = $value;
 
         return $this;
     }

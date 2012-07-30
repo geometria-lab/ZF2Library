@@ -5,7 +5,7 @@ namespace GeometriaLabTest\Model\Persistent\Relation\TestModels;
 use GeometriaLab\Model\Persistent\Model;
 
 /**
- * @property string                                                     $id    { "primary" : true }
+ * @property integer                                                    $id    { "primary" : true }
  * @property string                                                     $name
  *
  * @property \GeometriaLab\Model\Persistent\Collection                  $women { "relation"         : "hasMany",

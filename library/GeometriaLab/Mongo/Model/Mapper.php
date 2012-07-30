@@ -9,9 +9,8 @@ use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
     GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty,
     GeometriaLab\Model\Persistent\Schema\Property\ModelProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractHasRelation,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne as HasOneProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany as HasManyProperty;
 
 class Mapper extends AbstractMapper
 {
@@ -266,6 +265,8 @@ class Mapper extends AbstractMapper
             }
         }
 
+        // @todo id must be string
+
         if (count($primary) !== 1 || $primary[0] !== 'id') {
             throw new \InvalidArgumentException("Mongo mapper support only one primary key 'id'");
         }
@@ -373,6 +374,7 @@ class Mapper extends AbstractMapper
     /**
      * Delete model
      *
+     * @todo Refactor
      * @param ModelInterface $model
      * @return boolean
      * @throws \InvalidArgumentException
@@ -390,10 +392,48 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
         if ($result) {
-            // Remove foreign relations
+            // Remove target relations
             foreach($model->getSchema()->getProperties() as $property) {
-                if ($property instanceof AbstractHasRelation) {
-                    $property->removeForeignRelations($model);
+                if ($property instanceof HasOneProperty) {
+                    $onDelete = $property->getOnDelete();
+
+                    if ($onDelete === HasOneProperty::DELETE_NONE) {
+                        continue;
+                    }
+
+                    $targetModel = $model->get($property->getName());
+
+                    if ($targetModel === null) {
+                        continue;
+                    }
+
+                    if ($onDelete === HasOneProperty::DELETE_CASCADE) {
+                        $targetModel->delete();
+                    } else if ($onDelete === HasOneProperty::DELETE_SET_NULL) {
+                        $targetModel->set($property->getTargetProperty(), null);
+                        $targetModel->save();
+                    }
+                } else if ($property instanceof HasManyProperty) {
+                    $onDelete = $property->getOnDelete();
+
+                    if ($onDelete === HasOneProperty::DELETE_NONE) {
+                        continue;
+                    }
+
+                    $targetModels = $model->get($property->getName());
+
+                    if ($targetModels->isEmpty()) {
+                        continue;
+                    }
+
+                    foreach($targetModels as $targetModel) {
+                        if ($onDelete === HasOneProperty::DELETE_CASCADE) {
+                            $targetModel->delete();
+                        } else if ($onDelete === HasOneProperty::DELETE_SET_NULL) {
+                            $targetModel->set($property->getTargetProperty(), null);
+                            $targetModel->save();
+                        }
+                    }
                 }
             }
 

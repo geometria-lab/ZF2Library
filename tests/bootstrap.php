@@ -13,6 +13,11 @@ if ('@package_version@' !== $phpUnitVersion && version_compare($phpUnitVersion, 
 }
 unset($phpUnitVersion);
 
+if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    echo "Composer dependencies not installed.";
+    exit(1);
+}
+
 /*
  * Determine the root, library, and tests directories of the framework
  * distribution.

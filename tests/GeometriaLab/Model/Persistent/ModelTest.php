@@ -132,7 +132,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testGetMapper()
     {
         $mapper = Model::getMapper();
-        $this->assertInstanceOf('\GeometriaLabTest\Model\Persistent\TestModels\MockMapper', $mapper);
+        $this->assertInstanceOf('\GeometriaLab\Model\Persistent\Mapper\Mock', $mapper);
     }
 
     public function testGetMapperWithoutDefinition()

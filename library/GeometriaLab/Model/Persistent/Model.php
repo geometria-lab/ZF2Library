@@ -68,17 +68,32 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function set($name, $value)
     {
-        parent::set($name, $value);
+        if (!$this->getSchema()->hasProperty($name)) {
+            throw new \InvalidArgumentException("Property '$name' does not exists");
+        }
 
         $property = $this->getSchema()->getProperty($name);
 
-        if ($property instanceof BelongsToProperty) {
+        if ($value !== null) {
+            try {
+                $value = $property->prepare($value);
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            }
+        }
+
+        $method = "set{$name}";
+        if (method_exists($this, $method)) {
+            call_user_func(array($this, $method), $value);
+        } else if ($property instanceof BelongsToProperty) {
             $this->propertyValues[$name]->setTargetModel($value);
         } else if ($property instanceof HasOneProperty) {
             $this->propertyValues[$name]->setTargetModel($value);
         } else if ($property instanceof HasManyProperty) {
             $this->propertyValues[$name]->setTargetModels($value);
         } else {
+            $this->propertyValues[$name] = $value;
+
             foreach(static::getSchema()->getProperties() as $property) {
                 // @todo If changed referenced key?
                 if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
