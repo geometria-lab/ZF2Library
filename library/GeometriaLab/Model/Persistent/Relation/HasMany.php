@@ -38,10 +38,10 @@ class HasMany extends AbstractRelation
     }
 
     /**
-     * @param CollectionInterface|null $collection
+     * @param CollectionInterface $collection
      * @return HasMany
      */
-    public function setTargetModels(CollectionInterface $collection = null)
+    public function setTargetModels(CollectionInterface $collection)
     {
         $this->targetModels = $collection;
 
