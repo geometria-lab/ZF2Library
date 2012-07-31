@@ -7,6 +7,12 @@ use GeometriaLabTest\Model\Persistent\Relation\TestModels\Man,
 
 class BelongsToTest extends \PHPUnit_Framework_TestCase
 {
+    public function tearDown()
+    {
+        Man::getMapper()->deleteAll();
+        Dog::getMapper()->deleteAll();
+    }
+
     public function testGetTargetModelWithNullOriginProperty()
     {
         $dog = new Dog(array('name' => 'Lucky'));
