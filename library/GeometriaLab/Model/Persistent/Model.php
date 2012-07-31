@@ -59,6 +59,28 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
     }
 
     /**
+     * Get relation
+     *
+     * @param string $name
+     * @return BelongsTo|HasMany|HasOne
+     * @throws \InvalidArgumentException
+     */
+    public function getRelation($name)
+    {
+        if (!$this->getSchema()->hasProperty($name)) {
+            throw new \InvalidArgumentException("Relation '$name' does not exists");
+        }
+
+        $property = $this->getSchema()->getProperty($name);
+
+        if (!$property instanceof AbstractRelationProperty) {
+            throw new \InvalidArgumentException("'$name' is not relation");
+        }
+
+        return $this->propertyValues[$name];
+    }
+
+    /**
      * Set property value
      *
      * @param string $name

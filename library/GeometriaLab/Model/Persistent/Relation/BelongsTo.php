@@ -15,8 +15,12 @@ class BelongsTo extends AbstractRelation
      * @return ModelInterface|null
      * @throws \RuntimeException
      */
-    public function getTargetModel()
+    public function getTargetModel($refresh = false)
     {
+        if ($refresh) {
+            $this->targetModel = null;
+        }
+
         if ($this->targetModel === null) {
             $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
@@ -58,6 +62,8 @@ class BelongsTo extends AbstractRelation
         } else {
             $targetPropertyValue = null;
         }
+
+        $this->targetModel = null;
 
         $originPropertyName = $this->getProperty()->getOriginProperty();
 

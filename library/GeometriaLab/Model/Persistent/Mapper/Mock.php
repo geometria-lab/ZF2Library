@@ -71,7 +71,11 @@ class Mock extends AbstractMapper
             throw new \InvalidArgumentException('Query must be GeometriaLab\Model\Persistent\Mapper\Query');
         }
 
-        $collection = $this->data->getByCondition($query->getWhere());
+        if ($query->hasWhere()) {
+            $collection = $this->data->getByCondition($query->getWhere());
+        } else {
+            $collection = clone $this->data;
+        }
 
         if ($query->hasSort()) {
             $collection->sort($query->getSort());

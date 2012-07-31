@@ -16,8 +16,8 @@ class HasMany extends AbstractHasRelation
 
         $model = $value->getFirst();
 
-        if ($model !== null && !is_a($model, $this->getForeignModelClass())) {
-            throw new \InvalidArgumentException("must be collection of {$this->getForeignModelClass()}");
+        if ($model !== null && !is_a($model, $this->getTargetModelClass())) {
+            throw new \InvalidArgumentException("must be collection of {$this->getTargetModelClass()}");
         }
 
         return $value;

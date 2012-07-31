@@ -13,12 +13,29 @@ class BelongsToTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($dog->man);
     }
 
+    public function testSetNotSavedTargetModel()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+
+        $man = new Man(array('name' => 'Ivan'));
+        $dog = new Dog(array('name' => 'Lucky'));
+        $dog->man = $man;
+    }
+
     public function testSetTargetModel()
     {
-        $dog = new Dog(array('name' => 'Lucky'));
-        $man = new Man(array('name' => 'Lucky'));
+        $man = new Man(array('name' => 'Ivan'));
         $man->save();
+
+        $dog = new Dog(array('name' => 'Lucky'));
         $dog->man = $man;
+
+        $this->assertEquals($man->id, $dog->manId);
         $this->assertEquals($man, $dog->man);
+
+        $dog->man = null;
+
+        $this->assertNull($dog->manId);
+        $this->assertNull($dog->man);
     }
 }

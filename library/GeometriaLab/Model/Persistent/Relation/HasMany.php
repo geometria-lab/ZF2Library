@@ -14,15 +14,20 @@ class HasMany extends AbstractRelation
     /**
      * @return CollectionInterface
      */
-    public function getTargetModels()
+    public function getTargetModels($refresh = false)
     {
+        if ($refresh) {
+            $this->targetModels = null;
+        }
+
         if ($this->targetModels === null) {
             $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
 
             $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
             if ($originPropertyValue === null) {
-                $this->targetModels = $targetMapper->getCollectionClass();
+                $collectionClass = $targetMapper->getCollectionClass();
+                $this->targetModels = new $collectionClass;
             } else {
                 $query = $targetMapper->createQuery();
                 $query->where(array($this->getProperty()->getTargetProperty() => $originPropertyValue));
