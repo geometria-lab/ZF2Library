@@ -43,7 +43,7 @@ set_include_path(implode(PATH_SEPARATOR, $path));
  * Setup autoloading
  */
 include __DIR__ .  '/autoload.php';
-include __DIR__ . '/../vendor/autoload.php';
+include __DIR__ . '/../../../autoload.php';
 
 /*
  * Load the user-defined test configuration file, if it exists; otherwise, load
