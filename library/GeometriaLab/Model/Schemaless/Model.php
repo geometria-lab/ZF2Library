@@ -2,15 +2,8 @@
 
 namespace GeometriaLab\Model\Schemaless;
 
-class Model implements ModelInterface, \Iterator
+class Model implements ModelInterface
 {
-    /**
-     * Property iterator
-     *
-     * @var array|null
-     */
-    protected $propertyIteratorPosition;
-
     /**
      * Property values
      *
@@ -110,7 +103,7 @@ class Model implements ModelInterface, \Iterator
      */
     public function has($name)
     {
-        return isset($this->propertyValues[$name]);
+        return array_key_exists($name, $this->propertyValues);
     }
 
     /**
@@ -152,49 +145,5 @@ class Model implements ModelInterface, \Iterator
     protected function getProperties()
     {
         return $this->propertyValues;
-    }
-
-    /*
-     * Methods implements Iterator
-     */
-
-    public function current()
-    {
-        $name = $this->key();
-
-        return $this->get($name);
-    }
-
-    public function next()
-    {
-        return next($this->propertyIteratorPosition);
-    }
-
-    public function key()
-    {
-        return current($this->propertyIteratorPosition);
-    }
-
-    public function valid()
-    {
-        return key($this->propertyIteratorPosition) !== null;
-    }
-
-    public function rewind()
-    {
-        if ($this->propertyIteratorPosition === null) {
-            $this->propertyIteratorPosition = array_keys($this->getProperties());
-        }
-
-        return reset($this->propertyIteratorPosition);
-    }
-
-    /*
-    * Methods implements Iterator
-    */
-
-    public function count()
-    {
-        return count($this->getProperties());
     }
 }

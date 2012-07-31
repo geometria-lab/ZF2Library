@@ -48,21 +48,6 @@ interface ModelInterface extends \GeometriaLab\Model\ModelInterface
     public function getChangedProperties();
 
     /**
-     * Get property change
-     *
-     * @param string $name
-     * @return array
-     */
-    public function getChange($name);
-
-    /**
-     * Get model changes
-     *
-     * @return array
-     */
-    public function getChanges();
-
-    /**
      * Get clean property value
      *
      * @param string $name

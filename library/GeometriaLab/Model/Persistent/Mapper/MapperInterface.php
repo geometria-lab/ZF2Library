@@ -16,12 +16,12 @@ interface MapperInterface
     public function get($id);
 
     /**
-     * Get model by condition
+     * Get model by query
      *
-     * @param array $condition
+     * @param QueryInterface $query
      * @return ModelInterface
      */
-    public function getByCondition(array $condition);
+    public function getOne(QueryInterface $query = null);
 
     /**
      * Get models collection by query

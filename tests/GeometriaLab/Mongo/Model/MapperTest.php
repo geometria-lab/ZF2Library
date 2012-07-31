@@ -88,7 +88,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $collection);
 
         foreach($collection as $model) {
-            $this->assertFalse($model->has('floatProperty'));
+            $this->assertNull($model->get('floatProperty'));
         }
 
         $this->assertEquals($model4->id, $collection[0]->id);
@@ -225,7 +225,8 @@ class MapperTest extends \PHPUnit_Framework_TestCase
 
     protected function assertModelByCondition(Model $model, array $condition)
     {
-        $fetchedModel = Model::getMapper()->getByCondition($condition);
+        $query = Model::getMapper()->createQuery()->where($condition);
+        $fetchedModel = Model::getMapper()->getOne($query);
         $this->assertEquals($model, $fetchedModel);
     }
 }

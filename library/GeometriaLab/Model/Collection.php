@@ -35,7 +35,7 @@ class Collection implements CollectionInterface
     /**
      * Add model or models to the end of a collection
      *
-     * @param mixed $data
+     * @param SchemalessModelInterface|\Traversable|array $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
@@ -44,13 +44,14 @@ class Collection implements CollectionInterface
         if ($data instanceof SchemalessModelInterface) {
             array_push($this->models, $data);
         } else if (is_array($data) || $data instanceof \Traversable) {
-            // TODO: Create models?
-
             foreach ($data as $model) {
+                if (!$model instanceof SchemalessModelInterface) {
+                    throw new \InvalidArgumentException('Data must be model, array or iterated object with models.');
+                }
                 $this->push($model);
             }
         } else {
-            throw new \InvalidArgumentException('Data must be model, array or iterated object.');
+            throw new \InvalidArgumentException('Data must be model, array or iterated object with models.');
         }
 
         return $this;
@@ -69,7 +70,7 @@ class Collection implements CollectionInterface
     /**
      * Add model or models at the beginning of a collection
      *
-     * @param mixed $data
+     * @param SchemalessModelInterface|\Traversable|array $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
@@ -79,10 +80,13 @@ class Collection implements CollectionInterface
             array_unshift($this->models, $data);
         } else if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $model) {
+                if (!$model instanceof SchemalessModelInterface) {
+                    throw new \InvalidArgumentException('Data must be model, array or iterated object with models.');
+                }
                 $this->unshift($model);
             }
         } else {
-            throw new \InvalidArgumentException('Data must be model, array or iterated object.');
+            throw new \InvalidArgumentException('Data must be model, array or iterated object with models.');
         }
 
         return $this;
@@ -108,25 +112,6 @@ class Collection implements CollectionInterface
     public function set($offset, SchemalessModelInterface $model)
     {
         $this->models[$offset] = $model;
-
-        return $this;
-    }
-
-    /**
-     * Remove model from collection
-     *
-     * @param SchemalessModelInterface $model
-     * @return CollectionInterface|Collection
-     */
-    public function remove(SchemalessModelInterface $model)
-    {
-        $offset = array_search($model, $this->models, true);
-
-        if ($offset) {
-            unset($this->models[$offset]);
-            $this->models = array_values($this->models);
-            // TODO: rewind?
-        }
 
         return $this;
     }
@@ -171,6 +156,175 @@ class Collection implements CollectionInterface
 
         return $model !== false ? $model : null;
     }
+
+    /**
+     * Get models by callback
+     *
+     * @param \callback $callback
+     * @return Collection
+     */
+    public function getByCallback($callback)
+    {
+        /**
+         * @var Collection $collection
+         */
+        $collection = new $this;
+
+        if (count($this)) {
+            $data = array_filter($this->models, $callback);
+            $collection->push($data);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Get models by condition
+     *
+     * @param mixed $condition
+     * @return Collection
+     */
+    public function getByCondition($condition)
+    {
+        $callback = function(SchemalessModelInterface $model) use ($condition) {
+            /**
+             * @var SchemalessModelInterface $model
+             */
+            foreach ($condition as $propertyName => $value) {
+                if ($model->get($propertyName) != $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        return $this->getByCallback($callback);
+    }
+
+    /**
+     * Get slice of collection
+     *
+     * @param integer      $offset
+     * @param integer|null $length
+     * @return Collection
+     */
+    public function getSlice($offset, $length = null)
+    {
+        /**
+         * @var Collection $collection
+         */
+        $collection = new $this;
+
+        if (count($this)) {
+            $models = array_slice($this->models, $offset, $length);
+            $collection->push($models);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Get property from models
+     *
+     * @param string $name
+     * @return array
+     */
+    public function getProperty($name)
+    {
+        $callback = function(SchemalessModelInterface $model) use ($name) {
+            return $model->get($name);
+        };
+
+        return array_map($callback, $this->models);
+    }
+
+    /**
+     * Get property pairs
+     *
+     * @param string $keyPropertyName
+     * @param string $valuePropertyName
+     * @return array
+     */
+    public function getPropertyPairs($keyPropertyName, $valuePropertyName)
+    {
+        $result = array();
+
+        /**
+         * @var SchemalessModelInterface $model
+         */
+        foreach($this->models as $model) {
+            $result[$model->get($keyPropertyName)] = $model->get($valuePropertyName);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Remove model from collection
+     *
+     * @param SchemalessModelInterface $model
+     * @return CollectionInterface|Collection
+     */
+    public function remove(SchemalessModelInterface $model)
+    {
+        $offset = array_search($model, $this->models, true);
+
+        if ($offset) {
+            unset($this->models[$offset]);
+            $this->models = array_values($this->models);
+            // TODO: rewind?
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove models by callback
+     *
+     * @param \callback $callback
+     * @return Collection
+     */
+    public function removeByCallback($callback)
+    {
+        if (count($this)) {
+            $reversedCallback = function(SchemalessModelInterface $model) use ($callback) {
+                return !$callback($model);
+            };
+
+            $data = array_filter($this->models, $reversedCallback);
+
+            $this->clear()
+                ->push($data);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove models by condition
+     *
+     * @param mixed $condition
+     * @return Collection
+     */
+    public function removeByCondition($condition)
+    {
+        $callback = function(SchemalessModelInterface $model) use ($condition) {
+            /**
+             * @var SchemalessModelInterface $model
+             */
+            foreach ($condition as $propertyName => $value) {
+                if ($model->get($propertyName) != $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        return $this->removeByCallback($callback);
+    }
+
 
     /**
      * Shuffle collection
@@ -233,6 +387,10 @@ class Collection implements CollectionInterface
     public function toArray($depth = 0)
     {
         $array = array();
+
+        /**
+         * @var SchemalessModelInterface $model
+         */
         foreach($this->models as $model) {
             if ($depth !== 0) {
                 $array[] = $model->toArray($depth === -1 ? -1 : $depth - 1);
@@ -245,76 +403,39 @@ class Collection implements CollectionInterface
     }
 
     /**
-     * Get models by condition or callback
-     *
-     * @param mixed $condition
-     * @return Collection
-     */
-    public function getByCondition($condition)
-    {
-        /**
-         * @var Collection $collection
-         */
-        $collection = new $this;
-
-        if (count($this)) {
-            if (!is_callable($condition)) {
-                $callback = function(SchemalessModelInterface $model) use ($condition) {
-                    /**
-                     * @var SchemalessModelInterface $model
-                     */
-                    foreach ($condition as $name => $value) {
-                        if ($model->get($name) != $value) {
-                            return false;
-                        }
-                    }
-                    return true;
-                };
-            } else {
-                $callback = $condition;
-            }
-
-            $data = array_filter($this->models, $callback);
-            $collection->push($data);
-        }
-
-        return $collection;
-    }
-
-    /**
-     * Get slice of collection
-     *
-     * @param integer      $offset
-     * @param integer|null $length
-     * @return Collection
-     */
-    public function getSlice($offset, $length = null)
-    {
-        /**
-         * @var Collection $collection
-         */
-        $collection = new $this;
-
-        if (count($this)) {
-            $models = array_slice($this->models, $offset, $length);
-            $collection->push($models);
-        }
-
-        return $collection;
-    }
-
-    /**
      * Sort collection by callback
      *
-     * @param mixed $callback
+     * @param \callback $callback
      * @return Collection
      */
-    public function sort($callback)
+    public function sortByCallback($callback)
     {
         usort($this->models, $callback);
         $this->rewind();
 
         return $this;
+    }
+
+    /**
+     * Sort collection
+     *
+     * @param array $propertyNames
+     * @return Collection
+     */
+    public function sort(array $propertyNames)
+    {
+        $callback = function(SchemalessModelInterface $a, SchemalessModelInterface $b) use ($propertyNames) {
+            foreach($propertyNames as $propertyName => $direction) {
+                $comparison = strcmp($a->get($propertyName), $b->get($propertyName));
+                if ($comparison !== 0) {
+                    return $comparison * ($direction ? 1 : -1);
+                }
+            }
+
+            return 0;
+        };
+
+        return $this->sortByCallback($callback);
     }
 
     /*

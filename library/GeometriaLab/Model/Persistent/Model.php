@@ -6,6 +6,18 @@ use GeometriaLab\Model\Persistent\Schema\Schema,
     GeometriaLab\Model\Schema\Manager as SchemaManager,
     GeometriaLab\Model\Persistent\Mapper;
 
+use GeometriaLab\Model\Persistent\Relation\BelongsTo,
+    GeometriaLab\Model\Persistent\Relation\HasOne,
+    GeometriaLab\Model\Persistent\Relation\HasMany;
+
+use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo        as BelongsToProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne           as HasOneProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany          as HasManyProperty;
+
+/**
+ * @todo Abstract?
+ */
 class Model extends \GeometriaLab\Model\Model implements ModelInterface
 {
     /**
@@ -14,6 +26,106 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      * @var array
      */
     protected $cleanPropertyValues = array();
+
+    /**
+     * Get property value
+     *
+     * @param $name
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
+    public function get($name)
+    {
+        $value = parent::get($name);
+
+        if ($value instanceof BelongsTo) {
+            /**
+             * @var BelongsTo $value
+             */
+            return $value->getTargetModel();
+        } else if ($value instanceof HasOne) {
+            /**
+             * @var HasOne $value
+             */
+            return $value->getTargetModel();
+        } else if ($value instanceof HasMany) {
+            /**
+             * @var HasMany $value
+             */
+            return $value->getTargetModels();
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get relation
+     *
+     * @param string $name
+     * @return BelongsTo|HasMany|HasOne
+     * @throws \InvalidArgumentException
+     */
+    public function getRelation($name)
+    {
+        if (!$this->getSchema()->hasProperty($name)) {
+            throw new \InvalidArgumentException("Relation '$name' does not exists");
+        }
+
+        $property = $this->getSchema()->getProperty($name);
+
+        if (!$property instanceof AbstractRelationProperty) {
+            throw new \InvalidArgumentException("'$name' is not relation");
+        }
+
+        return $this->propertyValues[$name];
+    }
+
+    /**
+     * Set property value
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return Model|ModelInterface
+     * @throws \InvalidArgumentException
+     */
+    public function set($name, $value)
+    {
+        if (!$this->getSchema()->hasProperty($name)) {
+            throw new \InvalidArgumentException("Property '$name' does not exists");
+        }
+
+        $property = $this->getSchema()->getProperty($name);
+
+        if ($value !== null) {
+            try {
+                $value = $property->prepare($value);
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            }
+        }
+
+        $method = "set{$name}";
+        if (method_exists($this, $method)) {
+            call_user_func(array($this, $method), $value);
+        } else if ($property instanceof BelongsToProperty) {
+            $this->propertyValues[$name]->setTargetModel($value);
+        } else if ($property instanceof HasOneProperty) {
+            $this->propertyValues[$name]->setTargetModel($value);
+        } else if ($property instanceof HasManyProperty) {
+            $this->propertyValues[$name]->setTargetModels($value);
+        } else {
+            $this->propertyValues[$name] = $value;
+
+            foreach(static::getSchema()->getProperties() as $property) {
+                // @todo If changed referenced key?
+                if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
+                    $this->propertyValues[$property->getName()] = null;
+                }
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * Save model to storage
@@ -79,6 +191,12 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function isPropertyChanged($name)
     {
+        if ($this->getSchema()->hasProperty($name)) {
+            $property = $this->getSchema()->getProperty($name);
+            if (!$property->isPersistent()) {
+                return false;
+            }
+        }
         return $this->getClean($name) !== $this->get($name);
     }
 
@@ -97,32 +215,6 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         }
 
         return $changedProperties;
-    }
-
-    /**
-     * Get property change
-     *
-     * @param string $name
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    public function getChange($name)
-    {
-        return array($this->getClean($name), $this->get($name));
-    }
-
-    /**
-     * Get model changes
-     *
-     * @return array
-     */
-    public function getChanges()
-    {
-        $changes = array();
-        foreach($this->getChangedProperties() as $name) {
-            $changes[$name] = $this->getChange($name);
-        }
-        return $changes;
     }
 
     /**
@@ -214,5 +306,27 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         }
 
         return $schemas->get($className);
+    }
+
+    /**
+     * Setup model
+     */
+    protected function setup()
+    {
+        $this->schema = static::createSchema();
+
+        // Create relations and fill default values
+
+        /**
+         * @var \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface $property
+         */
+        foreach($this->getProperties() as $name => $property) {
+            if ($property instanceof AbstractRelationProperty) {
+                $relationClassName = $property->getRelationClass();
+                $this->propertyValues[$name] = new $relationClassName($this, $property);
+            } else if ($property->getDefaultValue() !== null) {
+                $this->set($name, $property->getDefaultValue());
+            }
+        }
     }
 }

@@ -91,10 +91,10 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $m = new Model();
         $m->populate(array(
-            'test1' => 1,
-            'test2' => null
+            'test1' => 1
         ));
 
+        $this->assertTrue($m->has('test1'));
         $this->assertFalse($m->has('test2'));
         $this->assertFalse($m->has('test3'));
     }
@@ -103,10 +103,10 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $m = new Model();
         $m->populate(array(
-            'test1' => 1,
-            'test2' => null
+            'test1' => 1
         ));
 
+        $this->assertTrue(isset($m->test1));
         $this->assertFalse(isset($m->test2));
         $this->assertFalse(isset($m->test3));
     }
@@ -141,43 +141,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($resultArray, $m->toArray(-1));
-    }
-
-    public function testIterator()
-    {
-        $array = array(
-            'test1' => 1,
-            'test2' => 2,
-            'test3' => 3,
-            'test4' => 4,
-            'test5' => 5
-        );
-        $m = new Model();
-        $m->populate($array);
-
-        $this->_iterate($m, $array);
-        $this->_iterate($m, $array);
-    }
-
-    protected function _iterate($m, $array)
-    {
-        reset($array);
-        foreach($m as $key => $value) {
-            $this->assertEquals(key($array), $key);
-            $this->assertEquals(current($array), $value);
-            next($array);
-        }
-    }
-
-    public function testCount()
-    {
-        $array = array(
-            'test1' => 1,
-            'test2' => 2
-        );
-        $m = new Model();
-        $m->populate($array);
-        $this->assertEquals(2, count($m));
     }
 }
 

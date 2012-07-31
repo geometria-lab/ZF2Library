@@ -12,34 +12,6 @@ class ArrayProperty extends AbstractProperty
     protected $itemProperty;
 
     /**
-     * @var string
-     */
-    protected $itemType;
-
-    /**
-     * Set item type
-     *
-     * @param string $type
-     * @return ArrayProperty
-     */
-    public function setItemType($type)
-    {
-        $this->itemType = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get item type
-     *
-     * @return string
-     */
-    public function getItemType()
-    {
-        return $this->itemType;
-    }
-
-    /**
      * Set item property
      *
      * @param PropertyInterface $property
@@ -59,16 +31,13 @@ class ArrayProperty extends AbstractProperty
      */
     public function getItemProperty()
     {
-        if ($this->itemProperty === null && $this->getItemType() !== null) {
-            $this->itemProperty = Schema::createProperty($this->getItemType());
-        }
-
         return $this->itemProperty;
     }
 
     /**
      * Prepare value
      *
+     * @todo Separate validation and filter
      * @param array $value
      * @return array
      * @throws \InvalidArgumentException

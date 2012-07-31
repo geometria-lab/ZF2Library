@@ -36,6 +36,17 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
     );
 
     /**
+     * Relations class map
+     *
+     * @var array
+     */
+    static protected $relationsClassMap = array(
+        'hasOne'    => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne',
+        'hasMany'   => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany',
+        'belongsTo' => 'GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo',
+    );
+
+    /**
      * Model property class name
      *
      * @var string
@@ -130,5 +141,45 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
             $this->setMapperClass($tag->getReturnType());
             $this->setMapperOptions($params);
         }
+    }
+
+    /**
+     * Create property by type and params
+     *
+     * @static
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     * @throws \InvalidArgumentException
+     */
+    static protected function createProperty($type, array $params = array())
+    {
+        if (isset(static::$regularPropertiesClassMap[$type])) {
+            $property = new static::$regularPropertiesClassMap[$type]($params);
+        } else if (class_exists($type)) {
+            if (isset($params['relation'])) {
+                if (!isset(static::$relationsClassMap[$params['relation']])) {
+                    throw new \InvalidArgumentException("Invalid relation '{$params['relation']}'");
+                }
+
+                if (!isset($params['targetModelClass']) && $params['relation'] !== 'hasMany') {
+                    $params['targetModelClass'] = $type;
+                }
+
+                $className = static::$relationsClassMap[$params['relation']];
+
+                unset($params['relation']);
+            } else {
+                $params['modelClass'] = $type;
+
+                $className = static::$modelPropertyClass;
+            }
+
+            $property = new $className($params);
+        } else {
+            throw new \InvalidArgumentException("Invalid property type '$type'");
+        }
+
+        return $property;
     }
 }

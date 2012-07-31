@@ -3,8 +3,12 @@
 namespace GeometriaLab\Model;
 
 use GeometriaLab\Model\Schema\Schema,
+    GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
+/**
+ * @todo Abstract?
+ */
 class Model extends Schemaless\Model implements ModelInterface
 {
     /**
@@ -65,22 +69,35 @@ class Model extends Schemaless\Model implements ModelInterface
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
-        $property = $this->getSchema()->getProperty($name);
+        if ($value !== null) {
+            $property = $this->getSchema()->getProperty($name);
 
-        try {
-            $value = $property->prepare($value);
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            try {
+                $value = $property->prepare($value);
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            }
         }
 
         $method = "set{$name}";
         if (method_exists($this, $method)) {
-            return call_user_func(array($this, $method), $value);
+            call_user_func(array($this, $method), $value);
+        } else {
+            $this->propertyValues[$name] = $value;
         }
 
-        $this->propertyValues[$name] = $value;
-
         return $this;
+    }
+
+    /**
+     * Has property?
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return $this->getSchema()->hasProperty($name);
     }
 
     /**
@@ -120,7 +137,7 @@ class Model extends Schemaless\Model implements ModelInterface
 
         // Fill default values
         /**
-         * @var Schema\Property\PropertyInterface $property
+         * @var PropertyInterface $property
          */
         foreach($this->getProperties() as $name => $property) {
             if ($property->getDefaultValue() !== null) {
@@ -132,7 +149,7 @@ class Model extends Schemaless\Model implements ModelInterface
     /**
      * Get properties
      *
-     * @return Schema\Property\PropertyInterface[]
+     * @return PropertyInterface[]
      */
     protected function getProperties()
     {

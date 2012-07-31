@@ -8,7 +8,8 @@ use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ZendTagInterface,
     Zend\Code\Reflection\DocBlock\Tag\PropertyTag as ZendPropertyTag,
     Zend\Code\Reflection\ClassReflection AS ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
-    Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection;
+    Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection,
+    Zend\Serializer\Serializer as ZendSerializer;
 
 class Schema
 {
@@ -45,6 +46,13 @@ class Schema
      * @var string
      */
     static protected $modelPropertyClass = '\GeometriaLab\Model\Schema\Property\ModelProperty';
+
+    /**
+     * Params serializer adapter
+     *
+     * @var string
+     */
+    static protected $paramsSerializerAdapter = 'json';
 
     /**
      * Protected constructor
@@ -133,32 +141,9 @@ class Schema
     }
 
     /**
-     * Create property by type and params
-     *
-     * @static
-     * @param string $type
-     * @param array $params
-     * @return PropertyInterface
-     * @throws \InvalidArgumentException
-     */
-    static public function createProperty($type, array $params = array())
-    {
-        if (isset(static::$regularPropertiesClassMap[$type])) {
-            $property = new static::$regularPropertiesClassMap[$type]($params);
-        } else if (class_exists($type)) {
-            $params['modelClass'] = $type;
-
-            $property = new static::$modelPropertyClass($params);
-        } else {
-            throw new \InvalidArgumentException("Invalid property type '$type'");
-        }
-
-        return $property;
-    }
-
-    /**
      * Parse class docblock
      *
+     * @todo Move from schema to standalone class (Zend/Code/.../Annotations?)
      * @param string $className
      * @throws \InvalidArgumentException
      */
@@ -203,7 +188,8 @@ class Schema
         $type = $tag->getType();
 
         if (strpos($type, '[]') === strlen($type) - 2) {
-            $params['itemType'] = substr($type, 0, strlen($type) - 2);
+            $itemPropertyType = substr($type, 0, strlen($type) - 2);
+            $params['itemProperty'] = static::createProperty($itemPropertyType);
             $type = 'array';
         }
 
@@ -212,6 +198,13 @@ class Schema
         $this->setProperty($property);
     }
 
+    /**
+     * Get params from tag
+     *
+     * @param \Zend\Code\Reflection\DocBlock\Tag\TagInterface $tag
+     * @return array|mixed
+     * @throws \InvalidArgumentException
+     */
     protected function getParamsFromTag(ZendTagInterface $tag)
     {
         $description = $tag->getDescription();
@@ -221,13 +214,38 @@ class Schema
         }
 
         $description = preg_replace('#\s+#m', ' ', $description);
-        $params = json_decode($description, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($params)) {
+        $params = ZendSerializer::unserialize($description, array('adapter' => static::$paramsSerializerAdapter));
+
+        if (!is_array($params)) {
             $name = substr($tag->getPropertyName(), 1);
-            throw new \InvalidArgumentException("Not valid JSON params for property '$name'");
+            throw new \InvalidArgumentException("Not valid params for property '$name'");
         }
 
         return $params;
+    }
+
+    /**
+     * Create property by type and params
+     *
+     * @static
+     * @param string $type
+     * @param array $params
+     * @return PropertyInterface
+     * @throws \InvalidArgumentException
+     */
+    static protected function createProperty($type, array $params = array())
+    {
+        if (isset(static::$regularPropertiesClassMap[$type])) {
+            $property = new static::$regularPropertiesClassMap[$type]($params);
+        } else if (class_exists($type)) {
+            $params['modelClass'] = $type;
+
+            $property = new static::$modelPropertyClass($params);
+        } else {
+            throw new \InvalidArgumentException("Invalid property type '$type'");
+        }
+
+        return $property;
     }
 }
