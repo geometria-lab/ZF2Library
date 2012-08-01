@@ -5,6 +5,15 @@ namespace GeometriaLab\Model\Persistent;
 interface ModelInterface extends \GeometriaLab\Model\ModelInterface
 {
     /**
+     * Get relation
+     *
+     * @abstract
+     * @param string $name
+     * @return mixed
+     */
+    public function getRelation($name);
+
+    /**
      * Save model to storage
      *
      * @return boolean

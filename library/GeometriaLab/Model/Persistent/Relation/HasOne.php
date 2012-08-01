@@ -10,7 +10,7 @@ class HasOne extends AbstractRelation
     /**
      * @var ModelInterface
      */
-    protected $targetModel;
+    protected $targetModel = false;
 
     /**
      * @return ModelInterface|null
@@ -18,29 +18,21 @@ class HasOne extends AbstractRelation
      */
     public function getTargetModel($refresh = false)
     {
-        if ($refresh) {
-            $this->targetModel = null;
-        }
-
-        if ($this->targetModel === null) {
+        if ($refresh || $this->targetModel === false) {
             $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
-            if ($originPropertyValue === null) {
-                return null;
-            }
+            if ($originPropertyValue !== null) {
+                /**
+                 * @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper
+                 */
+                $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
 
-            /**
-             * @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper
-             */
-            $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
+                $condition = array($this->getProperty()->getTargetProperty() => $originPropertyValue);
+                $query = $targetMapper->createQuery()->where($condition);
 
-            $condition = array($this->getProperty()->getTargetProperty() => $originPropertyValue);
-            $query = $targetMapper->createQuery()->where($condition);
-
-            $this->targetModel = $targetMapper->getOne($query);
-
-            if ($this->targetModel === null) {
-                throw new \RuntimeException('Invalid target model with: ' . json_encode($condition));
+                $this->targetModel = $targetMapper->getOne($query);
+            } else {
+                $this->targetModel = null;
             }
         }
 
@@ -56,5 +48,32 @@ class HasOne extends AbstractRelation
         $this->targetModel = $foreignModel;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function removeTargetRelation()
+    {
+        $onDelete = $this->getProperty()->getOnDelete();
+
+        if ($onDelete === HasOneProperty::DELETE_NONE) {
+            return 0;
+        }
+
+        $targetModel = $this->getTargetModel();
+
+        if ($targetModel === null) {
+            return 0;
+        }
+
+        if ($onDelete === HasOneProperty::DELETE_CASCADE) {
+            $targetModel->delete();
+        } else if ($onDelete === HasOneProperty::DELETE_SET_NULL) {
+            $targetModel->set($this->getProperty()->getTargetProperty(), null);
+            $targetModel->save();
+        }
+
+        return 1;
     }
 }

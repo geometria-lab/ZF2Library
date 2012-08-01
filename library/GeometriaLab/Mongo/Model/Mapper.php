@@ -9,7 +9,6 @@ use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
     GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty,
     GeometriaLab\Model\Persistent\Schema\Property\ModelProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractHasRelation as AbstractHasRelationProperty,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne as HasOneProperty,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany as HasManyProperty;
 
@@ -395,37 +394,10 @@ class Mapper extends AbstractMapper
         if ($result) {
             // Remove target relations
             foreach($model->getSchema()->getProperties() as $property) {
-                if ($property instanceof AbstractHasRelationProperty) {
-                    $onDelete = $property->getOnDelete();
-
-                    if ($onDelete === HasOneProperty::DELETE_NONE) {
-                        continue;
-                    }
-
-                    if ($property instanceof HasOneProperty) {
-                        $targetModel = $model->get($property->getName());
-
-                        if ($targetModel === null) {
-                            continue;
-                        }
-
-                        $targetModels = array($targetModel);
-                    } else {
-                        $targetModels = $model->get($property->getName());
-
-                        if ($targetModels->isEmpty()) {
-                            continue;
-                        }
-                    }
-
-                    foreach($targetModels as $targetModel) {
-                        if ($onDelete === HasOneProperty::DELETE_CASCADE) {
-                            $targetModel->delete();
-                        } else if ($onDelete === HasOneProperty::DELETE_SET_NULL) {
-                            $targetModel->set($property->getTargetProperty(), null);
-                            $targetModel->save();
-                        }
-                    }
+                if ($property instanceof HasOneProperty) {
+                    $model->getRelation($property->getName())->removeTargetRelation();
+                } else if ($property instanceof HasManyProperty) {
+                    $model->getRelation($property->getName())->removeTargetRelations();
                 }
             }
 

@@ -5,7 +5,9 @@ namespace GeometriaLab\Model\Persistent\Mapper;
 use GeometriaLab\Model\Persistent\ModelInterface,
     GeometriaLab\Model\Persistent\CollectionInterface,
     GeometriaLab\Model\Persistent\Mapper\AbstractMapper,
-    GeometriaLab\Model\Persistent\Mapper\QueryInterface;
+    GeometriaLab\Model\Persistent\Mapper\QueryInterface,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne as HasOneProperty,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany as HasManyProperty;
 
 class Mock extends AbstractMapper
 {
@@ -140,13 +142,34 @@ class Mock extends AbstractMapper
 
         $this->data->removeByCondition(array('id' => $model->id));
 
+        // Remove target relations
+        foreach($model->getSchema()->getProperties() as $property) {
+            if ($property instanceof HasOneProperty) {
+                $model->getRelation($property->getName())->removeTargetRelation();
+            } else if ($property instanceof HasManyProperty) {
+                $model->getRelation($property->getName())->removeTargetRelations();
+            }
+        }
+
         $model->markClean(false);
 
         return true;
     }
 
+    public function deleteAll()
+    {
+        return $this->data->clear();
+    }
+
     public function count(array $condition = array())
     {
-        throw new \RuntimeException('Not implemented');
+        $query = $this->createQuery();
+        $query->where($condition);
+
+        if ($query->hasWhere()) {
+            return $this->data->getByCondition($query)->count();
+        } else {
+            return $this->data->count();
+        }
     }
 }

@@ -2,25 +2,23 @@
 
 namespace GeometriaLab\Model\Persistent\Relation;
 
-use GeometriaLab\Model\Persistent\CollectionInterface;
+use GeometriaLab\Model\Persistent\CollectionInterface,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany as HasManyProperty;
 
 class HasMany extends AbstractRelation
 {
     /**
      * @var CollectionInterface
      */
-    protected $targetModels;
+    protected $targetModels = false;
 
     /**
+     * @param bool $refresh
      * @return CollectionInterface
      */
     public function getTargetModels($refresh = false)
     {
-        if ($refresh) {
-            $this->targetModels = null;
-        }
-
-        if ($this->targetModels === null) {
+        if ($refresh || $this->targetModels === false) {
             $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
 
             $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
@@ -40,13 +38,42 @@ class HasMany extends AbstractRelation
     }
 
     /**
-     * @param CollectionInterface|null $collection
+     * @param CollectionInterface $collection
      * @return HasMany
      */
-    public function setTargetModels(CollectionInterface $collection = null)
+    public function setTargetModels(CollectionInterface $collection)
     {
         $this->targetModels = $collection;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function removeTargetRelations()
+    {
+        $onDelete = $this->getProperty()->getOnDelete();
+
+        if ($onDelete === HasManyProperty::DELETE_NONE) {
+            return 0;
+        }
+
+        $targetModels = $this->getTargetModels();
+
+        if ($targetModels->isEmpty()) {
+            return 0;
+        }
+
+        foreach($targetModels as $targetModel) {
+            if ($onDelete === HasManyProperty::DELETE_CASCADE) {
+                $targetModel->delete();
+            } else if ($onDelete === HasManyProperty::DELETE_SET_NULL) {
+                $targetModel->set($this->getProperty()->getTargetProperty(), null);
+                $targetModel->save();
+            }
+        }
+
+        return count($targetModels);
     }
 }
