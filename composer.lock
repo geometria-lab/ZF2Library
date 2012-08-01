@@ -1,7 +1,18 @@
 {
     "hash": "1e49eb588bd80f8430dac4759932f0c7",
     "packages": [
-
+        {
+            "package": "zendframework/zendframework",
+            "version": "dev-master",
+            "source-reference": "eb38dc4012a016c32647225ff87e8b8e876cf4c8",
+            "alias-pretty-version": "2.0.x-dev",
+            "alias-version": "2.0.9999999.9999999-dev"
+        },
+        {
+            "package": "zendframework/zendframework",
+            "version": "dev-master",
+            "source-reference": "eb38dc4012a016c32647225ff87e8b8e876cf4c8"
+        }
     ],
     "packages-dev": null,
     "aliases": [
