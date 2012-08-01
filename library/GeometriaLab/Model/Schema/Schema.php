@@ -215,7 +215,7 @@ class Schema
 
         $description = preg_replace('#\s+#m', ' ', $description);
 
-        $params = ZendSerializer::unserialize($description, array('adapter' => static::$paramsSerializerAdapter));
+        $params = ZendSerializer::unserialize($description, static::$paramsSerializerAdapter);
 
         if (!is_array($params)) {
             $name = substr($tag->getPropertyName(), 1);
