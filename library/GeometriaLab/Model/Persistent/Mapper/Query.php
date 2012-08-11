@@ -364,6 +364,6 @@ class Query implements QueryInterface
     {
         $modelClass = $this->getMapper()->getModelClass();
 
-        return $modelClass::createSchema();
+        return $modelClass::getSchema();
     }
 }
