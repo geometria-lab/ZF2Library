@@ -2,9 +2,7 @@
 
 namespace GeometriaLab\Model\Persistent;
 
-use GeometriaLab\Model\Persistent\Schema\Schema,
-    GeometriaLab\Model\Schema\Manager as SchemaManager,
-    GeometriaLab\Model\Persistent\Mapper;
+use GeometriaLab\Model\Persistent\Mapper;
 
 use GeometriaLab\Model\Persistent\Relation\BelongsTo,
     GeometriaLab\Model\Persistent\Relation\HasOne,
@@ -20,6 +18,8 @@ use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as A
  */
 class Model extends \GeometriaLab\Model\Model implements ModelInterface
 {
+    static protected $schemaClassName = 'GeometriaLab\Model\Persistent\Schema\Schema';
+
     /**
      * Clean property values
      *
@@ -67,11 +67,13 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function getRelation($name)
     {
-        if (!$this->getSchema()->hasProperty($name)) {
+        $schema = static::getSchema();
+
+        if (!$schema->hasProperty($name)) {
             throw new \InvalidArgumentException("Relation '$name' does not exists");
         }
 
-        $property = $this->getSchema()->getProperty($name);
+        $property = $schema->getProperty($name);
 
         if (!$property instanceof AbstractRelationProperty) {
             throw new \InvalidArgumentException("'$name' is not relation");
@@ -90,11 +92,13 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function set($name, $value)
     {
-        if (!$this->getSchema()->hasProperty($name)) {
+        $schema = static::getSchema();
+
+        if (!$schema->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
-        $property = $this->getSchema()->getProperty($name);
+        $property = $schema->getProperty($name);
 
         if ($value !== null) {
             try {
@@ -116,7 +120,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         } else {
             $this->propertyValues[$name] = $value;
 
-            foreach(static::getSchema()->getProperties() as $property) {
+            foreach($schema->getProperties() as $property) {
                 // @todo If changed referenced key?
                 if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
                     $this->propertyValues[$property->getName()] = null;
@@ -191,8 +195,10 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function isPropertyChanged($name)
     {
-        if ($this->getSchema()->hasProperty($name)) {
-            $property = $this->getSchema()->getProperty($name);
+        $schema = static::getSchema();
+
+        if ($schema->hasProperty($name)) {
+            $property = $schema->getProperty($name);
             if (!$property->isPersistent()) {
                 return false;
             }
@@ -226,7 +232,9 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      */
     public function getClean($name)
     {
-        if (!$this->getSchema()->hasProperty($name)) {
+        $schema = static::getSchema();
+
+        if (!$schema->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
@@ -263,21 +271,10 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         $mappers = Mapper\Manager::getInstance();
 
         if (!$mappers->has($className)) {
-            $schemas = SchemaManager::getInstance();
-
-            /**
-             * @var Schema $schema
-             */
-            if (!$schemas->has($className)) {
-                /**
-                 * @var ModelInterface $className
-                 */
-                $schema = $className::createSchema();
-            } else {
-                $schema = $schemas->get($className);
-            }
+            $schema = $className::getSchema();
 
             $mapperClassName = $schema->getMapperClass();
+
             /**
              * @var Mapper\MapperInterface $mapper
              */
@@ -291,30 +288,10 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
     }
 
     /**
-     * Create persistent model schema
-     *
-     * @return Schema
-     */
-    static public function createSchema()
-    {
-        $schemas = SchemaManager::getInstance();
-
-        $className = get_called_class();
-
-        if (!$schemas->has($className)) {
-            $schemas->add(new Schema($className));
-        }
-
-        return $schemas->get($className);
-    }
-
-    /**
      * Setup model
      */
     protected function setup()
     {
-        $this->schema = static::createSchema();
-
         // Create relations and fill default values
 
         /**

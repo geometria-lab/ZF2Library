@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Schema\Schema,
+use GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
@@ -11,12 +11,7 @@ use GeometriaLab\Model\Schema\Schema,
  */
 class Model extends Schemaless\Model implements ModelInterface
 {
-    /**
-     * Model schema
-     *
-     * @var Schema
-     */
-    protected $schema;
+    static protected $schemaClassName = 'GeometriaLab\Model\Schema\Schema';
 
     /**
      * Constructor
@@ -39,7 +34,7 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     public function get($name)
     {
-        if (!$this->getSchema()->hasProperty($name)) {
+        if (!static::getSchema()->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
@@ -65,12 +60,14 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     public function set($name, $value)
     {
-        if (!$this->getSchema()->hasProperty($name)) {
+        $schema = static::getSchema();
+
+        if (!$schema->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
         if ($value !== null) {
-            $property = $this->getSchema()->getProperty($name);
+            $property = $schema->getProperty($name);
 
             try {
                 $value = $property->prepare($value);
@@ -97,32 +94,22 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     public function has($name)
     {
-        return $this->getSchema()->hasProperty($name);
+        return static::getSchema()->hasProperty($name);
     }
 
     /**
      * Get schema
      *
-     * @return Schema
+     * @return SchemaInterface
      */
-    public function getSchema()
-    {
-        return $this->schema;
-    }
-
-    /**
-     * Create model schema
-     *
-     * @return Schema
-     */
-    static public function createSchema()
+    static public function getSchema()
     {
         $schemas = SchemaManager::getInstance();
 
         $className = get_called_class();
 
         if (!$schemas->has($className)) {
-            $schemas->add(new Schema($className));
+            $schemas->add(new static::$schemaClassName($className));
         }
 
         return $schemas->get($className);
@@ -133,8 +120,6 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     protected function setup()
     {
-        $this->schema = static::createSchema();
-
         // Fill default values
         /**
          * @var PropertyInterface $property
@@ -153,6 +138,6 @@ class Model extends Schemaless\Model implements ModelInterface
      */
     protected function getProperties()
     {
-        return $this->getSchema()->getProperties();
+        return static::getSchema()->getProperties();
     }
 }

@@ -147,7 +147,7 @@ class Mock extends AbstractMapper
         $this->data->removeByCondition(array('id' => $model->id));
 
         // Remove target relations
-        foreach($model->getSchema()->getProperties() as $property) {
+        foreach($model::getSchema()->getProperties() as $property) {
             if ($property instanceof HasOneProperty) {
                 $model->getRelation($property->getName())->removeTargetRelation();
             } else if ($property instanceof HasManyProperty) {
