@@ -9,8 +9,11 @@ class BelongsToTest extends \PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
-        Man::getMapper()->deleteAll();
-        Dog::getMapper()->deleteAll();
+        $query = Man::getMapper()->createQuery();
+        Man::getMapper()->deleteByQuery($query);
+
+        $query = Dog::getMapper()->createQuery();
+        Dog::getMapper()->deleteByQuery($query);
     }
 
     public function testGetTargetModelWithNullOriginProperty()

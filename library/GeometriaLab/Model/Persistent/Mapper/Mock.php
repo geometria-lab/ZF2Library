@@ -73,6 +73,10 @@ class Mock extends AbstractMapper
             throw new \InvalidArgumentException('Query must be GeometriaLab\Model\Persistent\Mapper\Query');
         }
 
+        if ($query->hasSelect()) {
+            throw new \InvalidArgumentException('Select not implemented yet');
+        }
+
         if ($query->hasWhere()) {
             $collection = $this->data->getByCondition($query->getWhere());
         } else {
@@ -156,9 +160,33 @@ class Mock extends AbstractMapper
         return true;
     }
 
-    public function deleteAll()
+    public function deleteByQuery(QueryInterface $query)
     {
-        return $this->data->clear();
+        if (!$query instanceof Query) {
+            throw new \InvalidArgumentException('Query must be GeometriaLab\Model\Persistent\Mapper\Query');
+        }
+
+        if ($query->hasSelect()) {
+            throw new \InvalidArgumentException('Select not supported');
+        }
+
+        if ($query->hasSort()) {
+            throw new \InvalidArgumentException('Sort not implemented yet');
+        }
+
+        if ($query->hasOffset()) {
+            throw new \InvalidArgumentException('Offset not implemented yet');
+        }
+
+        if ($query->hasLimit()) {
+            throw new \InvalidArgumentException('Limit not implemented yet');
+        }
+
+        if ($query->hasWhere()) {
+            $this->data->removeByCondition($query->getWhere());
+        } else {
+            $this->data->clear();
+        }
     }
 
     public function count(array $condition = array())

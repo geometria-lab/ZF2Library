@@ -14,8 +14,11 @@ class HasManyTest extends \PHPUnit_Framework_TestCase
         $schemaManager = SchemaManager::getInstance();
         $schemaManager->removeAll();
 
-        Woman::getMapper()->deleteAll();
-        Man::getMapper()->deleteAll();
+        $query = Man::getMapper()->createQuery();
+        Man::getMapper()->deleteByQuery($query);
+
+        $query = Woman::getMapper()->createQuery();
+        Woman::getMapper()->deleteByQuery($query);
     }
 
     public function testGetTargetModels()

@@ -22,9 +22,9 @@ class MapperTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $manager = Manager::getInstance();
-        $mongoDb = $manager->get('default');
-        $mongoDb->drop();
+        $query = Model::getMapper()->createQuery();
+
+        Model::getMapper()->deleteByQuery($query);
     }
 
     public function testGet()

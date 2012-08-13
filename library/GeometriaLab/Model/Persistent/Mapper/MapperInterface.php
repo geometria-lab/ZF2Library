@@ -61,6 +61,13 @@ interface MapperInterface
 
     /**
      * @abstract
+     * @param QueryInterface $query
+     * @return mixed
+     */
+    public function deleteByQuery(QueryInterface $query);
+
+    /**
+     * @abstract
      * @return QueryInterface
      */
     public function createQuery();

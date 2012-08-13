@@ -14,8 +14,11 @@ class HasOneTest extends \PHPUnit_Framework_TestCase
         $schemaManager = SchemaManager::getInstance();
         $schemaManager->removeAll();
 
-        Man::getMapper()->deleteAll();
-        Dog::getMapper()->deleteAll();
+        $query = Man::getMapper()->createQuery();
+        Man::getMapper()->deleteByQuery($query);
+
+        $query = Dog::getMapper()->createQuery();
+        Dog::getMapper()->deleteByQuery($query);
     }
 
     public function testGetTargetModelWithoutRelations()

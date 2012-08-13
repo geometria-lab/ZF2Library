@@ -409,6 +409,37 @@ class Mapper extends AbstractMapper
         }
     }
 
+    public function deleteByQuery(QueryInterface $query)
+    {
+        if (!$query instanceof Query) {
+            throw new \InvalidArgumentException('Query must be GeometriaLab\Mongo\Model\Query');
+        }
+
+        if ($query->hasSelect()) {
+            throw new \InvalidArgumentException('Select not supported');
+        }
+
+        if ($query->hasSort()) {
+            throw new \InvalidArgumentException('Sort not supported');
+        }
+
+        if ($query->hasOffset()) {
+            throw new \InvalidArgumentException('Offset not supported');
+        }
+
+        if ($query->hasLimit()) {
+            throw new \InvalidArgumentException('Limit not supported');
+        }
+
+        if ($query->hasWhere()) {
+            $where = $this->transformModelDataForStorage($query->getWhere());
+        } else {
+            $where = array();
+        }
+
+        return $this->getMongoCollection()->remove($where);
+    }
+
     /**
      * Create query object
      *
