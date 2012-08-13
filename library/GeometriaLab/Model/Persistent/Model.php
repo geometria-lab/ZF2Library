@@ -118,8 +118,8 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
 
             foreach(static::getSchema()->getProperties() as $property) {
                 // @todo If changed referenced key?
-                if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
-                    $this->propertyValues[$property->getName()] = null;
+                if ($property instanceof BelongsToProperty && $property->getOriginProperty() === $name) {
+                    $this->propertyValues[$property->getName()]->resetTargetModel();
                 }
             }
         }
