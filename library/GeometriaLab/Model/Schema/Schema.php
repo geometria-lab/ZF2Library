@@ -11,7 +11,7 @@ use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ZendTagInterface,
     Zend\Code\Reflection\DocBlockReflection AS ZendDocBlockReflection,
     Zend\Serializer\Serializer as ZendSerializer;
 
-class Schema
+class Schema implements SchemaInterface
 {
     /**
      * Class name
