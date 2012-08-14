@@ -10,7 +10,7 @@ use GeometriaLab\Mongo\Manager,
 
 class MapperTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    static public function setUpBeforeClass()
     {
         $manager = Manager::getInstance();
         if (!$manager->has('default')) {
@@ -18,6 +18,12 @@ class MapperTest extends \PHPUnit_Framework_TestCase
             $mongoDb = $mongo->selectDB(TESTS_MONGO_MAPPER_CONNECTION_DB);
             $manager->set('default', $mongoDb);
         }
+    }
+
+    static public function tearDownAfterClass()
+    {
+        $manager = Manager::getInstance();
+        $manager->get('default')->drop();
     }
 
     public function tearDown()
