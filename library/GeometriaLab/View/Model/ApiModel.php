@@ -12,9 +12,10 @@ namespace GeometriaLab\View\Model;
 class ApiModel extends \Zend\View\Model\ViewModel
 {
     const FIELD_DATA = 'data';
-    const FIELD_CODE = 'code';
+    const FIELD_HTTPCODE = 'httpCode';
     const FIELD_STATUS = 'status';
-    const FIELD_MESSAGE = 'message';
+    const FIELD_ERRORCODE = 'errorCode';
+    const FIELD_ERRORMESSAGE = 'errorMessage';
 
     const STATUS_SUCCESS = 'success';
     const STATUS_FAIL = 'fail';

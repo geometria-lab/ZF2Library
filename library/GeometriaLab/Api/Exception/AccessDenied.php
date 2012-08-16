@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Mvc\Exception;
+namespace GeometriaLab\Api\Exception;
 
 class AccessDenied extends Exception
 {

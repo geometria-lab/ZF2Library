@@ -61,21 +61,16 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         }
 
         // set data (if not set yet)
-        if ($apiModel->getVariable(ApiModel::FIELD_DATA) === null) {
-            $apiModel->setVariable(ApiModel::FIELD_DATA, '');
+        if ($apiModel->getVariable(ApiModel::FIELD_DATA, false) === false) {
+            $apiModel->setVariable(ApiModel::FIELD_DATA, null);
         }
 
         $response = $e->getResponse();
         $apiException = $e->getParam('apiException', false);
 
-        if ($apiException) {
-            $httpCode = $apiException->getHttpStatusCode();
-        } else {
-            $httpCode = $response->getStatusCode();
-        }
-
-        // set code
-        $apiModel->setVariable(ApiModel::FIELD_CODE, $httpCode);
+        // set http code
+        $httpCode = $response->getStatusCode();
+        $apiModel->setVariable(ApiModel::FIELD_HTTPCODE, $httpCode);
 
         // set status
         if ($response->isClientError()) {
@@ -87,14 +82,16 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         }
         $apiModel->setVariable(ApiModel::FIELD_STATUS, $status);
 
-        // set message
+        // set error code and message (if any)
         if ($apiException) {
-            $apiCode = $apiException->getApiCode();
+            $errorCode = $apiException->getErrorCode();
+            $errorMessage = $apiException->getErrorMessage();
         } else {
-            $apiCode = $apiModel->getVariable(ApiModel::FIELD_MESSAGE, '');
+            $errorCode = null;
+            $errorMessage = null;
         }
-
-        $apiModel->setVariable(ApiModel::FIELD_MESSAGE, $apiCode);
+        $apiModel->setVariable(ApiModel::FIELD_ERRORCODE, $errorCode);
+        $apiModel->setVariable(ApiModel::FIELD_ERRORMESSAGE, $errorMessage);
 
         $e->setResult($apiModel);
     }

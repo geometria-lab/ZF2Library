@@ -45,11 +45,11 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
             case ZendApplication::ERROR_CONTROLLER_NOT_FOUND:
             case ZendApplication::ERROR_CONTROLLER_INVALID:
             case ZendApplication::ERROR_ROUTER_NO_MATCH:
-                $apiException = new \GeometriaLab\Mvc\Exception\NotFound();
+                $apiException = new \GeometriaLab\Api\Exception\ResourceNotFound();
                 break;
             default:
-                if (!$exception instanceof \GeometriaLab\Mvc\Exception\ApiException) {
-                    $apiException = new \GeometriaLab\Mvc\Exception\ServerError();
+                if (!$exception instanceof \GeometriaLab\Api\Exception\Exception) {
+                    $apiException = new \GeometriaLab\Api\Exception\ServerError();
                 } else {
                     $apiException = $exception;
                 }
@@ -62,7 +62,7 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
             $e->setResponse($response);
         }
 
-        $response->setStatusCode($apiException->getHttpStatusCode());
+        $response->setStatusCode($apiException->getHttpCode());
         $e->setParam('apiException', $apiException);
     }
 }
