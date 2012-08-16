@@ -13,7 +13,7 @@ if ('@package_version@' !== $phpUnitVersion && version_compare($phpUnitVersion, 
 }
 unset($phpUnitVersion);
 
-if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
+if (!file_exists(__DIR__ . '/../vendor/autoload.php') && !file_exists(__DIR__ . '/../../../autoload.php')) {
     echo "Composer dependencies not installed.";
     exit(1);
 }

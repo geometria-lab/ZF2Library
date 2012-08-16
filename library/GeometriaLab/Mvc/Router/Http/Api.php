@@ -86,7 +86,16 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
 
         $uri  = $request->getUri();
         $path = $uri->getPath();
-        $path = ltrim($path, '/');
+        $path = trim($path, '/');
+
+        foreach (array(\GeometriaLab\View\Strategy\ApiStrategy::FORMAT_JSON, \GeometriaLab\View\Strategy\ApiStrategy::FORMAT_XML) as $format) {
+            $needle = '.' . $format;
+            if (strpos($path, $needle) === strlen($path) - strlen($needle)) {
+                $request->setMetadata('format', $format);
+                $path = substr($path, 0, -strlen($needle));
+                break;
+            }
+        }
 
         $pathParts = explode('/', $path);
 

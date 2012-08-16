@@ -24,6 +24,8 @@ use Zend\Stdlib\DispatchableInterface as Dispatchable;
 use Zend\Stdlib\RequestInterface as Request;
 use Zend\Stdlib\ResponseInterface as Response;
 
+use GeometriaLab\View\Model\ApiModel;
+
 abstract class AbstractRestfulController implements
     Dispatchable,
     EventManagerAwareInterface,
@@ -151,102 +153,95 @@ abstract class AbstractRestfulController implements
     }
 
     public function execute(MvcEvent $e)
-        {
-            $routeMatch = $e->getRouteMatch();
-            if (!$routeMatch) {
-                /**
-                 * @todo Determine requirements for when route match is missing.
-                 *       Potentially allow pulling directly from request metadata?
-                 */
-                throw new \DomainException('Missing route matches; unsure how to retrieve action');
-            }
-
-            $request = $e->getRequest();
-            $action  = $routeMatch->getParam('action', false);
-            if ($action) {
-                // Handle arbitrary methods, ending in Action
-                $method = static::getMethodFromAction($action);
-                if (!method_exists($this, $method)) {
-                    $method = 'notFoundAction';
-                }
-                $return = $this->$method();
-            } else {
-                // RESTful methods
-
-                $id = $routeMatch->getParam('id');
-                if ($id === null) {
-                    $id = $request->getQuery()->get('id');
-                }
-
-                $subResource = $routeMatch->getParam('subResource');
-
-                switch (strtolower($request->getMethod())) {
-                    case 'get':
-                        if (null !== $id) {
-                            if (null !== $subResource) {
-                                $action = 'get' . ucfirst($subResource);
-                            } else {
-                                $action = 'get';
-                            }
-                        } else {
-                            if (null !== $subResource) {
-                                $action = 'get' . ucfirst($subResource) . 'List';
-                            } else {
-                                $action = 'getList';
-                            }
-                        }
-                        break;
-                    case 'post':
-                        if (null !== $id) {
-                            throw new \DomainException('Post is allowed on resources only');
-                        }
-                        if (null !== $subResource) {
-                            $action = 'create' . ucfirst($subResource);
-                        } else {
-                            $action = 'create';
-                        }
-                        break;
-                    case 'put':
-                        if (null === $id) {
-                            throw new \DomainException('Missing identifier');
-                        }
-                        if (null !== $subResource) {
-                            throw new \DomainException('Put is allowed on root resource object only');
-                        }
-                        $action = 'update';
-                        break;
-                    case 'delete':
-                        if (null === $id) {
-                            throw new \DomainException('Missing identifier');
-                        }
-                        if (null !== $subResource) {
-                            throw new \DomainException('Delete is allowed on root resource object only');
-                        }
-                        $action = 'delete';
-                        break;
-                    default:
-                        throw new \DomainException('Invalid HTTP method!');
-                }
-
-                $routeMatch->setParam('action', $action);
-
-                $params = $this->getServiceLocator()->get('ParamsLoader')->getByRouteMatch($routeMatch);
-
-                if ($id) {
-                    $params->id = (int)$id;
-                }
-
-                $return = $this->$action($params);
-
-
-            }
-
-            // Emit post-dispatch signal, passing:
-            // - return from method, request, response
-            // If a listener returns a response object, return it immediately
-            $e->setResult($return);
-            return $return;
+    {
+        $routeMatch = $e->getRouteMatch();
+        if (!$routeMatch) {
+            /**
+             * @todo Determine requirements for when route match is missing.
+             *       Potentially allow pulling directly from request metadata?
+             */
+            throw new \DomainException('Missing route matches; unsure how to retrieve action');
         }
+
+        $request = $e->getRequest();
+        $action  = $routeMatch->getParam('action', false);
+        if ($action) {
+            // Handle arbitrary methods, ending in Action
+            $method = static::getMethodFromAction($action);
+            if (!method_exists($this, $method)) {
+                $method = 'notFoundAction';
+            }
+            $return = $this->$method();
+        } else {
+            // RESTful methods
+
+            $id = $routeMatch->getParam('id');
+            if ($id === null) {
+                $id = $request->getQuery()->get('id');
+            }
+
+            $subResource = $routeMatch->getParam('subResource');
+
+            switch (strtolower($request->getMethod())) {
+                case 'get':
+                    if (null !== $id) {
+                        if (null !== $subResource) {
+                            $action = 'get' . ucfirst($subResource);
+                        } else {
+                            $action = 'get';
+                        }
+                    } else {
+                        if (null !== $subResource) {
+                            $action = 'get' . ucfirst($subResource) . 'List';
+                        } else {
+                            $action = 'getList';
+                        }
+                    }
+                    break;
+                case 'post':
+                    if (null !== $id) {
+                        throw new \DomainException('Post is allowed on resources only');
+                    }
+                    if (null !== $subResource) {
+                        $action = 'create' . ucfirst($subResource);
+                    } else {
+                        $action = 'create';
+                    }
+                    break;
+                case 'put':
+                    if (null === $id) {
+                        throw new \DomainException('Missing identifier');
+                    }
+                    if (null !== $subResource) {
+                        throw new \DomainException('Put is allowed on root resource object only');
+                    }
+                    $action = 'update';
+                    break;
+                case 'delete':
+                    if (null === $id) {
+                        throw new \DomainException('Missing identifier');
+                    }
+                    if (null !== $subResource) {
+                        throw new \DomainException('Delete is allowed on root resource object only');
+                    }
+                    $action = 'delete';
+                    break;
+                default:
+                    throw new \DomainException('Invalid HTTP method!');
+            }
+
+            $routeMatch->setParam('action', $action);
+        }
+
+        $params = $this->getServiceLocator()->get('ParamsLoader')->getByRouteMatch($routeMatch);
+        $return = $this->$action($params);
+
+        // Emit post-dispatch signal, passing:
+        // - return from method, request, response
+        // If a listener returns a response object, return it immediately
+        $e->setResult($return);
+        return $return;
+    }
 
     /**
      * Get request object

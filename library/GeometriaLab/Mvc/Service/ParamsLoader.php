@@ -28,7 +28,7 @@ class ParamsLoader
     public function getByRouteMatch(RouteMatch $routeMatch)
     {
         $parts = explode('\\', $routeMatch->getParam('__NAMESPACE__'));
-        $paramClassName = $parts[0] . '\\' . self::PARAM_DIR . '\\' . $this->event->getRouteMatch()->getParam('__CONTROLLER__') . '\\' . ucfirst($routeMatch->getParam('action'));
+        $paramClassName = $parts[0] . '\\' . self::PARAM_DIR . '\\' . $routeMatch->getParam('__CONTROLLER__') . '\\' . ucfirst($routeMatch->getParam('action'));
 
         return new $paramClassName;
     }
