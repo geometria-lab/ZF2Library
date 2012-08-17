@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Model\Persistent\Relation\TestModels;
 
-use GeometriaLab\Model\Persistent\Model;
+use GeometriaLab\Model\Persistent\AbstractModel;
 
 /**
  * @property integer                                                    $id    { "primary" : true }
@@ -17,7 +17,7 @@ use GeometriaLab\Model\Persistent\Model;
  *
  * @method static \GeometriaLab\Model\Persistent\Mapper\Mock getMapper()
  */
-class Man extends Model
+class Man extends AbstractModel
 {
 
 }

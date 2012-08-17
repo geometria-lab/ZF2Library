@@ -15,7 +15,7 @@ namespace GeometriaLabTest\Model\Persistent\TestModels;
  *
  * @method static Model getMapper()  {"collectionName" : "test"}
  */
-class ModelWithInvalidDefinition2 extends \GeometriaLab\Model\Persistent\Model
+class ModelWithInvalidDefinition2 extends \GeometriaLab\Model\Persistent\AbstractModel
 {
 
 }

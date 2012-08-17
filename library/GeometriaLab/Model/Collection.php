@@ -9,7 +9,7 @@ class Collection implements CollectionInterface
     /**
      * Models
      *
-     * @var array
+     * @var SchemalessModelInterface[]
      */
     protected $models = array();
 

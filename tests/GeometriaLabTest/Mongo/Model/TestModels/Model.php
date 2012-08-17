@@ -15,7 +15,7 @@ namespace GeometriaLabTest\Mongo\Model\TestModels;
  *
  * @method static \GeometriaLab\Mongo\Model\Mapper getMapper() { "mongoInstanceName" : "default", "collectionName" : "test" }
  */
-class Model extends \GeometriaLab\Model\Persistent\Model
+class Model extends \GeometriaLab\Model\Persistent\AbstractModel
 {
 
 }

@@ -15,7 +15,7 @@ namespace GeometriaLabTest\Model\Persistent\TestModels;
  *
  * @method static \GeometriaLab\Model\Persistent\Mapper\Mock getMapper()
  */
-class Model extends \GeometriaLab\Model\Persistent\Model
+class Model extends \GeometriaLab\Model\Persistent\AbstractModel
 {
 
 }

@@ -13,7 +13,7 @@ namespace GeometriaLabTest\Model\Persistent\TestModels;
  * @property string[]                                     $arrayOfString
  * @property \GeometriaLabTest\Model\TestModels\SubModel[]    $arrayOfSubTest
  */
-class ModelWithoutDefinition extends \GeometriaLab\Model\Persistent\Model
+class ModelWithoutDefinition extends \GeometriaLab\Model\Persistent\AbstractModel
 {
 
 }

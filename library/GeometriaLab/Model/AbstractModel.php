@@ -6,10 +6,7 @@ use GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
-/**
- * @todo Abstract?
- */
-class Model extends Schemaless\Model implements ModelInterface
+abstract class AbstractModel extends Schemaless\Model implements ModelInterface
 {
     static protected $schemaClassName = 'GeometriaLab\Model\Schema\Schema';
 
@@ -55,7 +52,7 @@ class Model extends Schemaless\Model implements ModelInterface
      *
      * @param string $name
      * @param mixed $value
-     * @return Model|ModelInterface
+     * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
     public function set($name, $value)

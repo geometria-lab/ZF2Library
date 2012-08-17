@@ -14,7 +14,7 @@ namespace GeometriaLabTest\Model\TestModels;
  * @property string[]                                      $arrayOfString
  * @property \GeometriaLabTest\Model\TestModels\SubModel[]     $arrayOfSubTest
  */
-class Model extends \GeometriaLab\Model\Model
+class Model extends \GeometriaLab\Model\AbstractModel
 {
     protected $callbackProperty;
 

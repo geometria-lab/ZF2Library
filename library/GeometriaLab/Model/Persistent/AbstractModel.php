@@ -13,10 +13,7 @@ use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as A
     GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne           as HasOneProperty,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany          as HasManyProperty;
 
-/**
- * @todo Abstract?
- */
-class Model extends \GeometriaLab\Model\Model implements ModelInterface
+abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implements ModelInterface
 {
     static protected $schemaClassName = 'GeometriaLab\Model\Persistent\Schema\Schema';
 
@@ -87,7 +84,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      *
      * @param string $name
      * @param mixed $value
-     * @return Model|ModelInterface
+     * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
     public function set($name, $value)
@@ -122,6 +119,9 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
 
             foreach($schema->getProperties() as $property) {
                 // @todo If changed referenced key?
+                /**
+                 * @var BelongsToProperty $property
+                 */
                 if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
                     $this->propertyValues[$property->getName()] = null;
                 }
@@ -199,6 +199,9 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
 
         if ($schema->hasProperty($name)) {
             $property = $schema->getProperty($name);
+            /**
+             * @var \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface $property
+             */
             if (!$property->isPersistent()) {
                 return false;
             }
@@ -249,7 +252,7 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
      * Mark model as clean, or remove clean data
      *
      * @param boolean $flag
-     * @return Model
+     * @return AbstractModel
      */
     public function markClean($flag = true)
     {
@@ -271,7 +274,10 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
         $mappers = Mapper\Manager::getInstance();
 
         if (!$mappers->has($className)) {
-            $schema = $className::getSchema();
+            /**
+             * @var Schema\Schema $schema
+             */
+            $schema = call_user_func(array($className, 'getSchema'));
 
             $mapperClassName = $schema->getMapperClass();
 
@@ -299,6 +305,9 @@ class Model extends \GeometriaLab\Model\Model implements ModelInterface
          */
         foreach($this->getProperties() as $name => $property) {
             if ($property instanceof AbstractRelationProperty) {
+                /**
+                 * @var AbstractRelationProperty $property
+                 */
                 $relationClassName = $property->getRelationClass();
                 $this->propertyValues[$name] = new $relationClassName($this, $property);
             } else if ($property->getDefaultValue() !== null) {
