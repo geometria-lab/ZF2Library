@@ -280,7 +280,7 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->insert($data, array('safe' => true));
 
         if ($result) {
-            $model->set('id', $data['_id']->{'$id'});
+            $model->set('id', (string)$data['_id']);
             $model->markClean();
 
             return true;
@@ -459,9 +459,9 @@ class Mapper extends AbstractMapper
     protected function transformModelDataForStorage(array $data)
     {
         if (isset($data['id'])) {
-            $data['_id'] = new \MongoId($data['id']);
+            $data['_id'] = $data['id'];
+            unset($data['id']);
         }
-        unset($data['id']);
 
         return $data;
     }
