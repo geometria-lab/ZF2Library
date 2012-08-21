@@ -474,7 +474,7 @@ class Mapper extends AbstractMapper
      */
     protected function transformStorageDataForModel(array $data)
     {
-        $data['id'] = $data['_id']->{'$id'};
+        $data['id'] = (string)$data['_id'];
         unset($data['_id']);
 
         return $data;
