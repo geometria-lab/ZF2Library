@@ -365,7 +365,7 @@ class Mapper extends AbstractMapper
         }
 
         $mongoId = new \MongoId($id);
-        if ($mongoId->{$id} != $id) {
+        if ((string)$mongoId != $id) {
             $mongoId = $id;
         }
 
@@ -395,7 +395,7 @@ class Mapper extends AbstractMapper
         }
 
         $mongoId = new \MongoId($id);
-        if ($mongoId->{$id} != $id) {
+        if ((string)$mongoId != $id) {
             $mongoId = $id;
         }
 
@@ -471,7 +471,10 @@ class Mapper extends AbstractMapper
     protected function transformModelDataForStorage(array $data)
     {
         if (isset($data['id'])) {
-            $data['_id'] = $data['id'];
+            $data['_id'] = new \MongoId($data['id']);
+            if ((string)$data['_id'] != $data['id']) {
+                $data['_id'] = $data['id'];
+            }
             unset($data['id']);
         }
 
