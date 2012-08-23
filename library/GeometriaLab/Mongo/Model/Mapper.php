@@ -364,7 +364,14 @@ class Mapper extends AbstractMapper
             $data['$unset'] = $unsetData;
         }
 
-        $this->getMongoCollection()->update(array('_id' => new \MongoId($id)), $data);
+        $mongoId = new \MongoId($id);
+        if ($mongoId->{$id} != $id) {
+            $mongoId = $id;
+        }
+
+        $condition = array('_id' => $mongoId);
+
+        $this->getMongoCollection()->update($condition, $data);
 
         $model->markClean();
 
@@ -387,7 +394,12 @@ class Mapper extends AbstractMapper
             throw new \InvalidArgumentException('Cant delete model - primary property id is empty');
         }
 
-        $condition = array('_id' => new \MongoId($id));
+        $mongoId = new \MongoId($id);
+        if ($mongoId->{$id} != $id) {
+            $mongoId = $id;
+        }
+
+        $condition = array('_id' => $mongoId);
 
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
