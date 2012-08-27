@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\View\Model;
+namespace GeometriaLab\Api\View\Model;
 
 class ApiModel extends \Zend\View\Model\ViewModel
 {

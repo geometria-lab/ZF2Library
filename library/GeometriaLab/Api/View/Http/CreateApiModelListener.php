@@ -1,17 +1,17 @@
 <?php
 
-namespace GeometriaLab\View\Http;
+namespace GeometriaLab\Api\View\Http;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
-use Zend\EventManager\EventManagerInterface as Events;
+use Zend\EventManager\EventManagerInterface as ZendEvents;
 use Zend\Mvc\MvcEvent as ZendMvcEvent;
 
-use GeometriaLab\View\Model\ApiModel;
+use GeometriaLab\Api\View\Model\ApiModel;
 use GeometriaLab\Model;
 
-//use Zend\Stdlib\ArrayUtils;
-//use Zend\View\Model\ViewModel;
-
+/**
+ *
+ */
 class CreateApiModelListener implements ZendListenerAggregateInterface
 {
     /**
@@ -24,10 +24,10 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
     /**
      * Attach listeners
      *
-     * @param  Events $events
+     * @param  ZendEvents $events
      * @return void
      */
-    public function attach(Events $events)
+    public function attach(ZendEvents $events)
     {
         $this->listeners[] = $events->attach('dispatch', array($this, 'createApiModel'),  -99);
         $this->listeners[] = $events->attach('dispatch', array($this, 'hydrateData'),  1);
@@ -36,10 +36,10 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
     /**
      * Detach listeners
      *
-     * @param  Events $events
+     * @param  ZendEvents $events
      * @return void
      */
-    public function detach(Events $events)
+    public function detach(ZendEvents $events)
     {
         foreach ($this->listeners as $index => $listener) {
             if ($events->detach($listener)) {
@@ -48,6 +48,9 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         }
     }
 
+    /**
+     * @param \Zend\Mvc\MvcEvent $e
+     */
     public function createApiModel(ZendMvcEvent $e)
     {
         $result = $e->getResult();
@@ -96,6 +99,9 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         $e->setResult($apiModel);
     }
 
+    /**
+     * @param \Zend\Mvc\MvcEvent $e
+     */
     public function hydrateData(ZendMvcEvent $e)
     {
         $result = $e->getResult();

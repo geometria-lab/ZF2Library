@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\View\Renderer;
+namespace GeometriaLab\Api\View\Renderer;
 
 use Zend\View\Renderer\RendererInterface as ZendViewRendererInterface;
 use Zend\View\Resolver\ResolverInterface as ZendViewResolver;

@@ -7,8 +7,11 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Mvc\Controller\Action;
+namespace GeometriaLab\Api\Mvc\Controller\Action;
 
+/**
+ *
+ */
 class Params extends \GeometriaLab\Model\Model
 {
 

@@ -1,13 +1,16 @@
 <?php
 
-namespace GeometriaLab\Mvc\Router\Http;
+namespace GeometriaLab\Api\Mvc\Router\Http;
 
 use Traversable;
-use Zend\Stdlib\ArrayUtils;
-use Zend\Stdlib\RequestInterface as Request;
-use Zend\Mvc\Router\Exception;
-use Zend\Mvc\Router\Http\RouteMatch;
+use Zend\Stdlib\ArrayUtils as ZendArrayUtils;
+use Zend\Stdlib\RequestInterface as ZendRequest;
+use Zend\Mvc\Router\Exception as ZendRouterException;
+use Zend\Mvc\Router\Http\RouteMatch as ZendRouteMatch;
 
+/**
+ *
+ */
 class Api implements \Zend\Mvc\Router\Http\RouteInterface
 {
     /**
@@ -54,9 +57,9 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     public static function factory($options = array())
     {
         if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
+            $options = ZendArrayUtils::iteratorToArray($options);
         } elseif (!is_array($options)) {
-            throw new Exception\InvalidArgumentException(__METHOD__ . ' expects an array or Traversable set of options');
+            throw new ZendRouterException\InvalidArgumentException(__METHOD__ . ' expects an array or Traversable set of options');
         }
 
         if (!isset($options['constraints'])) {
@@ -74,11 +77,11 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      * match(): defined by RouteInterface interface.
      *
      * @see    Route::match()
-     * @param  Request $request
+     * @param  ZendRequest $request
      * @param  string|null $pathOffset
-     * @return RouteMatch
+     * @return ZendRouteMatch
      */
-    public function match(Request $request, $pathOffset = null)
+    public function match(ZendRequest $request, $pathOffset = null)
     {
         if (!method_exists($request, 'getUri')) {
             return null;
@@ -88,7 +91,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $path = $uri->getPath();
         $path = trim($path, '/');
 
-        foreach (array(\GeometriaLab\View\Strategy\ApiStrategy::FORMAT_JSON, \GeometriaLab\View\Strategy\ApiStrategy::FORMAT_XML) as $format) {
+        foreach (array(\GeometriaLab\Api\View\Strategy\ApiStrategy::FORMAT_JSON, \GeometriaLab\Api\View\Strategy\ApiStrategy::FORMAT_XML) as $format) {
             $needle = '.' . $format;
             if (strpos($path, $needle) === strlen($path) - strlen($needle)) {
                 $request->setMetadata('format', $format);
@@ -124,7 +127,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
             }
         }
 
-        return new RouteMatch($params);
+        return new ZendRouteMatch($params);
     }
 
     /**
@@ -133,11 +136,12 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      * @see    Route::assemble()
      * @param  array $params
      * @param  array $options
+     * @throws \Zend\Mvc\Router\Exception\RuntimeException
      * @return mixed
      */
     public function assemble(array $params = array(), array $options = array())
     {
-        throw new \Exception\RuntimeException;
+        throw new \Zend\Mvc\Router\Exception\RuntimeException;
     }
 
     /**
@@ -151,6 +155,10 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         return $this->assembledParams;
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     protected function isValidId($value)
     {
         return is_numeric($value) || preg_match('/^[a-hA-H0-9]{24}$/', $value);

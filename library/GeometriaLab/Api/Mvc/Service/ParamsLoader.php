@@ -7,9 +7,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Mvc\Service;
+namespace GeometriaLab\Api\Mvc\Service;
 
-use Zend\Mvc\Router\RouteMatch;
+use Zend\Mvc\Router\RouteMatch as ZendRouteMatch;
 
 /**
  *
@@ -25,7 +25,7 @@ class ParamsLoader
      * @param \Zend\Mvc\Router\RouteMatch $routeMatch
      * @return mixed
      */
-    public function getByRouteMatch(RouteMatch $routeMatch)
+    public function getByRouteMatch(ZendRouteMatch $routeMatch)
     {
         $parts = explode('\\', $routeMatch->getParam('__NAMESPACE__'));
         $paramClassName = $parts[0] . '\\' . self::PARAM_DIR . '\\' . $routeMatch->getParam('__CONTROLLER__') . '\\' . ucfirst($routeMatch->getParam('action'));

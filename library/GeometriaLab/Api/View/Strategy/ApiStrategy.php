@@ -1,25 +1,27 @@
 <?php
 
-namespace GeometriaLab\View\Strategy;
+namespace GeometriaLab\Api\View\Strategy;
 
-use Zend\EventManager\ListenerAggregateInterface;
+use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
 use Zend\View\Renderer\JsonRenderer as ZendJsonRenderer;
 use Zend\EventManager\EventManagerInterface as ZendEventManagerInterface;
 use Zend\View\ViewEvent as ZendViewEvent;
 
-use GeometriaLab\View\Renderer\XmlRenderer;
+use GeometriaLab\Api\View\Renderer\XmlRenderer;
 
-
-//use Zend\Http\Request as HttpRequest;
-//use Zend\Http\Response as HttpResponse;
-//use Zend\View\Model;
-
-
-
-class ApiStrategy implements ListenerAggregateInterface
+/**
+ *
+ */
+class ApiStrategy implements ZendListenerAggregateInterface
 {
+    /**
+     *
+     */
     const FORMAT_JSON = 'json';
 
+    /**
+     *
+     */
     const FORMAT_XML = 'xml';
 
     /**
@@ -27,16 +29,29 @@ class ApiStrategy implements ListenerAggregateInterface
      */
     protected $listeners = array();
 
+    /**
+     * @var \Zend\View\Renderer\JsonRenderer
+     */
     protected $jsonRenderer;
 
+    /**
+     * @var \GeometriaLab\Api\View\Renderer\XmlRenderer
+     */
     protected $xmlRenderer;
 
+    /**
+     * @param \Zend\View\Renderer\JsonRenderer            $jsonRenderer
+     * @param \GeometriaLab\Api\View\Renderer\XmlRenderer $xmlRenderer
+     */
     public function __construct(ZendJsonRenderer $jsonRenderer, XmlRenderer $xmlRenderer)
     {
         $this->jsonRenderer = $jsonRenderer;
         $this->xmlRenderer = $xmlRenderer;
     }
 
+    /**
+     * @return array
+     */
     public function getFormats()
     {
         return array(
@@ -45,12 +60,19 @@ class ApiStrategy implements ListenerAggregateInterface
         );
     }
 
+    /**
+     * @param \Zend\EventManager\EventManagerInterface $events
+     * @param int                                      $priority
+     */
     public function attach(ZendEventManagerInterface $events, $priority = 1)
     {
         $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RENDERER, array($this, 'selectRenderer'), $priority);
         $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RESPONSE, array($this, 'injectResponse'), $priority);
     }
 
+    /**
+     * @param \Zend\EventManager\EventManagerInterface $events
+     */
     public function detach(ZendEventManagerInterface $events)
     {
         foreach ($this->listeners as $index => $listener) {
@@ -60,6 +82,10 @@ class ApiStrategy implements ListenerAggregateInterface
         }
     }
 
+    /**
+     * @param \Zend\View\ViewEvent $e
+     * @return \GeometriaLab\Api\View\Renderer\XmlRenderer|\Zend\View\Renderer\JsonRenderer
+     */
     public function selectRenderer(ZendViewEvent $e)
     {
         $format = $e->getRequest()->getMetadata('format');
@@ -71,6 +97,9 @@ class ApiStrategy implements ListenerAggregateInterface
         }
     }
 
+    /**
+     * @param \Zend\View\ViewEvent $e
+     */
     public function injectResponse(ZendViewEvent $e)
     {
         $renderer = $e->getRenderer();

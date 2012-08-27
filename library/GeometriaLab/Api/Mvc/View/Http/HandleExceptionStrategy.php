@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Mvc\View\Http;
+namespace GeometriaLab\Api\Mvc\View\Http;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface as ZendEventManagerInterface;
@@ -8,6 +8,9 @@ use Zend\Mvc\MvcEvent as ZendMvcEvent;
 use Zend\Mvc\Application as ZendApplication;
 use Zend\Http\Response as ZendHttpResponse;
 
+/**
+ *
+ */
 class HandleExceptionStrategy implements ZendListenerAggregateInterface
 {
     /**
@@ -15,11 +18,17 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
      */
     protected $listeners = array();
 
+    /**
+     * @param \Zend\EventManager\EventManagerInterface $events
+     */
     public function attach(ZendEventManagerInterface $events)
     {
         $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_DISPATCH_ERROR, array($this, 'detectNotFoundError'));
     }
 
+    /**
+     * @param \Zend\EventManager\EventManagerInterface $events
+     */
     public function detach(ZendEventManagerInterface $events)
     {
         foreach ($this->listeners as $index => $listener) {
@@ -29,6 +38,9 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
         }
     }
 
+    /**
+     * @param \Zend\Mvc\MvcEvent $e
+     */
     public function detectException(ZendMvcEvent $e)
     {
         $error = $e->getError();
