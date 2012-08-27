@@ -29,47 +29,6 @@ abstract class AbstractController extends ZendAbstractController
     protected $eventIdentifier = __CLASS__;
 
     /**
-     * Return list of resources
-     *
-     * @param Params $params
-     * @return mixed
-     */
-    abstract public function getList(Params $params);
-
-
-    /**
-     * Return single resource
-     *
-     * @param Params $params
-     * @return mixed
-     */
-    abstract public function get(Params $params);
-
-    /**
-     * Create a new resource
-     *
-     * @param Params $params
-     * @return mixed
-     */
-    abstract public function create(Params $params);
-
-    /**
-     * Update an existing resource
-     *
-     * @param Params $params
-     * @return mixed
-     */
-    abstract public function update(Params $params);
-
-    /**
-     * Delete an existing resource
-     *
-     * @param Params $params
-     * @return mixed
-     */
-    abstract public function delete(Params $params);
-
-    /**
      * Dispatch a request
      *
      * If the route match includes an "action" key, then this acts basically like
@@ -101,83 +60,64 @@ abstract class AbstractController extends ZendAbstractController
     public function onDispatch(ZendMvcEvent $e)
     {
         $routeMatch = $e->getRouteMatch();
-        if (!$routeMatch) {
-            /**
-             * @todo Determine requirements for when route match is missing.
-             *       Potentially allow pulling directly from request metadata?
-             */
-            throw new ZendMvcException\DomainException('Missing route matches; unsure how to retrieve action');
-        }
-
         $request = $e->getRequest();
-        $action  = $routeMatch->getParam('action', false);
-        if ($action) {
-            // Handle arbitrary methods, ending in Action
-            $method = static::getMethodFromAction($action);
-            if (!method_exists($this, $method)) {
-                $method = 'notFoundAction';
-            }
-            $return = $this->$method();
-        } else {
-            // RESTful methods
 
-            $id = $routeMatch->getParam('id');
-            if ($id === null) {
-                $id = $request->getQuery()->get('id');
-            }
-
-            $subResource = $routeMatch->getParam('subResource');
-
-            switch (strtolower($request->getMethod())) {
-                case 'get':
-                    if (null !== $id) {
-                        if (null !== $subResource) {
-                            $action = 'get' . ucfirst($subResource);
-                        } else {
-                            $action = 'get';
-                        }
-                    } else {
-                        if (null !== $subResource) {
-                            $action = 'get' . ucfirst($subResource) . 'List';
-                        } else {
-                            $action = 'getList';
-                        }
-                    }
-                    break;
-                case 'post':
-                    if (null !== $id) {
-                        throw new ZendMvcException\DomainException('Post is allowed on resources only');
-                    }
-                    if (null !== $subResource) {
-                        $action = 'create' . ucfirst($subResource);
-                    } else {
-                        $action = 'create';
-                    }
-                    break;
-                case 'put':
-                    if (null === $id) {
-                        throw new ZendMvcException\DomainException('Missing identifier');
-                    }
-                    if (null !== $subResource) {
-                        throw new ZendMvcException\DomainException('Put is allowed on root resource object only');
-                    }
-                    $action = 'update';
-                    break;
-                case 'delete':
-                    if (null === $id) {
-                        throw new ZendMvcException\DomainException('Missing identifier');
-                    }
-                    if (null !== $subResource) {
-                        throw new ZendMvcException\DomainException('Delete is allowed on root resource object only');
-                    }
-                    $action = 'delete';
-                    break;
-                default:
-                    throw new ZendMvcException\DomainException('Invalid HTTP method!');
-            }
-
-            $routeMatch->setParam('action', $action);
+        $id = $routeMatch->getParam('id');
+        if ($id === null) {
+            $id = $request->getQuery()->get('id');
         }
+
+        $subResource = $routeMatch->getParam('subResource');
+
+        switch (strtolower($request->getMethod())) {
+            case 'get':
+                if (null !== $id) {
+                    if (null !== $subResource) {
+                        $action = 'get' . ucfirst($subResource);
+                    } else {
+                        $action = 'get';
+                    }
+                } else {
+                    if (null !== $subResource) {
+                        $action = 'get' . ucfirst($subResource) . 'List';
+                    } else {
+                        $action = 'getList';
+                    }
+                }
+                break;
+            case 'post':
+                if (null !== $id) {
+                    throw new ZendMvcException\DomainException('Post is allowed on resources only');
+                }
+                if (null !== $subResource) {
+                    $action = 'create' . ucfirst($subResource);
+                } else {
+                    $action = 'create';
+                }
+                break;
+            case 'put':
+                if (null === $id) {
+                    throw new ZendMvcException\DomainException('Missing identifier');
+                }
+                if (null !== $subResource) {
+                    throw new ZendMvcException\DomainException('Put is allowed on root resource object only');
+                }
+                $action = 'update';
+                break;
+            case 'delete':
+                if (null === $id) {
+                    throw new ZendMvcException\DomainException('Missing identifier');
+                }
+                if (null !== $subResource) {
+                    throw new ZendMvcException\DomainException('Delete is allowed on root resource object only');
+                }
+                $action = 'delete';
+                break;
+            default:
+                throw new ZendMvcException\DomainException('Invalid HTTP method!');
+        }
+
+        $routeMatch->setParam('action', $action);
 
         $params = $this->getServiceLocator()->get('ParamsLoader')->getByRouteMatch($routeMatch);
         $return = $this->$action($params);
