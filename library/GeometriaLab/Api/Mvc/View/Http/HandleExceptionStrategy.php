@@ -8,6 +8,8 @@ use Zend\Mvc\MvcEvent as ZendMvcEvent;
 use Zend\Mvc\Application as ZendApplication;
 use Zend\Http\Response as ZendHttpResponse;
 
+use GeometriaLab\Api\Exception as ApiException;
+
 /**
  *
  */
@@ -57,11 +59,11 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
             case ZendApplication::ERROR_CONTROLLER_NOT_FOUND:
             case ZendApplication::ERROR_CONTROLLER_INVALID:
             case ZendApplication::ERROR_ROUTER_NO_MATCH:
-                $apiException = new \GeometriaLab\Api\Exception\ResourceNotFound();
+                $apiException = new ApiException\ResourceNotFound();
                 break;
             default:
-                if (!$exception instanceof \GeometriaLab\Api\Exception\Exception) {
-                    $apiException = new \GeometriaLab\Api\Exception\ServerError();
+                if (!$exception instanceof ApiException\Exception) {
+                    $apiException = new ApiException\ServerError();
                 } else {
                     $apiException = $exception;
                 }

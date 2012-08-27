@@ -9,9 +9,21 @@
 
 namespace GeometriaLab\Api\Exception;
 
+/**
+ *
+ */
 class ResourceNotFound extends Exception
 {
+    /**
+     * @var int
+     */
     protected $errorCode = 46;
+    /**
+     * @var string
+     */
     protected $errorMessage = 'Resource not found';
+    /**
+     * @var int
+     */
     protected $httpCode = 404;
 }

@@ -9,10 +9,19 @@
 
 namespace GeometriaLab\Stdlib\Hydrator;
 
+/**
+ *
+ */
 class Schema
 {
+    /**
+     * @var array
+     */
     protected $properties;
 
+    /**
+     * @param array $properties
+     */
     public function __construct(array $properties)
     {
         $this->properties = array();
@@ -22,6 +31,9 @@ class Schema
         }
     }
 
+    /**
+     * @return array
+     */
     public function getProperties()
     {
         return $this->properties;

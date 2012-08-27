@@ -9,22 +9,43 @@
 
 namespace GeometriaLab\Api\Exception;
 
+/**
+ *
+ */
 class Exception extends \Exception
 {
+    /**
+     * @var
+     */
     protected $errorCode;
+    /**
+     * @var
+     */
     protected $errorMessage;
+    /**
+     * @var
+     */
     protected $httpCode;
 
+    /**
+     * @return mixed
+     */
     public function getErrorCode()
     {
         return $this->errorCode;
     }
 
+    /**
+     * @return mixed
+     */
     public function getHttpCode()
     {
         return $this->httpCode;
     }
 
+    /**
+     * @return mixed
+     */
     public function getErrorMessage()
     {
         return $this->errorMessage;

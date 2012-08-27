@@ -9,6 +9,8 @@
 
 namespace GeometriaLab\Api\Stdlib\Hydrator;
 
+use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
+
 use GeometriaLab\Stdlib\Hydrator\Schema;
 
 /**
@@ -26,7 +28,8 @@ abstract class Api implements \Zend\Stdlib\Hydrator\HydratorInterface
      */
     public function __construct()
     {
-        $this->schema = $this->createSchema();
+        $schema = $this->createSchema();
+        $this->setSchema($schema);
     }
 
     /**
@@ -41,6 +44,11 @@ abstract class Api implements \Zend\Stdlib\Hydrator\HydratorInterface
     public function getSchema()
     {
         return $this->schema;
+    }
+
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
     }
 
     /**
@@ -83,6 +91,6 @@ abstract class Api implements \Zend\Stdlib\Hydrator\HydratorInterface
      */
     public function hydrate(array $data, $object)
     {
-        throw new \Zend\Stdlib\Exception\BadMethodCallException("Not implemented");
+        throw new ZendBadMethodCallException("Not implemented");
     }
 }

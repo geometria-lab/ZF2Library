@@ -9,9 +9,21 @@
 
 namespace GeometriaLab\Api\Exception;
 
+/**
+ *
+ */
 class AccessDenied extends Exception
 {
+    /**
+     * @var int
+     */
     protected $errorCode = 44;
+    /**
+     * @var string
+     */
     protected $errorMessage = 'Access denied';
+    /**
+     * @var int
+     */
     protected $httpCode = 401;
 }

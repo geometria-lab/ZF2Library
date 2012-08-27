@@ -9,9 +9,21 @@
 
 namespace GeometriaLab\Api\Exception;
 
+/**
+ *
+ */
 class ServerError extends Exception
 {
+    /**
+     * @var int
+     */
     protected $errorCode = 50;
+    /**
+     * @var string
+     */
     protected $errorMessage = 'Server error';
+    /**
+     * @var int
+     */
     protected $httpCode = 500;
 }

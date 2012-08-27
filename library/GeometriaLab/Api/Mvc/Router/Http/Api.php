@@ -7,6 +7,9 @@ use Zend\Stdlib\ArrayUtils as ZendArrayUtils;
 use Zend\Stdlib\RequestInterface as ZendRequest;
 use Zend\Mvc\Router\Exception as ZendRouterException;
 use Zend\Mvc\Router\Http\RouteMatch as ZendRouteMatch;
+use Zend\Mvc\Router\Exception\RuntimeException as ZendRuntimeException;
+
+use GeometriaLab\Api\View\Strategy\ApiStrategy;
 
 /**
  *
@@ -91,7 +94,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $path = $uri->getPath();
         $path = trim($path, '/');
 
-        foreach (array(\GeometriaLab\Api\View\Strategy\ApiStrategy::FORMAT_JSON, \GeometriaLab\Api\View\Strategy\ApiStrategy::FORMAT_XML) as $format) {
+        foreach (array(ApiStrategy::FORMAT_JSON, ApiStrategy::FORMAT_XML) as $format) {
             $needle = '.' . $format;
             if (strpos($path, $needle) === strlen($path) - strlen($needle)) {
                 $request->setMetadata('format', $format);
@@ -141,7 +144,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      */
     public function assemble(array $params = array(), array $options = array())
     {
-        throw new \Zend\Mvc\Router\Exception\RuntimeException;
+        throw new ZendRuntimeException("Not implemented");
     }
 
     /**

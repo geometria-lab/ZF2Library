@@ -9,9 +9,21 @@
 
 namespace GeometriaLab\Api\Exception;
 
+/**
+ *
+ */
 class WrongFields extends Exception
 {
+    /**
+     * @var int
+     */
     protected $errorCode = 41;
+    /**
+     * @var string
+     */
     protected $errorMessage = 'Wrong fields';
+    /**
+     * @var int
+     */
     protected $httpCode = 400;
 }

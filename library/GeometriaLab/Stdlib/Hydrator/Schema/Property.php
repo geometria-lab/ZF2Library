@@ -10,6 +10,7 @@
 namespace GeometriaLab\Stdlib\Hydrator\Schema;
 
 use Zend\Filter as ZendFilter;
+use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 /**
  *
@@ -41,7 +42,7 @@ class Property
         $this->setName($name);
 
         if (empty($options['source'])) {
-            throw new \Zend\Stdlib\Exception\BadMethodCallException("Source option is required");
+            throw new ZendBadMethodCallException("Source option is required");
         }
         $this->setSource($options['source']);
 

@@ -13,7 +13,7 @@ if ('@package_version@' !== $phpUnitVersion && version_compare($phpUnitVersion, 
 }
 unset($phpUnitVersion);
 
-if (!file_exists(__DIR__ . '/../vendor/autoload.php') && !file_exists(__DIR__ . '/../../../autoload.php')) {
+if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
     echo "Composer dependencies not installed.";
     exit(1);
 }
@@ -43,7 +43,7 @@ set_include_path(implode(PATH_SEPARATOR, $path));
  * Setup autoloading
  */
 include __DIR__ .  '/autoload.php';
-include __DIR__ . '/../../../autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 /*
  * Load the user-defined test configuration file, if it exists; otherwise, load

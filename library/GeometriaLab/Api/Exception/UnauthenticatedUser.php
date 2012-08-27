@@ -9,9 +9,21 @@
 
 namespace GeometriaLab\Api\Exception;
 
+/**
+ *
+ */
 class UnauthenticatedUser extends Exception
 {
+    /**
+     * @var int
+     */
     protected $errorCode = 45;
+    /**
+     * @var string
+     */
     protected $errorMessage = 'Unauthenticated user';
+    /**
+     * @var int
+     */
     protected $httpCode = 403;
 }
