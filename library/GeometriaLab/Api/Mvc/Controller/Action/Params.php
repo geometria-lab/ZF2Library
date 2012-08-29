@@ -12,7 +12,7 @@ namespace GeometriaLab\Api\Mvc\Controller\Action;
 /**
  *
  */
-class Params extends \GeometriaLab\Model\Model
+class Params extends \GeometriaLab\Model\AbstractModel
 {
 
 }
