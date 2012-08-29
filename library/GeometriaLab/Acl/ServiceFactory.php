@@ -45,12 +45,10 @@ class ServiceFactory implements ZendFactoryInterface
         $controller = $routeMatch->getParam('controller');
         $action = $routeMatch->getParam('action');
 
-        if ($controller === null || $action === null) {
-            return false;
+        if ($controller !== null && $action !== null) {
+            $this->acl->setCurrentResource($controller);
+            $this->acl->setCurrentPrivilege($action);
         }
-
-        $this->acl->setCurrentResource($controller);
-        $this->acl->setCurrentPrivilege($action);
 
         return $this->acl;
     }
