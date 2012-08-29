@@ -23,7 +23,39 @@ class ServiceFactory implements ZendFactoryInterface
      * @var ZendAcl
      */
     private $acl;
+    /**
+     * @var array
+     */
+    private $config = array();
 
+    /**
+     * @param ZendServiceLocatorInterface $serviceLocator
+     * @return ZendAcl
+     */
+    public function createService(ZendServiceLocatorInterface $serviceLocator)
+    {
+        $config = $serviceLocator->get('Configuration');
+        if (isset($config['acl'])) {
+            $this->setConfig($config['acl']);
+        }
+
+        $this->addRoles();
+
+        $controllerNameSpace = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
+        $moduleName = explode('\\', $controllerNameSpace);
+        $this->addAcl(array_shift($moduleName));
+
+        return $this->getAcl();
+    }
+    /**
+     * @param array $config
+     * @return ServiceFactory
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
+        return $this;
+    }
     /**
      * @return ZendAcl
      */
@@ -34,30 +66,16 @@ class ServiceFactory implements ZendFactoryInterface
         }
         return $this->acl;
     }
-
-    /**
-     * @param ZendServiceLocatorInterface $serviceLocator
-     * @return ZendAcl
-     */
-    public function createService(ZendServiceLocatorInterface $serviceLocator)
-    {
-        $config = $serviceLocator->get('Configuration');
-
-        $this->addRoles();
-
-        $controllerName = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
-        $moduleName = explode('\\', $controllerName);
-        $this->addAcl(array_shift($moduleName));
-
-        return $this->getAcl();
-    }
     /**
      * @return ServiceFactory
      */
     private function addRoles()
     {
-        $this->getAcl()->addRole(new ZendGenericRole('guest'));
-
+        if (isset($this->config['roles']) && is_array($this->config['roles'])) {
+            foreach ($this->config['roles'] as $role) {
+                $this->getAcl()->addRole(new ZendGenericRole($role));
+            }
+        }
         return $this;
     }
     /**
