@@ -1,6 +1,6 @@
 {
     "name": "geometria-lab/zf2-library",
-    "description": "Zend Framework 2 library extending",
+    "description": "Geometria Lab Zend Framework 2 library extending",
     "type": "library",
     "keywords": [
         "framework",
@@ -12,11 +12,9 @@
     },
     "autoload": {
         "psr-0": {
-            "GeometriaLab": "library/"
+            "GeometriaLab": "library/",
+            "GeometriaLabTest" : "tests/"
         }
-    },
-    "config": {
-        "bin-dir": "bin"
     },
     "extra": {
         "branch-alias": {
