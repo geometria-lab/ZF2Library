@@ -35,7 +35,7 @@ abstract class Resource extends ZendResource implements ZendAssertionInterface
 
         $methodName = "assert{$privilege}";
         if (!method_exists($this, $methodName)) {
-            throw new \InvalidArgumentException("Invalid dynamic assert - need declare $this->$methodName");
+            throw new \InvalidArgumentException('Invalid dynamic assert - need declare ' . get_class($this) . '->' . $methodName);
         }
 
         return call_user_func(array($this, $methodName), $acl, $role);
