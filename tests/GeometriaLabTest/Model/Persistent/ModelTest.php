@@ -6,6 +6,8 @@ use GeometriaLabTest\Model\Persistent\TestModels\Model,
     GeometriaLabTest\Model\Persistent\TestModels\ModelWithInvalidDefinition,
     GeometriaLabTest\Model\Persistent\TestModels\ModelWithInvalidDefinition2,
     GeometriaLabTest\Model\Persistent\TestModels\ModelWithoutDefinition,
+    GeometriaLabTest\Model\Persistent\TestModels\WithInvalidRelations\NotExists,
+    GeometriaLabTest\Model\Persistent\TestModels\WithInvalidRelations\NotRelation,
     GeometriaLabTest\Model\TestModels\SubModel;
 
 
