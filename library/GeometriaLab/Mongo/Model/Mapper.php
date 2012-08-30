@@ -280,7 +280,7 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->insert($data, array('safe' => true));
 
         if ($result) {
-            $model->set('id', $data['_id']->{'$id'});
+            $model->set('id', (string)$data['_id']);
             $model->markClean();
 
             return true;
@@ -364,7 +364,9 @@ class Mapper extends AbstractMapper
             $data['$unset'] = $unsetData;
         }
 
-        $this->getMongoCollection()->update(array('_id' => new \MongoId($id)), $data);
+        $condition = $this->transformModelDataForStorage(array('id' => $id));
+
+        $this->getMongoCollection()->update($condition, $data);
 
         $model->markClean();
 
@@ -387,8 +389,7 @@ class Mapper extends AbstractMapper
             throw new \InvalidArgumentException('Cant delete model - primary property id is empty');
         }
 
-        $condition = array('_id' => new \MongoId($id));
-
+        $condition = $this->transformModelDataForStorage(array('id' => $id));
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
         if ($result) {
@@ -407,6 +408,37 @@ class Mapper extends AbstractMapper
         } else {
             return false;
         }
+    }
+
+    public function deleteByQuery(QueryInterface $query)
+    {
+        if (!$query instanceof Query) {
+            throw new \InvalidArgumentException('Query must be GeometriaLab\Mongo\Model\Query');
+        }
+
+        if ($query->hasSelect()) {
+            throw new \InvalidArgumentException('Select not supported');
+        }
+
+        if ($query->hasSort()) {
+            throw new \InvalidArgumentException('Sort not supported');
+        }
+
+        if ($query->hasOffset()) {
+            throw new \InvalidArgumentException('Offset not supported');
+        }
+
+        if ($query->hasLimit()) {
+            throw new \InvalidArgumentException('Limit not supported');
+        }
+
+        if ($query->hasWhere()) {
+            $where = $this->transformModelDataForStorage($query->getWhere());
+        } else {
+            $where = array();
+        }
+
+        return $this->getMongoCollection()->remove($where);
     }
 
     /**
@@ -429,8 +461,11 @@ class Mapper extends AbstractMapper
     {
         if (isset($data['id'])) {
             $data['_id'] = new \MongoId($data['id']);
+            if ((string)$data['_id'] != $data['id']) {
+                $data['_id'] = $data['id'];
+            }
+            unset($data['id']);
         }
-        unset($data['id']);
 
         return $data;
     }
@@ -443,7 +478,7 @@ class Mapper extends AbstractMapper
      */
     protected function transformStorageDataForModel(array $data)
     {
-        $data['id'] = $data['_id']->{'$id'};
+        $data['id'] = (string)$data['_id'];
         unset($data['_id']);
 
         return $data;

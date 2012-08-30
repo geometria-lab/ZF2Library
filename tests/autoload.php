@@ -19,7 +19,7 @@ function GeometriaLabTest_Autoloader($class)
             $file = dirname(__DIR__) . '/library/GeometriaLab/';
             break;
         case 'GeometriaLabTest':
-            $file = __DIR__ . '/GeometriaLab/';
+            $file = __DIR__ . '/GeometriaLabTest/';
             break;
         default:
             $file = false;
