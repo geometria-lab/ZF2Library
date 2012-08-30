@@ -31,6 +31,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $this->model->booleanProperty);
         $this->assertEquals(3.4, $this->model->floatProperty);
         $this->assertEquals($data['subTest'], $this->model->subTest);
+        $this->assertEquals(null, $this->model->nonSetProperty);
     }
 
     public function testGetNotPresentProperty()
@@ -110,6 +111,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->model->callbackProperty = 1;
         $this->assertEquals(1,  $this->model->getCallbackProperty());
         $this->assertEquals(1,  $this->model->callbackProperty);
+    }
+
+    public function testHas()
+    {
+        $this->assertEquals(true, $this->model->has('booleanProperty'));
+        $this->assertEquals(false, $this->model->has('nonExistsProperty'));
     }
 
     protected function getData()

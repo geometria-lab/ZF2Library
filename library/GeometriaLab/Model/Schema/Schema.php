@@ -95,12 +95,12 @@ class Schema implements SchemaInterface
      *
      * @param string $name
      * @return PropertyInterface
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function getProperty($name)
     {
         if (!$this->hasProperty($name)) {
-            throw new \Exception("Property '$name' not present in model '$this->className'");
+            throw new \InvalidArgumentException("Property '$name' not present in model '$this->className'");
         }
 
         return $this->properties[$name];

@@ -69,4 +69,42 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->query->where(array('integerProperty' => array('$in' => array('string', 2, 3))));
     }
+
+    public function testWhereWithNotImplementedOperators()
+    {
+        $this->setExpectedException('\InvalidArgumentException', 'Operator $or not implemented yet');
+        $this->query->where(array('$or' => array('$in' => array('string', 2, 3))));
+    }
+
+    public function testWhereOperatorAcceptValue()
+    {
+        $where = array('integerProperty' => array('$gt' => 1));
+        $this->query->where($where);
+        $this->assertEquals($where, $this->query->getWhere());
+    }
+
+    public function testWhereWithOperatorNotArray()
+    {
+        $this->setExpectedException('\InvalidArgumentException', 'Value of operator $mod must be array');
+        $this->query->where(array('integerProperty' => array('$mod' => 'foo')));
+    }
+
+    public function testWherePrepareModelFieldValueWithDotNotation()
+    {
+        $this->setExpectedException('\InvalidArgumentException', 'Invalid field \'arrayOfString.id\' not present in model!');
+        $this->query->where(array('arrayOfString.id' => array('$in' => array(1, 2, 3))));
+    }
+
+    public function testWhereArrayPropertyNullItemProperty()
+    {
+        $where = array('arrayOfSomeThing' => array('$gt' => 1));
+        $this->query->where($where);
+        $this->assertEquals($where, $this->query->getWhere());
+    }
+
+    public function testWherePrepareModelFieldValueWithDotNotationInvalidType()
+    {
+        $this->setExpectedException('\InvalidArgumentException', 'Invalid field \'integerProperty.id\' not present in model!');
+        $this->query->where(array('integerProperty.id' => array('$in' => array(1, 2, 3))));
+    }
 }
