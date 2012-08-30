@@ -43,7 +43,7 @@ class ServiceFactory implements ZendFactoryInterface
 
         $controllerNameSpace = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
         $moduleName = explode('\\', $controllerNameSpace);
-        $this->addAcl(array_shift($moduleName));
+        $this->addResources(array_shift($moduleName));
 
         return $this->getAcl();
     }
@@ -82,9 +82,9 @@ class ServiceFactory implements ZendFactoryInterface
      * @param $moduleName
      * @return ServiceFactory
      */
-    private function addAcl($moduleName)
+    private function addResources($moduleName)
     {
-        $pathPattern = $this->getAclPath($moduleName) . '*';
+        $pathPattern = $this->getResourcesPath($moduleName) . '*';
         foreach (ZendGlob::glob($pathPattern, ZendGlob::GLOB_BRACE) as $file) {
             /* @var \GeometriaLab\Permissions\Acl\Resource $resource */
             $resourceName = '\\' . $moduleName . '\\' . self::ACL_DIR . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
@@ -102,7 +102,7 @@ class ServiceFactory implements ZendFactoryInterface
      * @param $moduleName
      * @return string
      */
-    private function getAclPath($moduleName)
+    private function getResourcesPath($moduleName)
     {
         return 'module' . DIRECTORY_SEPARATOR
             . $moduleName . DIRECTORY_SEPARATOR
