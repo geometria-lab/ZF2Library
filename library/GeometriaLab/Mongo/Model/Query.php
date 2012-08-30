@@ -154,7 +154,7 @@ class Query extends AbstractQuery
 
                 if ($subProperty instanceof ModelProperty) {
                     $className = $subProperty->getModelClass();
-                    $schema = $className::createSchema();
+                    $schema = $className::getSchema();
 
                     return $this->prepareModelFieldValue($schema, $fullField, $subFields, $value);
                 } else {
@@ -162,7 +162,7 @@ class Query extends AbstractQuery
                 }
             } else if ($property instanceof ModelProperty) {
                 $className = $property->getModelClass();
-                $schema = $className::createSchema();
+                $schema = $className::getSchema();
 
                 return $this->prepareModelFieldValue($schema, $fullField, $subFields, $value);
             } else {
