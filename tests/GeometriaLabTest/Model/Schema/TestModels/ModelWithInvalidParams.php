@@ -1,12 +1,12 @@
 <?php
 
-namespace GeometriaLabTest\Model\TestModels\WithInvalidSchema;
+namespace GeometriaLabTest\Model\Schema\TestModels;
 
 use GeometriaLabTest\Model\TestModels\Model;
 
 /**
  * @property boolean $foo "bar"
  */
-class InvalidParams extends Model
+class ModelWithInvalidParams extends Model
 {
 }

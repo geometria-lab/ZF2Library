@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Model\TestModels\WithInvalidSchema;
+namespace GeometriaLabTest\Model\Schema\TestModels;
 
 use GeometriaLabTest\Model\TestModels\Model;
 
@@ -8,6 +8,6 @@ use GeometriaLabTest\Model\TestModels\Model;
  * @property boolean                                            $foo
  * @property boolean                                            $foo
  */
-class DoubleProperty extends Model
+class ModelWithDoubleProperty extends Model
 {
 }

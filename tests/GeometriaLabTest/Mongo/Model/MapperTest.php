@@ -74,12 +74,6 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($model, $fetchedModel);
     }
 
-    public function testGetOneQueryNotQuery()
-    {
-        //$this->setExpectedException('\InvalidArgumentException', 'Invalid field \'integerProperty.id\' not present in model!');
-        Model::getMapper()->getOne(new \stdClass());
-    }
-
     public function testGetAll()
     {
         $model = new Model();

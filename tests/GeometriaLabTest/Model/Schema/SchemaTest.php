@@ -2,9 +2,7 @@
 
 namespace GeometriaLabTest\Model\Schema;
 
-use GeometriaLab\Model\Schema\Schema,
-    GeometriaLab\Model\Model,
-    GeometriaLabTest\Model\TestModels\WithInvalidSchema\DoubleProperty;
+use GeometriaLab\Model\Schema\Schema;
 
 class SchemaTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,19 +22,19 @@ class SchemaTest extends \PHPUnit_Framework_TestCase
     public function testParsePropertyTag()
     {
         $this->setExpectedException('InvalidArgumentException', 'Property with name \'foo\' already exists');
-        new Schema('GeometriaLabTest\Model\TestModels\WithInvalidSchema\DoubleProperty');
+        new Schema('GeometriaLabTest\Model\Schema\TestModels\ModelWithDoubleProperty');
     }
 
     public function testGetParamsFromTag()
     {
         $this->setExpectedException('InvalidArgumentException', 'Not valid params for property \'foo\'');
-        new Schema('GeometriaLabTest\Model\TestModels\WithInvalidSchema\InvalidParams');
+        new Schema('GeometriaLabTest\Model\Schema\TestModels\ModelWithInvalidParams');
     }
 
     public function testCreateProperty()
     {
         $this->setExpectedException('InvalidArgumentException', 'Invalid property type \'bulean\'');
-        new Schema('GeometriaLabTest\Model\TestModels\WithInvalidSchema\InvalidType');
+        new Schema('GeometriaLabTest\Model\Schema\TestModels\ModelWithInvalidType');
     }
 }
 

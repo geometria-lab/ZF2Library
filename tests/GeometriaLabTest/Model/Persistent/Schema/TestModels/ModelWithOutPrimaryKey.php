@@ -5,8 +5,9 @@ namespace GeometriaLabTest\Model\Persistent\Schema\TestModels;
 use GeometriaLabTest\Model\Persistent\TestModels\Model;
 
 /**
- * @property bulean $foo
+ * @method static \GeometriaLab\Model\Persistent\Mapper\Mock getMapper()
  */
-class InvalidType extends Model
+class ModelWithOutPrimaryKey extends Model
 {
+
 }
