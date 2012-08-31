@@ -18,9 +18,16 @@ class ServiceFactory implements ZendFactoryInterface
     private $config = array();
 
     /**
+     * Mongo instances
+     *
+     * @var \Mongo[]
+     */
+    protected $mongoInstances = array();
+
+    /**
      * MongoDb instances
      *
-     * @var \MongoDB[]
+     * @var \MongoDb[]
      */
     protected $mongoDbInstances = array();
 
@@ -48,7 +55,7 @@ class ServiceFactory implements ZendFactoryInterface
     {
         $config = $serviceLocator->get('Configuration');
         if (!isset($config['mongo'])) {
-            throw new \InvalidArgumentException('Invalid ');
+            throw new \InvalidArgumentException('Need "mongo" param in config');
         }
 
         self::getInstance()->setConfig($config['mongo']);
@@ -67,23 +74,9 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
-     * Set MongoDB instance
+     * Get all Mongo instances
      *
-     * @param $name
-     * @param \MongoDB $mongoDb
-     * @return ServiceFactory
-     */
-    public function set($name, \MongoDB $mongoDb)
-    {
-        $this->mongoDbInstances[$name] = $mongoDb;
-
-        return $this;
-    }
-
-    /**
-     * Get all MongoDB instances
-     *
-     * @return array|\MongoDB[]
+     * @return \Mongo[]
      */
     public function getAll()
     {
@@ -113,16 +106,40 @@ class ServiceFactory implements ZendFactoryInterface
     public function has($name)
     {
         if (!isset($this->mongoDbInstances[$name])) {
-            if (isset($this->config[$name])) {
-                $mongo = new \Mongo($this->config[$name]['connectionString']);
-                $mongoDb = $mongo->selectDB($this->config[$name]['db']);
-                $this->set($name, $mongoDb);
-            }
+            return $this->create($name);
         }
         return isset($this->mongoDbInstances[$name]);
     }
 
     /**
+     * Create Mongo instance
+     *
+     * @param $name
+     * @return \Mongo
+     * @throws \InvalidArgumentException
+     */
+    public function create($name)
+    {
+        if (!isset($this->config[$name]['connectionString'])) {
+            throw new \InvalidArgumentException('Need "connectionString" param in config');
+        }
+
+        if (!isset($this->config[$name]['db'])) {
+            throw new \InvalidArgumentException('Need "db" param in config');
+        }
+
+        if (!isset($this->mongoInstances[$this->config[$name]['connectionString']])) {
+            $this->mongoInstances[$this->config[$name]['connectionString']] = new \Mongo($this->config[$name]['connectionString']);
+        }
+
+        $this->mongoDbInstances[$name] = $this->mongoInstances[$this->config[$name]['connectionString']]->selectDB($this->config[$name]['db']);
+
+        return $this->mongoDbInstances[$name];
+    }
+
+    /**
+     * Remove Mongo instance
+     *
      * @param $name
      * @return ServiceFactory
      * @throws \InvalidArgumentException
@@ -133,7 +150,7 @@ class ServiceFactory implements ZendFactoryInterface
             throw new \InvalidArgumentException("Instance '$name' is not present");
         }
 
-        unset($this->mongoDbInstances[$name]);
+        unset($this->mongoInstances[$name]);
 
         return $this;
     }
@@ -143,7 +160,7 @@ class ServiceFactory implements ZendFactoryInterface
      */
     public function removeAll()
     {
-        $this->mongoDbInstances = array();
+        $this->mongoInstances = array();
 
         return $this;
     }
