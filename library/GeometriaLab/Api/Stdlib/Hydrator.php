@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Api\Stdlib\Hydrator;
+namespace GeometriaLab\Api\Stdlib;
 
 use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
@@ -16,7 +16,7 @@ use GeometriaLab\Stdlib\Hydrator\Schema;
 /**
  *
  */
-abstract class Api implements \Zend\Stdlib\Hydrator\HydratorInterface
+abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
 {
     /**
      * @var Schema
