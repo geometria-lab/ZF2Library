@@ -18,16 +18,16 @@ class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var ZendServiceManager
      */
-    protected $sm;
+    static protected $sm;
     /**
      * @var ZendServiceManager
      */
     static protected $serviceManager;
 
-    public function setUp()
+    static public function setUpBeforeClass()
     {
         $config = self::$config;
-        $this->sm = new ZendServiceManager(
+        self::$sm = new ZendServiceManager(
             new ZendServiceManagerConfig(array(
                 'factories' => array(
                     'MongoManager' => '\GeometriaLab\Mongo\ServiceFactory',
@@ -39,12 +39,12 @@ class TestCase extends \PHPUnit_Framework_TestCase
                 ),
             ))
         );
-        MongoMapper::setServiceManager($this->sm);
+        MongoMapper::setServiceManager(self::$sm);
     }
 
     public function tearDown()
     {
-        foreach ($this->sm->get('MongoManager')->getAll() as $mongoDb) {
+        foreach (self::$sm->get('MongoManager')->getAll() as $mongoDb) {
             $mongoDb->drop();
         }
     }
