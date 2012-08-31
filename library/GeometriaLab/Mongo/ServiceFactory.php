@@ -50,7 +50,8 @@ class ServiceFactory implements ZendFactoryInterface
         if (!isset($config['mongo'])) {
             throw new \InvalidArgumentException('Invalid ');
         }
-        $this->setConfig($config['mongo']);
+
+        self::getInstance()->setConfig($config['mongo']);
 
         return self::getInstance();
     }
@@ -77,6 +78,16 @@ class ServiceFactory implements ZendFactoryInterface
         $this->mongoDbInstances[$name] = $mongoDb;
 
         return $this;
+    }
+
+    /**
+     * Get all MongoDB instances
+     *
+     * @return array|\MongoDB[]
+     */
+    public function getAll()
+    {
+        return $this->mongoDbInstances;
     }
 
     /**
