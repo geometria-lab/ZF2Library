@@ -78,7 +78,7 @@ if (defined('TESTS_GENERATE_REPORT') && TESTS_GENERATE_REPORT === true) {
 }
 
 // Config will be set to this class if available
-if (method_exists('GeometriaLab\Test\TestCase', 'setServiceManager')) {
+if (method_exists('GeometriaLabTest\Mongo\AbstractTestCase', 'setConfig')) {
     GeometriaLabTest\Mongo\AbstractTestCase::setConfig(isset($config) ? $config : array());
 }
 
