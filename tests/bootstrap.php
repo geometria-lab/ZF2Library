@@ -78,8 +78,20 @@ if (defined('TESTS_GENERATE_REPORT') && TESTS_GENERATE_REPORT === true) {
 }
 
 // Config will be set to this class if available
-if (method_exists('GeometriaLab\Test\TestCase', 'setConfig')) {
-    GeometriaLab\Test\TestCase::setConfig(isset($config) ? $config : array());
+if (method_exists('GeometriaLab\Test\TestCase', 'setServiceManager')) {
+    if (!isset($config)) {
+        $config = array();
+    }
+    GeometriaLab\Test\TestCase::setServiceManager(new Zend\ServiceManager\ServiceManager(
+        new Zend\Mvc\Service\ServiceManagerConfig(array(
+            'factories' => array(
+                'MongoManager' => '\GeometriaLab\Mongo\ServiceFactory',
+                'Configuration' => function($sm) use ($config) {
+                    return new Zend\Config\Config($config);
+                },
+            ),
+        ))
+    ));
 }
 
 /*
