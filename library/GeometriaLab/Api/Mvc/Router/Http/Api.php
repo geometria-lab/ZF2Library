@@ -16,6 +16,8 @@ use GeometriaLab\Api\View\Strategy\ApiStrategy;
  */
 class Api implements \Zend\Mvc\Router\Http\RouteInterface
 {
+    const API_MODULE_DIR = 'Api';
+
     /**
      * Default values.
      *
@@ -108,7 +110,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         if (empty($pathParts[0]) || !preg_match('/^v(\d+)$/', $pathParts[0], $matches)) {
             return null;
         }
-        $params['__NAMESPACE__'] = ucfirst($matches[0]) . '\Controller';
+        $params['__NAMESPACE__'] = self::API_MODULE_DIR . '\\' . ucfirst($matches[0]) . '\Controller';
 
         if (empty($pathParts[1]) || !preg_match('/^([\w-]+)$/', $pathParts[1], $matches)) {
             return null;
