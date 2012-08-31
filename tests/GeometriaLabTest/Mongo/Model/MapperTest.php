@@ -5,10 +5,10 @@ namespace GeometriaLabTest\Mongo\Model;
 use GeometriaLabTest\Mongo\Model\TestModels\Model,
     GeometriaLabTest\Model\TestModels\SubModel;
 
-use GeometriaLab\Test\TestCase,
+use GeometriaLabTest\Mongo\AbstractTestCase,
     GeometriaLab\Mongo\Model\Mapper;
 
-class MapperTest extends TestCase
+class MapperTest extends AbstractTestCase
 {
     public function testGet()
     {
