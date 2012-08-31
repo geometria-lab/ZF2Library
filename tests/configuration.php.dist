@@ -1,14 +1,19 @@
 <?php
 
 /**
- * MongoDb
- */
-
-defined('TESTS_MONGO_MAPPER_CONNECTION_SERVER') || define('TESTS_MONGO_MAPPER_CONNECTION_SERVER', "127.0.0.1");
-defined('TESTS_MONGO_MAPPER_CONNECTION_DB') || define('TESTS_MONGO_MAPPER_CONNECTION_DB', "geometria-lab-zf2-library-tests");
-
-/**
  * PHPUnit Code Coverage / Test Report
  */
 defined('TESTS_GENERATE_REPORT') || define('TESTS_GENERATE_REPORT', false);
 defined('TESTS_GENERATE_REPORT_TARGET') || define('TESTS_GENERATE_REPORT_TARGET', '/path/to/target');
+
+/**
+ * Configuration
+ */
+$config = array(
+    'mongo' => array(
+        'default' => array(
+            'connectionString' => 'mongodb://127.0.0.1:27017',
+            'db'               => 'test',
+        ),
+    ),
+);

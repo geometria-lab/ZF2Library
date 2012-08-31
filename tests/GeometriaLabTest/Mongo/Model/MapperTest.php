@@ -5,34 +5,11 @@ namespace GeometriaLabTest\Mongo\Model;
 use GeometriaLabTest\Mongo\Model\TestModels\Model,
     GeometriaLabTest\Model\TestModels\SubModel;
 
-use GeometriaLab\Mongo\Manager,
+use GeometriaLabTest\Mongo\AbstractTestCase,
     GeometriaLab\Mongo\Model\Mapper;
 
-class MapperTest extends \PHPUnit_Framework_TestCase
+class MapperTest extends AbstractTestCase
 {
-    static public function setUpBeforeClass()
-    {
-        $manager = Manager::getInstance();
-        if (!$manager->has('default')) {
-            $mongo = new \Mongo(TESTS_MONGO_MAPPER_CONNECTION_SERVER);
-            $mongoDb = $mongo->selectDB(TESTS_MONGO_MAPPER_CONNECTION_DB);
-            $manager->set('default', $mongoDb);
-        }
-    }
-
-    static public function tearDownAfterClass()
-    {
-        $manager = Manager::getInstance();
-        $manager->get('default')->drop();
-    }
-
-    public function tearDown()
-    {
-        $query = Model::getMapper()->createQuery();
-
-        Model::getMapper()->deleteByQuery($query);
-    }
-
     public function testGet()
     {
         $model = new Model();
