@@ -77,6 +77,11 @@ if (defined('TESTS_GENERATE_REPORT') && TESTS_GENERATE_REPORT === true) {
     unset($codeCoverageFilter);
 }
 
+// Config will be set to this class if available
+if (method_exists('GeometriaLab\Test\TestCase', 'setConfig')) {
+    GeometriaLab\Test\TestCase::setConfig(isset($config) ? $config : array());
+}
+
 /*
  * Unset global variables that are no longer needed.
  */
