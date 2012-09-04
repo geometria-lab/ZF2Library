@@ -102,16 +102,17 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      */
     static public function getSchema()
     {
-        $schemas = SchemaManager::getInstance();
+        $schemaManager = SchemaManager::getInstance();
 
         $className = get_called_class();
 
-        if (!$schemas->has($className)) {
+        if (!$schemaManager->has($className)) {
             $parserClassName = static::$parserClassName;
-            $schemas->add($parserClassName::getInstance()->getSchema($className));
+            $schema = $parserClassName::getInstance()->createSchema($className);
+            $schemaManager->add($schema);
         }
 
-        return $schemas->get($className);
+        return $schemaManager->get($className);
     }
 
     /**

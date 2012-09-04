@@ -21,8 +21,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function testAdd()
     {
         $this->setExpectedException('\InvalidArgumentException', 'Model \'GeometriaLabTest\Model\TestModels\Model\' schema already added');
-        $foo = DocBlockParser::getInstance()->getSchema('GeometriaLabTest\Model\TestModels\Model');
-        $bar = DocBlockParser::getInstance()->getSchema('GeometriaLabTest\Model\TestModels\Model');
+        $foo = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\Model');
+        $bar = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\Model');
         Manager::getInstance()->add($foo);
         Manager::getInstance()->add($bar);
     }
@@ -35,8 +35,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAll()
     {
-        $foo = DocBlockParser::getInstance()->getSchema('GeometriaLabTest\Model\TestModels\Model');
-        $bar = DocBlockParser::getInstance()->getSchema('GeometriaLabTest\Model\TestModels\SubModel');
+        $foo = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\Model');
+        $bar = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\SubModel');
         Manager::getInstance()->add($foo);
         Manager::getInstance()->add($bar);
         $this->assertEquals(2, count(Manager::getInstance()->getAll()));
@@ -44,8 +44,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIterator()
     {
-        $foo = DocBlockParser::getInstance()->getSchema('GeometriaLabTest\Model\TestModels\Model');
-        $bar = DocBlockParser::getInstance()->getSchema('GeometriaLabTest\Model\TestModels\SubModel');
+        $foo = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\Model');
+        $bar = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\SubModel');
         Manager::getInstance()->add($foo);
         Manager::getInstance()->add($bar);
         $this->assertEquals(true, Manager::getInstance()->getIterator() instanceof \ArrayIterator);
@@ -54,7 +54,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRemove()
     {
-        $foo = DocBlockParser::getInstance()->getSchema('GeometriaLabTest\Model\TestModels\Model');
+        $foo = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\Model');
         Manager::getInstance()->add($foo);
         $this->assertEquals(1, count(Manager::getInstance()->getAll()));
         Manager::getInstance()->remove('GeometriaLabTest\Model\TestModels\Model');

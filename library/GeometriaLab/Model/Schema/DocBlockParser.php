@@ -81,7 +81,7 @@ class DocBlockParser
      * @param $className
      * @return Schema
      */
-    public function getSchema($className)
+    public function createSchema($className)
     {
         return $this->parseDocBlock($className);
     }
