@@ -7,12 +7,19 @@ use GeometriaLabTest\Model\Persistent\TestModels\Model,
     GeometriaLabTest\Model\Persistent\TestModels\ModelWithInvalidDefinition2,
     GeometriaLabTest\Model\Persistent\TestModels\ModelWithoutDefinition,
     GeometriaLabTest\Model\Persistent\TestModels\WithInvalidRelations\NotExists,
+    GeometriaLabTest\Model\Persistent\TestModels\WithInvalidRelations\Inherit,
     GeometriaLabTest\Model\Persistent\TestModels\WithInvalidRelations\NotRelation,
     GeometriaLabTest\Model\TestModels\SubModel;
 
 
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetInheritRelation()
+    {
+        $model = new TestModels\WithInvalidRelations\Inherit();
+        $this->assertTrue($model->has('foo'));
+    }
+
     public function testGetRelationNotExists()
     {
         $this->setExpectedException('\InvalidArgumentException', 'Relation \'foo\' does not exists');
@@ -32,6 +39,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\InvalidArgumentException', 'Property \'bar\' does not exists');
         $model = new TestModels\Model();
         $model->set('bar', 'baz');
+    }
+
+    public function testGetInheritProperty()
+    {
+        $model = new TestModels\WithInvalidRelations\Inherit();
+        $this->assertTrue($model->has('stringProperty'));
     }
 
     public function testSetInvalidProperty()
