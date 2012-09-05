@@ -11,6 +11,7 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->order = new \stdClass();
         $this->order->id = 2;
+        $this->order->transactionId = 123;
 
         $this->user = new \stdClass();
         $this->user->id = 1;
@@ -23,7 +24,7 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
         $hydrator = new TestHydrators\Order();
         $data = $hydrator->extract($this->order);
 
-        $this->assertEquals($data, array('id' => 2));
+        $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
     }
 
     public function testFilters()
@@ -43,6 +44,6 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(isset($data['order']));
 
-        $this->assertEquals($data['order'], array('id' => 2));
+        $this->assertEquals($data['order'], array('id' => 2, 'transactionId' => 123));
     }
 }

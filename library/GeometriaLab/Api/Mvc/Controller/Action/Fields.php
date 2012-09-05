@@ -84,6 +84,18 @@ class Fields implements \ArrayAccess, \Countable/*, \Iterator*/
     }
 
     /**
+     * Is has some fields
+     *
+     * @return bool
+     */
+    public function hasFields()
+    {
+        return !count($this) || isset($this['*']);
+    }
+
+    /**
+     * Create Fields from string
+     *
      * @static
      * @param $fieldsString
      * @return Fields

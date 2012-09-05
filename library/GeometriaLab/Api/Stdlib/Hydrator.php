@@ -68,10 +68,7 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
     {
         $result = array();
 
-        $allFields = true;
-        if (count($fields) && !isset($fields['*'])) {
-            $allFields = false;
-        }
+        $allFields = ($fields !== null) ? $fields->hasFields() : true;
 
         foreach ($this->schema->getProperties() as $property) {
             // get initial value

@@ -17,6 +17,9 @@ class Order extends Hydrator
             'id' => array(
                 'source' => 'id',
             ),
+            'transactionId' => array(
+                'source' => 'transactionId',
+            ),
         ));
     }
 }
