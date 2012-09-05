@@ -55,7 +55,7 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
      * Extract values from an object
      *
      * @param  object $object
-     * @throws \Zend\Stdlib\Exception\BadMethodCallException
+     * @throws ZendBadMethodCallException
      * @return array
      */
     public function extract($object)
@@ -63,18 +63,25 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
         $result = array();
 
         foreach ($this->schema->getProperties() as $property) {
-
             // get initial value
             $source = $property->getSource();
-            if (is_callable($source)) {
-                $result[$property->getName()] = call_user_func($source, $object);
+            $propertyName = $property->getName();
+            if (is_subclass_of($source, get_class())) {
+                /* @var Hydrator $hydrator */
+                $hydrator = new $source();
+                if (!method_exists($hydrator, 'extract')) {
+                    throw new ZendBadMethodCallException("Invalid hydrator for property '$propertyName'");
+                }
+                $result[$propertyName] = isset($object->$propertyName) ? $hydrator->extract($object->$propertyName) : null;
+            } elseif (is_callable($source)) {
+                $result[$propertyName] = call_user_func($source, $object);
             } else {
-                $result[$property->getName()] = $object->$source;
+                $result[$propertyName] = $object->$source;
             }
 
             // cast value
             if ($property->hasFilters()) {
-                $result[$property->getName()] = $property->getFilterChain()->filter($result[$property->getName()]);
+                $result[$propertyName] = $property->getFilterChain()->filter($result[$propertyName]);
             }
         }
 

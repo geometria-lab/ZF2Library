@@ -9,13 +9,15 @@
 
 namespace GeometriaLab\Stdlib\Hydrator;
 
+use GeometriaLab\Stdlib\Hydrator\Schema\Property;
+
 /**
  *
  */
 class Schema
 {
     /**
-     * @var array
+     * @var Property[]
      */
     protected $properties;
 
@@ -27,12 +29,12 @@ class Schema
         $this->properties = array();
 
         foreach ($properties as $name => $options) {
-            $this->properties[] = new Schema\Property($name, $options);
+            $this->properties[] = new Property($name, $options);
         }
     }
 
     /**
-     * @return array
+     * @return Property[]
      */
     public function getProperties()
     {
