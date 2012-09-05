@@ -16,7 +16,8 @@ use Zend\Mvc\MvcEvent as ZendMvcEvent;
 use Zend\Stdlib\RequestInterface as ZendRequest;
 use Zend\Stdlib\ResponseInterface as ZendResponse;
 
-use GeometriaLab\Api\Mvc\Controller\Action\Params;
+use GeometriaLab\Api\Mvc\Controller\Action\Params,
+    GeometriaLab\Api\Mvc\Controller\Action\Fields;
 
 /**
  * Abstract Api Rest controller
@@ -120,7 +121,9 @@ abstract class AbstractController extends ZendAbstractController
         $routeMatch->setParam('action', $action);
 
         $params = $this->getServiceLocator()->get('ParamsLoader')->getByRouteMatch($routeMatch);
-        $return = $this->$action($params);
+        $fields = Fields::createFromString($request->getQuery()->get('_fields'));
+
+        $return = $this->$action($params, $fields);
 
         // Emit post-dispatch signal, passing:
         // - return from method, request, response
