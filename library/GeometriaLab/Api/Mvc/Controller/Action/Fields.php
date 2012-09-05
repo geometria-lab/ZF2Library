@@ -4,7 +4,7 @@ namespace GeometriaLab\Api\Mvc\Controller\Action;
 
 use Zend\Filter\Exception\RuntimeException as ZendFilterRuntimeException;
 
-class Fields implements \ArrayAccess, \Countable/*, \Iterator*/
+class Fields implements \ArrayAccess, \Countable
 {
     const FLAG = true;
 
