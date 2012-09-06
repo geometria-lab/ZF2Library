@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Stdlib\Hydrator;
+namespace GeometriaLab\Stdlib\Extractor;
 
 use GeometriaLab\Api\Exception\WrongFields;
 

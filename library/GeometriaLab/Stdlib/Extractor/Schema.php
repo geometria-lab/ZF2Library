@@ -7,9 +7,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Stdlib\Hydrator;
+namespace GeometriaLab\Stdlib\Extractor;
 
-use GeometriaLab\Stdlib\Hydrator\Schema\Property;
+use GeometriaLab\Stdlib\Extractor\Schema\Property;
 
 /**
  *

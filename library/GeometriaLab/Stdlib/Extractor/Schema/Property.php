@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Stdlib\Hydrator\Schema;
+namespace GeometriaLab\Stdlib\Extractor\Schema;
 
 use Zend\Filter as ZendFilter;
 use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;

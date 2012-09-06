@@ -1,12 +1,12 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\Hydrator\TestHydrators;
+namespace GeometriaLabTest\Stdlib\Extractor\TestExtractors;
 
-use GeometriaLab\Stdlib\Hydrator\Schema,
-    GeometriaLab\Api\Stdlib\Hydrator;
+use GeometriaLab\Stdlib\Extractor\Schema,
+    GeometriaLab\Stdlib\Extractor\Extractor;
 
 
-class User extends Hydrator
+class User extends Extractor
 {
     /**
      * @return Schema
@@ -26,7 +26,7 @@ class User extends Hydrator
                 )
             ),
             'order' => array(
-                'source' => 'GeometriaLabTest\StdLib\Hydrator\TestHydrators\Order',
+                'source' => 'GeometriaLabTest\StdLib\Extractor\TestExtractors\Order',
             ),
         ));
     }

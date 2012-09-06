@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Stdlib\Hydrator;
+namespace GeometriaLab\Stdlib\Extractor;
 
 use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\ServiceManager\ServiceLocatorInterface as ZendServiceLocatorInterface,
@@ -8,22 +8,22 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Model\ModelInterface,
-    GeometriaLab\Api\Stdlib\Hydrator,
-    GeometriaLab\Stdlib\Hydrator\Fields;
+    GeometriaLab\Stdlib\Extractor\Extractor,
+    GeometriaLab\Stdlib\Extractor\Fields;
 
 class Service implements ZendFactoryInterface
 {
-    const HYDRATOR_DIR = 'Hydrator';
+    const EXTRACTOR_DIR = 'Extractor';
 
     /**
-     * @var Hydrator[]
+     * @var Extractor[]
      */
-    static private $hydratorInstances;
+    static private $extractorInstances;
 
     /**
      * @var string
      */
-    private $hydratorPath;
+    private $extractorPath;
 
     /**
      * @param ZendServiceLocatorInterface $serviceLocator
@@ -34,7 +34,7 @@ class Service implements ZendFactoryInterface
         $controllerNameSpace = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
         $parts = explode('\\', $controllerNameSpace);
         array_pop($parts);
-        $this->hydratorPath = implode('\\', $parts) . '\\' . self::HYDRATOR_DIR;
+        $this->extractorPath = implode('\\', $parts) . '\\' . self::EXTRACTOR_DIR;
 
         return $this;
     }
@@ -46,22 +46,22 @@ class Service implements ZendFactoryInterface
      * @throws ZendBadMethodCallException
      * @throws ZendServiceNotCreatedException
      */
-    public function hydrate(ModelInterface $model, Fields $fields = null)
+    public function extract(ModelInterface $model, Fields $fields = null)
     {
-        if ($this->hydratorPath === null) {
+        if ($this->extractorPath === null) {
             throw new ZendServiceNotCreatedException('Get me from Service Manager');
         }
 
         $parts = explode('\\', get_class($model));
-        $hydratorName = $this->hydratorPath . '\\' . array_pop($parts);
+        $extractorName = $this->extractorPath . '\\' . array_pop($parts);
 
-        if (!isset(static::$hydratorInstances[$hydratorName])) {
-            if (is_subclass_of($hydratorName, 'Hydrator')) {
-                throw new ZendBadMethodCallException("Invalid hydrator for model '" . get_class($model) . "'");
+        if (!isset(static::$extractorInstances[$extractorName])) {
+            if (is_subclass_of($extractorName, 'Extractor')) {
+                throw new ZendBadMethodCallException("Invalid extractor for model '" . get_class($model) . "'");
             }
-            static::$hydratorInstances[$hydratorName] = new $hydratorName;
+            static::$extractorInstances[$extractorName] = new $extractorName;
         }
 
-        return static::$hydratorInstances[$hydratorName]->extract($model, $fields);
+        return static::$extractorInstances[$extractorName]->extract($model, $fields);
     }
 }

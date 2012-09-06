@@ -1,12 +1,12 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\Hydrator\TestHydrators;
+namespace GeometriaLabTest\Stdlib\Extractor\TestExtractors;
 
-use GeometriaLab\Stdlib\Hydrator\Schema,
-    GeometriaLab\Api\Stdlib\Hydrator;
+use GeometriaLab\Stdlib\Extractor\Schema,
+    GeometriaLab\Stdlib\Extractor\Extractor;
 
 
-class Order extends Hydrator
+class Order extends Extractor
 {
     /**
      * @return Schema

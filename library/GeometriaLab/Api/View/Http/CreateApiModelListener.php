@@ -8,7 +8,7 @@ use Zend\Mvc\MvcEvent as ZendMvcEvent;
 
 use GeometriaLab\Model,
     GeometriaLab\Api\View\Model\ApiModel,
-    GeometriaLab\Stdlib\Hydrator\Fields;
+    GeometriaLab\Stdlib\Extractor\Fields;
 
 /**
  *
@@ -115,7 +115,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
         if ($data instanceof Model\ModelInterface || $data instanceof Model\CollectionInterface) {
             $fields = Fields::createFromString($e->getRequest()->getQuery()->get('_fields'));
-            $data = $e->getApplication()->getServiceManager()->get('Hydrator')->hydrate($data, $fields);
+            $data = $e->getApplication()->getServiceManager()->get('Extractor')->extract($data, $fields);
 
             if ($result instanceof ApiModel) {
                 $result->setVariable(ApiModel::FIELD_DATA, $data);

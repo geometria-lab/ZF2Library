@@ -7,18 +7,18 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Api\Stdlib;
+namespace GeometriaLab\Stdlib\Extractor;
 
 use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
-use GeometriaLab\Stdlib\Hydrator\Schema,
-    GeometriaLab\Stdlib\Hydrator\Fields,
+use GeometriaLab\Stdlib\Extractor\Schema,
+    GeometriaLab\Stdlib\Extractor\Fields,
     GeometriaLab\Api\Exception\WrongFields;
 
 /**
  *
  */
-abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
+abstract class Extractor
 {
     /**
      * @var Fields
@@ -62,8 +62,9 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
      *
      * @param  object $object
      * @param  Fields $fields
-     * @throws ZendBadMethodCallException
      * @return array
+     * @throws WrongFields
+     * @throws ZendBadMethodCallException
      */
     public function extract($object, Fields $fields = null)
     {
@@ -89,10 +90,10 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
                 continue;
             }
             if (is_subclass_of($source, get_class())) {
-                /* @var Hydrator $hydrator */
-                $hydrator = new $source();
-                if (!method_exists($hydrator, 'extract')) {
-                    throw new ZendBadMethodCallException("Invalid hydrator for property '$propertyName'");
+                /* @var Extractor $extractor */
+                $extractor = new $source();
+                if (!method_exists($extractor, 'extract')) {
+                    throw new ZendBadMethodCallException("Invalid extractor for property '$propertyName'");
                 }
 
                 $childFields = null;
@@ -100,7 +101,7 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
                     $childFields = $fields[$propertyName];
                 }
 
-                $result[$propertyName] = isset($object->$propertyName) ? $hydrator->extract($object->$propertyName, $childFields) : null;
+                $result[$propertyName] = isset($object->$propertyName) ? $extractor->extract($object->$propertyName, $childFields) : null;
             } elseif (is_callable($source)) {
                 $result[$propertyName] = call_user_func($source, $object);
             } else {
@@ -114,18 +115,5 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Hydrate $object with the provided $data.
-     *
-     * @param  array  $data
-     * @param  object $object
-     * @throws \Zend\Stdlib\Exception\BadMethodCallException
-     * @return object
-     */
-    public function hydrate(array $data, $object)
-    {
-        throw new ZendBadMethodCallException("Not implemented");
     }
 }

@@ -1,8 +1,11 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\Hydrator;
+namespace GeometriaLabTest\Stdlib\Extractor;
 
-class HydratorTest extends \PHPUnit_Framework_TestCase
+use GeometriaLabTest\Stdlib\Extractor\TestExtractors\User,
+    GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order;
+
+class ExtractorTest extends \PHPUnit_Framework_TestCase
 {
     private $order;
     private $user;
@@ -21,7 +24,7 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
 
     public function testExtract()
     {
-        $hydrator = new TestHydrators\Order();
+        $hydrator = new Order();
         $data = $hydrator->extract($this->order);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
@@ -29,7 +32,7 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
 
     public function testFilters()
     {
-        $hydrator = new TestHydrators\User();
+        $hydrator = new User();
         $data = $hydrator->extract($this->user);
 
         $this->assertTrue(isset($data['name']));
@@ -39,7 +42,7 @@ class HydratorTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractRecursive()
     {
-        $hydrator = new TestHydrators\User();
+        $hydrator = new User();
         $data = $hydrator->extract($this->user);
 
         $this->assertTrue(isset($data['order']));

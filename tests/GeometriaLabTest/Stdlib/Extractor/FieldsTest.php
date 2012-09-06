@@ -1,8 +1,11 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\Hydrator;
+namespace GeometriaLabTest\Stdlib\Extractor;
 
-use GeometriaLab\Stdlib\Hydrator\Fields;
+use GeometriaLab\Stdlib\Extractor\Fields;
+
+use GeometriaLabTest\Stdlib\Extractor\TestExtractors\User,
+    GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order;
 
 class FieldsTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,7 +36,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     public function testExtractOneField()
     {
         $fields = Fields::createFromString('id');
-        $hydrator = new TestHydrators\Order();
+        $hydrator = new Order();
         $data = $hydrator->extract($this->order, $fields);
 
         $this->assertEquals($data, array('id' => 2));
@@ -42,7 +45,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     public function testExtractSeveralFields()
     {
         $fields = Fields::createFromString('id,transactionId');
-        $hydrator = new TestHydrators\Order();
+        $hydrator = new Order();
         $data = $hydrator->extract($this->order, $fields);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
@@ -53,14 +56,14 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
 
         $fields = Fields::createFromString('id,foo');
-        $hydrator = new TestHydrators\Order();
+        $hydrator = new Order();
         $hydrator->extract($this->order, $fields);
     }
 
     public function testExtractAllFields()
     {
         $fields = Fields::createFromString('*');
-        $hydrator = new TestHydrators\Order();
+        $hydrator = new Order();
         $data = $hydrator->extract($this->order, $fields);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
@@ -69,7 +72,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     public function testExtractAllNestedFields()
     {
         $fields = Fields::createFromString('*');
-        $hydrator = new TestHydrators\User();
+        $hydrator = new User();
         $data = $hydrator->extract($this->user, $fields);
 
         $equalsData = array(
@@ -87,7 +90,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     public function testExtractOneFieldsAndOneNestedFields()
     {
         $fields = Fields::createFromString('id,order(transactionId)');
-        $hydrator = new TestHydrators\User();
+        $hydrator = new User();
         $data = $hydrator->extract($this->user, $fields);
 
         $equalsData = array(
@@ -105,7 +108,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
 
         $fields = Fields::createFromString('id,order(foo)');
-        $hydrator = new TestHydrators\User();
+        $hydrator = new User();
         $hydrator->extract($this->user, $fields);
     }
 }
