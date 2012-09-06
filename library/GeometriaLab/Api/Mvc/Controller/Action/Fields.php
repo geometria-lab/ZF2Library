@@ -4,7 +4,7 @@ namespace GeometriaLab\Api\Mvc\Controller\Action;
 
 use GeometriaLab\Api\Exception\WrongFields;
 
-class Fields implements \ArrayAccess, \Countable
+class Fields implements \ArrayAccess, \Countable, \IteratorAggregate
 {
     const FLAG = true;
 
@@ -30,6 +30,14 @@ class Fields implements \ArrayAccess, \Countable
                 $this[$key] = clone $value;
             }
         }
+    }
+
+    /**
+     * @return \Traversable
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->data);
     }
 
     /**

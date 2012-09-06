@@ -29,7 +29,7 @@ class Schema
         $this->properties = array();
 
         foreach ($properties as $name => $options) {
-            $this->properties[] = new Property($name, $options);
+            $this->properties[$name] = new Property($name, $options);
         }
     }
 

@@ -12,7 +12,8 @@ namespace GeometriaLab\Api\Stdlib;
 use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Stdlib\Hydrator\Schema,
-    GeometriaLab\Api\Mvc\Controller\Action\Fields;
+    GeometriaLab\Api\Mvc\Controller\Action\Fields,
+    GeometriaLab\Api\Exception\WrongFields;
 
 /**
  *
@@ -67,10 +68,19 @@ abstract class Hydrator implements \Zend\Stdlib\Hydrator\HydratorInterface
     public function extract($object, Fields $fields = null)
     {
         $result = array();
-
+        $selectProperties = $schemaProperties = $this->schema->getProperties();
         $allFields = ($fields !== null) ? $fields->hasFields() : true;
 
-        foreach ($this->schema->getProperties() as $property) {
+        if (!$allFields) {
+            foreach ($fields as $name => $value) {
+                if (!isset($schemaProperties[$name])) {
+                    throw new WrongFields('Wrong fields provided');
+                }
+                $selectProperties[$name] = $schemaProperties[$name];
+            }
+        }
+
+        foreach ($selectProperties as $property) {
             // get initial value
             $source = $property->getSource();
             $propertyName = $property->getName();
