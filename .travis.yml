@@ -4,8 +4,7 @@ php:
   - 5.4
 before_script:
   # Composer
-  - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev
+  - composer install
   # Mongo
   - wget http://pecl.php.net/get/mongo-1.2.10.tgz
   - tar -xzf mongo-1.2.10.tgz
