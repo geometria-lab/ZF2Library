@@ -48,6 +48,15 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
     }
 
+    public function testExtractWrongField()
+    {
+        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
+
+        $fields = Fields::createFromString('id,foo');
+        $hydrator = new TestHydrators\Order();
+        $hydrator->extract($this->order, $fields);
+    }
+
     public function testExtractAllFields()
     {
         $fields = Fields::createFromString('*');
@@ -89,5 +98,14 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($data, $equalsData);
+    }
+
+    public function testExtractWrongNestedField()
+    {
+        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
+
+        $fields = Fields::createFromString('id,order(foo)');
+        $hydrator = new TestHydrators\User();
+        $hydrator->extract($this->user, $fields);
     }
 }
