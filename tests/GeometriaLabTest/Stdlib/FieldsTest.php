@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Stdlib;
 
-use GeometriaLab\Api\Mvc\Controller\Action\Fields;
+use GeometriaLab\Stdlib\Hydrator\Fields;
 
 class FieldsTest extends \PHPUnit_Framework_TestCase
 {

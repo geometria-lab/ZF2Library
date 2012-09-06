@@ -8,7 +8,7 @@ use Zend\Mvc\MvcEvent as ZendMvcEvent;
 
 use GeometriaLab\Model,
     GeometriaLab\Api\View\Model\ApiModel,
-    GeometriaLab\Api\Mvc\Controller\Action\Fields;
+    GeometriaLab\Stdlib\Hydrator\Fields;
 
 /**
  *

@@ -12,7 +12,7 @@ namespace GeometriaLab\Api\Stdlib;
 use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Stdlib\Hydrator\Schema,
-    GeometriaLab\Api\Mvc\Controller\Action\Fields,
+    GeometriaLab\Stdlib\Hydrator\Fields,
     GeometriaLab\Api\Exception\WrongFields;
 
 /**

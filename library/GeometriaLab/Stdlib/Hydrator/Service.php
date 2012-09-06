@@ -9,7 +9,7 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
 
 use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Api\Stdlib\Hydrator,
-    GeometriaLab\Api\Mvc\Controller\Action\Fields;
+    GeometriaLab\Stdlib\Hydrator\Fields;
 
 class Service implements ZendFactoryInterface
 {

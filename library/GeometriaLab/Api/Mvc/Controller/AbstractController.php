@@ -16,8 +16,7 @@ use Zend\Mvc\MvcEvent as ZendMvcEvent;
 use Zend\Stdlib\RequestInterface as ZendRequest;
 use Zend\Stdlib\ResponseInterface as ZendResponse;
 
-use GeometriaLab\Api\Mvc\Controller\Action\Params,
-    GeometriaLab\Api\Mvc\Controller\Action\Fields;
+use GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 /**
  * Abstract Api Rest controller

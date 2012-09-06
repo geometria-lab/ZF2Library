@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Api\Mvc\Controller\Action;
+namespace GeometriaLab\Stdlib\Hydrator;
 
 use GeometriaLab\Api\Exception\WrongFields;
 
