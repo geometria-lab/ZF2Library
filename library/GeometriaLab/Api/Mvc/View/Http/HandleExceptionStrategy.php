@@ -55,6 +55,17 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
             return;
         }
 
+        if (APPLICATION_ENV === 'production') {
+            $error = new \Shiterator\Error\Exception($exception);
+            $shiterator = \Shiterator\ErrorHandler::getInstance();
+            $shiterator->getClient()->addError($error);
+        } else {
+            $config = $e->getApplication()->getServiceManager()->get('Config');
+            if (!empty($config['throwExceptions'])) {
+                throw $exception;
+            }
+        }
+
         switch ($error) {
             case ZendApplication::ERROR_CONTROLLER_NOT_FOUND:
             case ZendApplication::ERROR_CONTROLLER_INVALID:

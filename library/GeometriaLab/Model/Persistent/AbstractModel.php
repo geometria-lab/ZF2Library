@@ -15,7 +15,7 @@ use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as A
 
 abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implements ModelInterface
 {
-    static protected $schemaClassName = 'GeometriaLab\Model\Persistent\Schema\Schema';
+    static protected $parserClassName = 'GeometriaLab\Model\Persistent\Schema\DocBlockParser';
 
     /**
      * Clean property values

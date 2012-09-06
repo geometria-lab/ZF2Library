@@ -2,13 +2,14 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Schema\SchemaInterface,
+use GeometriaLab\Model\Schema\DocBlockParser,
+    GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
 abstract class AbstractModel extends Schemaless\Model implements ModelInterface
 {
-    static protected $schemaClassName = 'GeometriaLab\Model\Schema\Schema';
+    static protected $parserClassName = 'GeometriaLab\Model\Schema\DocBlockParser';
 
     /**
      * Constructor
@@ -101,15 +102,17 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      */
     static public function getSchema()
     {
-        $schemas = SchemaManager::getInstance();
+        $schemaManager = SchemaManager::getInstance();
 
         $className = get_called_class();
 
-        if (!$schemas->has($className)) {
-            $schemas->add(new static::$schemaClassName($className));
+        if (!$schemaManager->has($className)) {
+            $parserClassName = static::$parserClassName;
+            $schema = $parserClassName::getInstance()->createSchema($className);
+            $schemaManager->add($schema);
         }
 
-        return $schemas->get($className);
+        return $schemaManager->get($className);
     }
 
     /**

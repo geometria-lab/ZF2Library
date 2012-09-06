@@ -55,17 +55,26 @@ class BelongsTo extends AbstractRelation
             if ($targetPropertyValue === null) {
                 throw new \InvalidArgumentException('Target property is null');
             }
+
+            $this->targetModel = false;
         } else {
             $targetPropertyValue = null;
-        }
 
-        $this->targetModel = $targetModel;
+            $this->targetModel = null;
+        }
 
         $originPropertyName = $this->getProperty()->getOriginProperty();
 
         if ($this->getOriginModel()->get($originPropertyName) !== $targetPropertyValue) {
             $this->getOriginModel()->set($originPropertyName, $targetPropertyValue);
         }
+
+        return $this;
+    }
+
+    public function resetTargetModel()
+    {
+        $this->targetModel = false;
 
         return $this;
     }

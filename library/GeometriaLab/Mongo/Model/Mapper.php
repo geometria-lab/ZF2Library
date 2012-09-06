@@ -12,6 +12,8 @@ use GeometriaLab\Mongo,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne as HasOneProperty,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany as HasManyProperty;
 
+use Zend\ServiceManager\ServiceManager as ZendServiceManager;
+
 class Mapper extends AbstractMapper
 {
     /**
@@ -34,6 +36,11 @@ class Mapper extends AbstractMapper
      * @var bool
      */
     protected $isPrimaryKeysValidated = false;
+
+    /**
+     * @var ZendServiceManager
+     */
+    static protected $serviceManager;
 
     /**
      * Set collection name
@@ -452,6 +459,16 @@ class Mapper extends AbstractMapper
     }
 
     /**
+     * Set Service Manager
+     *
+     * @param ZendServiceManager $serviceManager
+     */
+    static public function setServiceManager(ZendServiceManager $serviceManager)
+    {
+        static::$serviceManager = $serviceManager;
+    }
+
+    /**
      * Transform model data for storage
      *
      * @param array $data
@@ -484,7 +501,6 @@ class Mapper extends AbstractMapper
         return $data;
     }
 
-
     /**
      * Get MongoDB instance
      *
@@ -492,7 +508,7 @@ class Mapper extends AbstractMapper
      */
     protected function getMongo()
     {
-        return Mongo\Manager::getInstance()->get($this->getMongoInstanceName());
+        return self::$serviceManager->get('MongoManager')->get($this->getMongoInstanceName());
     }
 
     /**

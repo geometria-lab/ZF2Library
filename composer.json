@@ -22,6 +22,7 @@
         }
     },
     "require" : {
-        "zendframework/zendframework" : "dev-master"
+        "zendframework/zendframework" : "dev-master",
+        "geometria-lab/shiterator": "dev-master"
     }
 }

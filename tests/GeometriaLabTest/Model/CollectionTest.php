@@ -18,8 +18,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             new Model(array('test' => 1)),
             new Model(array('test' => 2)),
             new Model(array('test' => 3)),
+            new Model(array('test' => 5)),
             new Model(array('test' => 4)),
-            new Model(array('test' => 5))
+            new Model(array('test' => 4))
         );
     }
 
@@ -56,6 +57,14 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\InvalidArgumentException');
 
         $c = new Collection();
+        $c->push(array(1));
+    }
+
+    public function testPushWithNotIteratedArgument()
+    {
+        $this->setExpectedException('\InvalidArgumentException');
+
+        $c = new Collection();
         $c->push(1);
     }
 
@@ -63,8 +72,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Collection($this->models);
 
+        $this->assertEquals($this->models[5], $c->pop());
         $this->assertEquals($this->models[4], $c->pop());
-        $this->assertEquals($this->models[3], $c->pop());
     }
 
     public function testUnshift()
@@ -79,6 +88,14 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testUnshiftWithInvalidArgument()
+    {
+        $this->setExpectedException('\InvalidArgumentException');
+
+        $c = new Collection();
+        $c->unshift(array(1));
+    }
+
+    public function testUnshiftWithNotIteratedArgument()
     {
         $this->setExpectedException('\InvalidArgumentException');
 
@@ -104,11 +121,50 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($model, $models[1]);
     }
 
+    public function testGetProperty()
+    {
+        $models = array(
+            new Model(array('test' => 1)),
+            new Model(array('test' => 2)),
+        );
+        $c = new Collection($models);
+        $this->assertEquals(
+            array(
+                $this->models[0]->test,
+                $this->models[1]->test,
+            ),
+            $c->getProperty('test')
+        );
+        $this->assertEquals(count($models), count($c->getProperty('test')));
+        $this->assertEquals(array(null,null), $c->getProperty('test2'));
+    }
+
+    public function testGetPropertyPairs()
+    {
+        $model = array(
+            new Model(array('test' => 'new', 'test2' => 'new2')),
+        );
+        $c = new Collection($model);
+        $this->assertEquals(
+            array($model[0]->test => $model[0]->test2),
+            $c->getPropertyPairs('test', 'test2')
+        );
+    }
+
     public function testRemove()
     {
         $c = new Collection($this->models);
         $c->remove($this->models[1]);
         $models = $c->toArray();
+        $this->assertEquals($this->models[2], $models[1]);
+    }
+
+    public function testRemoveByCondition()
+    {
+        $c = new Collection($this->models);
+        $c->removeByCondition(array('test' => $this->models[0]->test));
+        $models = $c->toArray();
+        $this->assertEquals(count($this->models)-1, count($models));
         $this->assertEquals($this->models[2], $models[1]);
     }
 
@@ -133,9 +189,13 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testShuffle()
     {
-        $c = new Collection($this->models);
+        $models = array();
+        for ($i=0; $i < 1000; $i++) {
+            $models[] = new Model(array('test' => $i));
+        }
+        $c = new Collection($models);
         $c->shuffle();
-        $this->assertNotEquals($this->models, $c->toArray());
+        $this->assertNotEquals($models, $c->toArray());
     }
 
     public function testReverse()
@@ -246,7 +306,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testCount()
     {
         $c = new Collection($this->models);
-        $this->assertEquals(5, count($c));
+        $this->assertEquals(count($this->models), count($c));
     }
 
     public function testOffsetExists()
@@ -272,14 +332,14 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $model =  new Model(array('test' => 6));
         $c[] = $model;
 
-        $this->assertEquals($model, $c->get(5));
+        $this->assertEquals($model, $c->get(6));
     }
 
     public function testOffsetUnset()
     {
         $c = new Collection($this->models);
         unset($c[4]);
-        $this->assertEquals(4, count($c));
+        $this->assertEquals(count($this->models)-1, count($c));
     }
 
     public function testToArray()
@@ -296,8 +356,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             array('test' => 1),
             array('test' => 2),
             array('test' => 3),
+            array('test' => 5),
             array('test' => 4),
-            array('test' => 5)
+            array('test' => 4)
         );
 
         $this->assertEquals($result, $c->toArray(-1));

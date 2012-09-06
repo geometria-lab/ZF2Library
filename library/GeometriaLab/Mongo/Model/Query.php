@@ -75,7 +75,7 @@ class Query extends AbstractQuery
                                 foreach($operatorValue as &$item) {
                                     $item = $this->prepareFieldValue($field, $item);
                                 }
-                            } else if ($this->operators[$operator] === self::OPERATOR_ACCEPTS_ARRAY) {
+                            } else if ($this->operators[$operator] === self::OPERATOR_ACCEPTS_VALUE) {
                                 $operatorValue = $this->prepareFieldValue($field, $operatorValue);
                             }
                         }
@@ -111,7 +111,7 @@ class Query extends AbstractQuery
     }
 
     /**
-     * Prepare field value for sepcified model
+     * Prepare field value for specified model
      *
      * @todo Refactor and optimize!
      *
@@ -133,11 +133,12 @@ class Query extends AbstractQuery
         if (!$modelSchema->hasProperty($field)) {
             throw new \InvalidArgumentException("Field in where '$fullField' not present in model!");
         }
-
+        /* @var ModelProperty|ArrayProperty $property */
         $property = $modelSchema->getProperty($field);
 
         if ($hasDotNotation) {
             if ($property instanceof ArrayProperty) {
+                /* @var ModelProperty $subProperty */
                 $subProperty = $property->getItemProperty();
 
                 if ($subProperty === null) {
@@ -152,16 +153,16 @@ class Query extends AbstractQuery
                 }
 
                 if ($subProperty instanceof ModelProperty) {
-                    $manager = SchemaManager::getInstance();
-                    $schema = $manager->get($subProperty->getModelClass());
+                    $className = $subProperty->getModelClass();
+                    $schema = $className::getSchema();
 
                     return $this->prepareModelFieldValue($schema, $fullField, $subFields, $value);
                 } else {
                     throw new \InvalidArgumentException("Invalid field '$fullField' not present in model!");
                 }
             } else if ($property instanceof ModelProperty) {
-                $manager = SchemaManager::getInstance();
-                $schema = $manager->get($property->getModelClass());
+                $className = $property->getModelClass();
+                $schema = $className::getSchema();
 
                 return $this->prepareModelFieldValue($schema, $fullField, $subFields, $value);
             } else {
