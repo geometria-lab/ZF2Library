@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Permissions\Acl;
 
+use GeometriaLab\Api\Mvc\Router\Http\Api;
+
 use Zend\Stdlib\Glob as ZendGlob,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
 
@@ -43,7 +45,7 @@ class ServiceFactory implements ZendFactoryInterface
 
         $controllerNameSpace = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
         $moduleName = explode('\\', $controllerNameSpace);
-        $this->addResources(array_shift($moduleName));
+        $this->addResources($moduleName[1]);
 
         return $this->getAcl();
     }
@@ -87,8 +89,8 @@ class ServiceFactory implements ZendFactoryInterface
         $pathPattern = $this->getResourcesPath($moduleName) . '*';
         foreach (ZendGlob::glob($pathPattern, ZendGlob::GLOB_BRACE) as $file) {
             /* @var \GeometriaLab\Permissions\Acl\Resource $resource */
-            $resourceName = '\\' . $moduleName . '\\' . self::ACL_DIR . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
-            $resourceId = $moduleName . '\\' . self::CONTROLLER_DIR . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
+            $resourceName = '\\' . Api::API_MODULE_DIR . '\\' . $moduleName . '\\' . self::ACL_DIR . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
+            $resourceId = Api::API_MODULE_DIR . '\\' . $moduleName . '\\' . self::CONTROLLER_DIR . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
             $resource = new $resourceName($resourceId);
 
             $this->getAcl()->addResource($resource);
@@ -105,6 +107,7 @@ class ServiceFactory implements ZendFactoryInterface
     private function getResourcesPath($moduleName)
     {
         return 'module' . DIRECTORY_SEPARATOR
+            . Api::API_MODULE_DIR . DIRECTORY_SEPARATOR
             . $moduleName . DIRECTORY_SEPARATOR
             . 'src' . DIRECTORY_SEPARATOR
             . $moduleName . DIRECTORY_SEPARATOR
