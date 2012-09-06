@@ -6,8 +6,9 @@ use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterfa
 use Zend\EventManager\EventManagerInterface as ZendEvents;
 use Zend\Mvc\MvcEvent as ZendMvcEvent;
 
-use GeometriaLab\Api\View\Model\ApiModel;
-use GeometriaLab\Model;
+use GeometriaLab\Model,
+    GeometriaLab\Api\View\Model\ApiModel,
+    GeometriaLab\Api\Mvc\Controller\Action\Fields;
 
 /**
  *
@@ -100,7 +101,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
     }
 
     /**
-     * @param \Zend\Mvc\MvcEvent $e
+     * @param ZendMvcEvent $e
      */
     public function hydrateData(ZendMvcEvent $e)
     {
@@ -113,7 +114,8 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         }
 
         if ($data instanceof Model\ModelInterface || $data instanceof Model\CollectionInterface) {
-            // $data = hydrate($data);
+            $fields = Fields::createFromString($e->getRequest()->getQuery()->get('_fields'));
+            $data = $e->getApplication()->getServiceManager()->get('Hydrator')->hydrate($data, $fields);
 
             if ($result instanceof ApiModel) {
                 $result->setVariable(ApiModel::FIELD_DATA, $data);

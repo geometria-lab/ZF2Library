@@ -121,9 +121,7 @@ abstract class AbstractController extends ZendAbstractController
         $routeMatch->setParam('action', $action);
 
         $params = $this->getServiceLocator()->get('ParamsLoader')->getByRouteMatch($routeMatch);
-        $fields = Fields::createFromString($request->getQuery()->get('_fields'));
-
-        $return = $this->$action($params, $fields);
+        $return = $this->$action($params);
 
         // Emit post-dispatch signal, passing:
         // - return from method, request, response

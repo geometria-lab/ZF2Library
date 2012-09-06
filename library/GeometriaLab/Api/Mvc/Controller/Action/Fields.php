@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Api\Mvc\Controller\Action;
 
-use Zend\Filter\Exception\RuntimeException as ZendFilterRuntimeException;
+use GeometriaLab\Api\Exception\WrongFields;
 
 class Fields implements \ArrayAccess, \Countable
 {
@@ -99,7 +99,7 @@ class Fields implements \ArrayAccess, \Countable
      * @static
      * @param $fieldsString
      * @return Fields
-     * @throws ZendFilterRuntimeException
+     * @throws WrongFields
      */
     static public function createFromString($fieldsString)
     {
@@ -132,7 +132,7 @@ class Fields implements \ArrayAccess, \Countable
                     }
                     unset($stack[$level--]);
                     if ($level < 0) {
-                        throw new ZendFilterRuntimeException('Bad _fields syntax');
+                        throw new WrongFields('Bad _fields syntax');
                     }
                     $field = '';
                     break;
@@ -145,7 +145,7 @@ class Fields implements \ArrayAccess, \Countable
             }
         }
         if (count($stack) > 1) {
-            throw new ZendFilterRuntimeException('Bad _fields syntax');
+            throw new WrongFields('Bad _fields syntax');
         }
 
         return new self($fields);
