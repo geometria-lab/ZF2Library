@@ -16,6 +16,11 @@ class Service implements ZendFactoryInterface
     const HYDRATOR_DIR = 'Hydrator';
 
     /**
+     * @var Hydrator[]
+     */
+    static private $hydratorInstances;
+
+    /**
      * @var string
      */
     private $hydratorPath;
@@ -50,13 +55,13 @@ class Service implements ZendFactoryInterface
         $parts = explode('\\', get_class($model));
         $hydratorName = $this->hydratorPath . '\\' . array_pop($parts);
 
-        if (is_subclass_of($hydratorName, 'Hydrator')) {
-            throw new ZendBadMethodCallException("Invalid hydrator for model '" . get_class($model) . "'");
+        if (!isset(static::$hydratorInstances[$hydratorName])) {
+            if (is_subclass_of($hydratorName, 'Hydrator')) {
+                throw new ZendBadMethodCallException("Invalid hydrator for model '" . get_class($model) . "'");
+            }
+            static::$hydratorInstances[$hydratorName] = new $hydratorName;
         }
 
-        /* @var Hydrator $hydrator*/
-        $hydrator = new $hydratorName();
-
-        return $hydrator->extract($model, $fields);
+        return static::$hydratorInstances[$hydratorName]->extract($model, $fields);
     }
 }
