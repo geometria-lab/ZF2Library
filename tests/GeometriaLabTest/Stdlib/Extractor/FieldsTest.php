@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Stdlib\Extractor;
 
-use GeometriaLab\Stdlib\Extractor\Fields;
+use GeometriaLab\Api\Stdlib\Extractor\Service;
 
 use GeometriaLabTest\Stdlib\Extractor\TestExtractors\User,
     GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order;
@@ -26,7 +26,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromString()
     {
-        $fields = Fields::createFromString('id,transactionId');
+        $fields = Service::createFieldsFromString('id,transactionId');
 
         $this->assertTrue(isset($fields['id']));
 
@@ -35,7 +35,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractOneField()
     {
-        $fields = Fields::createFromString('id');
+        $fields = Service::createFieldsFromString('id');
         $extractor = new Order();
         $data = $extractor->extract($this->order, $fields);
 
@@ -44,7 +44,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractSeveralFields()
     {
-        $fields = Fields::createFromString('id,transactionId');
+        $fields = Service::createFieldsFromString('id,transactionId');
         $extractor = new Order();
         $data = $extractor->extract($this->order, $fields);
 
@@ -55,14 +55,14 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
 
-        $fields = Fields::createFromString('id,foo');
+        $fields = Service::createFieldsFromString('id,foo');
         $extractor = new Order();
         $extractor->extract($this->order, $fields);
     }
 
     public function testExtractAllFields()
     {
-        $fields = Fields::createFromString('*');
+        $fields = Service::createFieldsFromString('*');
         $extractor = new Order();
         $data = $extractor->extract($this->order, $fields);
 
@@ -71,7 +71,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractAllNestedFields()
     {
-        $fields = Fields::createFromString('*');
+        $fields = Service::createFieldsFromString('*');
         $extractor = new User();
         $data = $extractor->extract($this->user, $fields);
 
@@ -89,7 +89,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractOneFieldsAndOneNestedFields()
     {
-        $fields = Fields::createFromString('id,order(transactionId)');
+        $fields = Service::createFieldsFromString('id,order(transactionId)');
         $extractor = new User();
         $data = $extractor->extract($this->user, $fields);
 
@@ -107,7 +107,7 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
 
-        $fields = Fields::createFromString('id,order(foo)');
+        $fields = Service::createFieldsFromString('id,order(foo)');
         $extractor = new User();
         $extractor->extract($this->user, $fields);
     }
