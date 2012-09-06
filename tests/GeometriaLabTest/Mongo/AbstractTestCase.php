@@ -2,6 +2,8 @@
 
 namespace GeometriaLabTest\Mongo;
 
+use GeometriaLab\Model\Persistent\Mapper\Manager as MapperManager;
+
 use GeometriaLab\Mongo\ServiceFactory as MongoServiceFactory,
     GeometriaLab\Mongo\Model\Mapper as MongoMapper;
 
@@ -20,12 +22,24 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      */
     static protected $serviceManager;
 
+    public function tearDown()
+    {
+        $mapperManager = MapperManager::getInstance();
+
+        foreach($mapperManager->getAll() as $mapper) {
+            if ($mapper instanceof MongoMapper) {
+                $query = $mapper->createQuery();
+                $mapper->deleteByQuery($query);
+            }
+        }
+    }
+
     static public function setUpBeforeClass()
     {
         MongoMapper::setServiceManager(self::$sm);
     }
 
-    public function tearDown()
+    static public function tearDownAfterClass()
     {
         foreach (self::$sm->get('MongoManager')->getAll() as $mongoDb) {
             $mongoDb->drop();
