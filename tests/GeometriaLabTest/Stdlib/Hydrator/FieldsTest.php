@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib;
+namespace GeometriaLabTest\Stdlib\Hydrator;
 
 use GeometriaLab\Stdlib\Hydrator\Fields;
 

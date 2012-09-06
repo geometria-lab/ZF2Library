@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib;
+namespace GeometriaLabTest\Stdlib\Hydrator;
 
 class HydratorTest extends \PHPUnit_Framework_TestCase
 {

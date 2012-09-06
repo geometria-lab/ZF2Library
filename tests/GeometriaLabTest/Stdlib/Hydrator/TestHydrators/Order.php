@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\TestHydrators;
+namespace GeometriaLabTest\Stdlib\Hydrator\TestHydrators;
 
 use GeometriaLab\Stdlib\Hydrator\Schema,
     GeometriaLab\Api\Stdlib\Hydrator;

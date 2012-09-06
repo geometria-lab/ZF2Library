@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\TestHydrators;
+namespace GeometriaLabTest\Stdlib\Hydrator\TestHydrators;
 
 use GeometriaLab\Stdlib\Hydrator\Schema,
     GeometriaLab\Api\Stdlib\Hydrator;
@@ -26,7 +26,7 @@ class User extends Hydrator
                 )
             ),
             'order' => array(
-                'source' => 'GeometriaLabTest\StdLib\TestHydrators\Order',
+                'source' => 'GeometriaLabTest\StdLib\Hydrator\TestHydrators\Order',
             ),
         ));
     }
