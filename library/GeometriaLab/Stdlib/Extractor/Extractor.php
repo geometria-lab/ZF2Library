@@ -15,23 +15,13 @@ use GeometriaLab\Stdlib\Extractor\Schema,
     GeometriaLab\Stdlib\Extractor\Fields,
     GeometriaLab\Api\Exception\WrongFields;
 
-/**
- *
- */
 abstract class Extractor
 {
-    /**
-     * @var Fields
-     */
-    protected $fields;
     /**
      * @var Schema
      */
     protected $schema;
 
-    /**
-     *
-     */
     public function __construct()
     {
         $schema = $this->createSchema();
@@ -61,16 +51,20 @@ abstract class Extractor
      * Extract values from an object
      *
      * @param  object $object
-     * @param  Fields $fields
+     * @param  array $fields
      * @return array
      * @throws WrongFields
      * @throws ZendBadMethodCallException
      */
-    public function extract($object, Fields $fields = null)
+    public function extract($object, $fields = array())
     {
         $result = array();
         $selectProperties = $schemaProperties = $this->schema->getProperties();
-        $allFields = ($fields !== null) ? $fields->hasFields() : true;
+
+        $allFields = true;
+        if (count($fields) && !isset($fields['*'])) {
+            $allFields = false;
+        }
 
         if (!$allFields) {
             foreach ($fields as $name => $value) {
@@ -96,7 +90,7 @@ abstract class Extractor
                     throw new ZendBadMethodCallException("Invalid extractor for property '$propertyName'");
                 }
 
-                $childFields = null;
+                $childFields = array();
                 if (isset($fields[$propertyName]) && $fields[$propertyName] !== true) {
                     $childFields = $fields[$propertyName];
                 }

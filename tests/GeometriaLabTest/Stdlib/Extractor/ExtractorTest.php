@@ -24,16 +24,16 @@ class ExtractorTest extends \PHPUnit_Framework_TestCase
 
     public function testExtract()
     {
-        $hydrator = new Order();
-        $data = $hydrator->extract($this->order);
+        $extractor = new Order();
+        $data = $extractor->extract($this->order);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
     }
 
     public function testFilters()
     {
-        $hydrator = new User();
-        $data = $hydrator->extract($this->user);
+        $extractor = new User();
+        $data = $extractor->extract($this->user);
 
         $this->assertTrue(isset($data['name']));
 
@@ -42,8 +42,8 @@ class ExtractorTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractRecursive()
     {
-        $hydrator = new User();
-        $data = $hydrator->extract($this->user);
+        $extractor = new User();
+        $data = $extractor->extract($this->user);
 
         $this->assertTrue(isset($data['order']));
 
