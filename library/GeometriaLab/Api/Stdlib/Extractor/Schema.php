@@ -7,7 +7,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Stdlib\Hydrator;
+namespace GeometriaLab\Api\Stdlib\Extractor;
+
+use GeometriaLab\Api\Stdlib\Extractor\Schema\Property;
 
 /**
  *
@@ -15,7 +17,7 @@ namespace GeometriaLab\Stdlib\Hydrator;
 class Schema
 {
     /**
-     * @var array
+     * @var Property[]
      */
     protected $properties;
 
@@ -27,12 +29,12 @@ class Schema
         $this->properties = array();
 
         foreach ($properties as $name => $options) {
-            $this->properties[] = new Schema\Property($name, $options);
+            $this->properties[$name] = new Property($name, $options);
         }
     }
 
     /**
-     * @return array
+     * @return Property[]
      */
     public function getProperties()
     {

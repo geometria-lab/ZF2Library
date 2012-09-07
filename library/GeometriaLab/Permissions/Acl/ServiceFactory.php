@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Permissions\Acl;
 
+use GeometriaLab\Api\Mvc\Router\Http\Api;
+
 use Zend\Stdlib\Glob as ZendGlob,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
 
@@ -16,9 +18,6 @@ use Zend\Stdlib\Glob as ZendGlob,
 
 class ServiceFactory implements ZendFactoryInterface
 {
-    const ACL_DIR = 'Acl';
-    const CONTROLLER_DIR = 'Controller';
-
     /**
      * @var ZendAcl
      */
@@ -39,11 +38,10 @@ class ServiceFactory implements ZendFactoryInterface
             $this->setConfig($config['acl']);
         }
 
-        $this->addRoles();
-
         $controllerNameSpace = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
-        $moduleName = explode('\\', $controllerNameSpace);
-        $this->addResources(array_shift($moduleName));
+
+        $this->addRoles();
+        $this->addResources($controllerNameSpace);
 
         return $this->getAcl();
     }
@@ -79,16 +77,18 @@ class ServiceFactory implements ZendFactoryInterface
         return $this;
     }
     /**
-     * @param $moduleName
+     * @param string $controllerNamespace
      * @return ServiceFactory
      */
-    private function addResources($moduleName)
+    private function addResources($controllerNamespace)
     {
-        $pathPattern = $this->getResourcesPath($moduleName) . '*';
+        $namespace = $this->getNamespace();
+        $pathPattern = $this->getResourcesPath() . '*';
+
         foreach (ZendGlob::glob($pathPattern, ZendGlob::GLOB_BRACE) as $file) {
             /* @var \GeometriaLab\Permissions\Acl\Resource $resource */
-            $resourceName = '\\' . $moduleName . '\\' . self::ACL_DIR . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
-            $resourceId = $moduleName . '\\' . self::CONTROLLER_DIR . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
+            $resourceName = $namespace . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
+            $resourceId = $controllerNamespace . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
             $resource = new $resourceName($resourceId);
 
             $this->getAcl()->addResource($resource);
@@ -98,16 +98,28 @@ class ServiceFactory implements ZendFactoryInterface
         }
         return $this;
     }
+
     /**
-     * @param $moduleName
      * @return string
+     * @throws \InvalidArgumentException
      */
-    private function getResourcesPath($moduleName)
+    private function getNamespace()
     {
-        return 'module' . DIRECTORY_SEPARATOR
-            . $moduleName . DIRECTORY_SEPARATOR
-            . 'src' . DIRECTORY_SEPARATOR
-            . $moduleName . DIRECTORY_SEPARATOR
-            . self::ACL_DIR . DIRECTORY_SEPARATOR;
+        if (empty($this->config['__NAMESPACE__'])) {
+            throw new \InvalidArgumentException('Need not empty "acl.__NAMESPACE__" param in config');
+        }
+        return $this->config['__NAMESPACE__'];
+    }
+
+    /**
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    private function getResourcesPath()
+    {
+        if (empty($this->config['base_dir'])) {
+            throw new \InvalidArgumentException('Need not empty "acl.base_dir" param in config');
+        }
+        return rtrim($this->config['base_dir'], '/') . '/';
     }
 }
