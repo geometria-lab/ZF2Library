@@ -26,7 +26,7 @@ class User extends Extractor
                 )
             ),
             'order' => array(
-                'source' => 'GeometriaLabTest\StdLib\Extractor\TestExtractors\Order',
+                'source' => 'order',
             ),
         ));
     }

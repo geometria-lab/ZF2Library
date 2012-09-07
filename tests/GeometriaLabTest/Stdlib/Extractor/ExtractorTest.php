@@ -2,48 +2,51 @@
 
 namespace GeometriaLabTest\Stdlib\Extractor;
 
-use GeometriaLabTest\Stdlib\Extractor\TestExtractors\User,
-    GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order;
+use GeometriaLab\Api\Stdlib\Extractor\Service,
+    GeometriaLabTest\Stdlib\Extractor\TestExtractors\User as UserExtractor,
+    GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order as OrderExtractor,
+    GeometriaLabTest\Stdlib\Extractor\TestModels\User,
+    GeometriaLabTest\Stdlib\Extractor\TestModels\Order;
 
 class ExtractorTest extends \PHPUnit_Framework_TestCase
 {
-    private $order;
-    private $user;
+    static private $order;
+    static private $user;
 
     public function setUp()
     {
-        $this->order = new \stdClass();
-        $this->order->id = 2;
-        $this->order->transactionId = 123;
+        self::$order = new Order();
+        self::$order->id = 2;
+        self::$order->transactionId = 123;
 
-        $this->user = new \stdClass();
-        $this->user->id = 1;
-        $this->user->name = 'Bender';
-        $this->user->order = $this->order;
+        self::$user = new User();
+        self::$user->id = 1;
+        self::$user->name = 'Bender';
+        self::$user->order = self::$order;
     }
 
     public function testExtract()
     {
-        $extractor = new Order();
-        $data = $extractor->extract($this->order);
+        $extractor = new OrderExtractor();
+        $data = $extractor->extract(self::$order);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
     }
 
     public function testFilters()
     {
-        $extractor = new User();
-        $data = $extractor->extract($this->user);
+        $extractor = new UserExtractor();
+        $data = $extractor->extract(self::$user);
 
         $this->assertTrue(isset($data['name']));
 
-        $this->assertEquals($data['name'], $this->user->name . ' Rodriguez');
+        $this->assertEquals($data['name'], self::$user->name . ' Rodriguez');
     }
 
     public function testExtractRecursive()
     {
-        $extractor = new User();
-        $data = $extractor->extract($this->user);
+        $extractorService = new Service();
+        $data = $extractorService->setNamespace('GeometriaLabTest\Stdlib\Extractor\TestExtractors')->extract(self::$user);
 
         $this->assertTrue(isset($data['order']));
 

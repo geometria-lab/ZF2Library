@@ -2,51 +2,48 @@
 
 namespace GeometriaLabTest\Stdlib\Extractor;
 
-use GeometriaLab\Api\Stdlib\Extractor\Service;
-
-use GeometriaLabTest\Stdlib\Extractor\TestExtractors\User,
-    GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order;
+use GeometriaLab\Api\Stdlib\Extractor\Service,
+    GeometriaLabTest\Stdlib\Extractor\TestExtractors\User as UserExtractor,
+    GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order as OrderExtractor,
+    GeometriaLabTest\Stdlib\Extractor\TestModels\User,
+    GeometriaLabTest\Stdlib\Extractor\TestModels\Order;
 
 class FieldsTest extends \PHPUnit_Framework_TestCase
 {
-    private $order;
-    private $user;
+    static private $order;
+    static private $user;
+    /**
+     * @var Service
+     */
+    static private $extractorService;
 
-    public function setUp()
+    static public function setUpBeforeClass()
     {
-        $this->order = new \stdClass();
-        $this->order->id = 2;
-        $this->order->transactionId = 123;
+        self::$order = new Order();
+        self::$order->id = 2;
+        self::$order->transactionId = 123;
 
-        $this->user = new \stdClass();
-        $this->user->id = 1;
-        $this->user->name = 'Bender';
-        $this->user->order = $this->order;
-    }
+        self::$user = new User();
+        self::$user->id = 1;
+        self::$user->name = 'Bender';
+        self::$user->order = self::$order;
 
-    public function testCreateFromString()
-    {
-        $fields = Service::createFieldsFromString('id,transactionId');
-
-        $this->assertTrue(isset($fields['id']));
-
-        $this->assertTrue(isset($fields['transactionId']));
+        self::$extractorService = new Service();
+        self::$extractorService->setNamespace('GeometriaLabTest\Stdlib\Extractor\TestExtractors');
     }
 
     public function testExtractOneField()
     {
-        $fields = Service::createFieldsFromString('id');
-        $extractor = new Order();
-        $data = $extractor->extract($this->order, $fields);
+        $fields = array('id' => true);
+        $data = self::$extractorService->extract(self::$order, $fields);
 
         $this->assertEquals($data, array('id' => 2));
     }
 
     public function testExtractSeveralFields()
     {
-        $fields = Service::createFieldsFromString('id,transactionId');
-        $extractor = new Order();
-        $data = $extractor->extract($this->order, $fields);
+        $fields = array('id' => true, 'transactionId' => true);
+        $data = self::$extractorService->extract(self::$order, $fields);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
     }
@@ -55,32 +52,29 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
 
-        $fields = Service::createFieldsFromString('id,foo');
-        $extractor = new Order();
-        $extractor->extract($this->order, $fields);
+        $fields = array('id' => true, 'foo' => true);
+        self::$extractorService->extract(self::$order, $fields);
     }
 
     public function testExtractAllFields()
     {
-        $fields = Service::createFieldsFromString('*');
-        $extractor = new Order();
-        $data = $extractor->extract($this->order, $fields);
+        $fields = array('*' => true);
+        $data = self::$extractorService->extract(self::$order, $fields);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
     }
 
     public function testExtractAllNestedFields()
     {
-        $fields = Service::createFieldsFromString('*');
-        $extractor = new User();
-        $data = $extractor->extract($this->user, $fields);
+        $fields = array('*' => true);
+        $data = self::$extractorService->extract(self::$user, $fields);
 
         $equalsData = array(
             'id' => 1,
             'name' => 'Bender Rodriguez',
             'order' => array(
                 'id' => 2,
-                'transactionId' => 123
+                'transactionId' => 123,
             ),
         );
 
@@ -89,14 +83,18 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractOneFieldsAndOneNestedFields()
     {
-        $fields = Service::createFieldsFromString('id,order(transactionId)');
-        $extractor = new User();
-        $data = $extractor->extract($this->user, $fields);
+        $fields = array(
+            'id' => true,
+            'order' => array(
+                'transactionId' => true,
+            ),
+        );
+        $data = self::$extractorService->extract(self::$user, $fields);
 
         $equalsData = array(
             'id' => 1,
             'order' =>  array(
-                'transactionId' => 123
+                'transactionId' => 123,
             ),
         );
 
@@ -107,8 +105,12 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
 
-        $fields = Service::createFieldsFromString('id,order(foo)');
-        $extractor = new User();
-        $extractor->extract($this->user, $fields);
+        $fields = array(
+            'id' => true,
+            'order' => array(
+                'foo' => true,
+            ),
+        );
+        self::$extractorService->extract(self::$user, $fields);
     }
 }

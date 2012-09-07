@@ -7,7 +7,9 @@ use Zend\EventManager\EventManagerInterface as ZendEvents;
 use Zend\Mvc\MvcEvent as ZendMvcEvent;
 
 use GeometriaLab\Model,
-    GeometriaLab\Api\View\Model\ApiModel;
+    GeometriaLab\Model\ModelInterface,
+    GeometriaLab\Api\View\Model\ApiModel,
+    GeometriaLab\Api\Exception\WrongFields;
 
 /**
  *
@@ -113,7 +115,11 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         }
 
         if ($data instanceof Model\ModelInterface || $data instanceof Model\CollectionInterface) {
-            $extractedData = $e->getApplication()->getServiceManager()->get('Extractor')->extract($data);
+            $fields = $e->getRequest()->getQuery()->get('_fields');
+            $fieldsData = self::createFieldsFromString($fields);
+
+            $extractedData = $e->getApplication()->getServiceManager()->get('Extractor')->extract($data, $fieldsData);
+
             if ($result instanceof ApiModel) {
                 $result->setVariable(ApiModel::FIELD_DATA, $extractedData);
             } else {
@@ -122,5 +128,63 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
             $e->setResult($result);
         }
+    }
+
+    /**
+     * Create Fields from string
+     *
+     * @static
+     * @param $fieldsString
+     * @return array
+     * @throws WrongFields
+     */
+    static public function createFieldsFromString($fieldsString)
+    {
+        $fieldsString = str_replace(' ', '', $fieldsString);
+        $fields = array();
+        $level = 0;
+        $stack = array();
+        $stack[$level] = &$fields;
+        $field = '';
+        $len = strlen($fieldsString) - 1;
+
+        for ($i = 0; $i <= $len; $i++) {
+            $char = $fieldsString[$i];
+            switch ($char) {
+                case ',':
+                    if ('' != $field) {
+                        $stack[$level][$field] = true;
+                        $field = '';
+                    }
+                    break;
+                case '(':
+                    $stack[$level][$field] = array();
+                    $oldLevel = $level;
+                    $stack[++$level] = &$stack[$oldLevel][$field];
+                    $field = '';
+                    break;
+                case ')':
+                    if ('' != $field) {
+                        $stack[$level][$field] = true;
+                    }
+                    unset($stack[$level--]);
+                    if ($level < 0) {
+                        throw new WrongFields('Bad _fields syntax');
+                    }
+                    $field = '';
+                    break;
+                default:
+                    $field.= $char;
+                    if ($i == $len && '' !== $field) {
+                        $stack[$level][$field] = true;
+                        $field = '';
+                    }
+            }
+        }
+        if (count($stack) > 1) {
+            throw new WrongFields('Bad _fields syntax');
+        }
+
+        return $fields;
     }
 }

@@ -13,13 +13,6 @@ use GeometriaLab\Model\ModelInterface,
 
 class Service implements ZendFactoryInterface
 {
-    const EXTRACTOR_DIR = 'Extractor';
-
-    /**
-     * @var array
-     */
-    private $fields;
-
     /**
      * @var Extractor[]
      */
@@ -28,105 +21,78 @@ class Service implements ZendFactoryInterface
     /**
      * @var string
      */
-    private $extractorPath;
+    private $extractorsNamespace;
 
     /**
      * @param ZendServiceLocatorInterface $serviceLocator
      * @return Service
+     * @throws \InvalidArgumentException
      */
     public function createService(ZendServiceLocatorInterface $serviceLocator)
     {
-        $controllerNameSpace = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
-        $parts = explode('\\', $controllerNameSpace);
-        array_pop($parts);
-        $this->extractorPath = implode('\\', $parts) . '\\' . self::EXTRACTOR_DIR;
+        $config = $serviceLocator->get('Configuration');
 
-        $fieldsParam = $serviceLocator->get('Application')->getMvcEvent()->getRequest()->getQuery()->get('_fields');
-        $this->fields = self::createFieldsFromString($fieldsParam);
+        if (!isset($config['extractor'])) {
+            throw new \InvalidArgumentException('Need not empty "extractor" param in config');
+        }
+        if (!isset($config['extractor']['__NAMESPACE__'])) {
+            throw new \InvalidArgumentException('Need not empty "extractor.__NAMESPACE__" param in config');
+        }
+
+        $this->setNamespace($config['extractor']['__NAMESPACE__']);
 
         return $this;
     }
 
     /**
-     * @param ModelInterface $model
-     * @return array
-     * @throws ZendBadMethodCallException
-     * @throws ZendServiceNotCreatedException
+     * @param string $nameSpace
+     * @return Service
      */
-    public function extract(ModelInterface $model)
+    public function setNamespace($nameSpace)
     {
-        if ($this->extractorPath === null) {
-            throw new ZendServiceNotCreatedException('Get me from Service Manager');
+        $this->extractorsNamespace = $nameSpace;
+        return $this;
+    }
+
+    /**
+     * @param ModelInterface $model
+     * @param array $fields
+     * @return array
+     * @throws WrongFields
+     * @throws ZendBadMethodCallException
+     * @throws \InvalidArgumentException
+     */
+    public function extract(ModelInterface $model, $fields = array())
+    {
+        if ($this->extractorsNamespace === null) {
+            throw new \InvalidArgumentException('Need setup Namespace');
+        }
+
+        $extractFields = $fields;
+        if (isset($fields['*'])) {
+            $extractFields = array();
         }
 
         $parts = explode('\\', get_class($model));
-        $extractorName = $this->extractorPath . '\\' . array_pop($parts);
+        $extractorName = $this->extractorsNamespace . '\\' . array_pop($parts);
 
         if (!isset(static::$extractorInstances[$extractorName])) {
-            if (is_subclass_of($extractorName, 'Extractor')) {
+            if (!is_subclass_of($extractorName, '\GeometriaLab\Stdlib\Extractor\Extractor')) {
                 throw new ZendBadMethodCallException("Invalid extractor for model '" . get_class($model) . "'");
             }
             static::$extractorInstances[$extractorName] = new $extractorName;
         }
 
-        return static::$extractorInstances[$extractorName]->extract($model, $this->fields);
-    }
+        $extractor = static::$extractorInstances[$extractorName];
+        $data = $extractor->extract($model, $extractFields);
 
-    /**
-     * Create Fields from string
-     *
-     * @static
-     * @param $fieldsString
-     * @return array
-     * @throws WrongFields
-     */
-    static public function createFieldsFromString($fieldsString)
-    {
-        $fieldsString = str_replace(' ', '', $fieldsString);
-        $fields = array();
-        $level = 0;
-        $stack = array();
-        $stack[$level] = &$fields;
-        $field = '';
-        $len = strlen($fieldsString) - 1;
-
-        for ($i = 0; $i <= $len; $i++) {
-            $char = $fieldsString[$i];
-            switch ($char) {
-                case ',':
-                    if ('' != $field) {
-                        $stack[$level][$field] = true;
-                        $field = '';
-                    }
-                    break;
-                case '(':
-                    $stack[$level][$field] = array();
-                    $oldLevel = $level;
-                    $stack[++$level] = &$stack[$oldLevel][$field];
-                    $field = '';
-                    break;
-                case ')':
-                    if ('' != $field) {
-                        $stack[$level][$field] = true;
-                    }
-                    unset($stack[$level--]);
-                    if ($level < 0) {
-                        throw new WrongFields('Bad _fields syntax');
-                    }
-                    $field = '';
-                    break;
-                default:
-                    $field.= $char;
-                    if ($i == $len && '' !== $field) {
-                        $stack[$level][$field] = true;
-                        $field = '';
-                    }
+        foreach ($data as $name => $field) {
+            if ($field instanceof \GeometriaLab\Model\ModelInterface) {
+                $parentExtractFields = isset($fields[$name]) ? $fields[$name] : array();
+                $data[$name] = $this->extract($field, $parentExtractFields);
             }
         }
-        if (count($stack) > 1) {
-            throw new WrongFields('Bad _fields syntax');
-        }
 
-        return $fields;
+        return $data;
     }
 }

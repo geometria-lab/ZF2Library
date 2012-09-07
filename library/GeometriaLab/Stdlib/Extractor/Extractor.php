@@ -9,10 +9,10 @@
 
 namespace GeometriaLab\Stdlib\Extractor;
 
-use Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
+use Zend\Stdlib\Hydrator\HydratorInterface as ZendHydratorInterface,
+    Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Stdlib\Extractor\Schema,
-    GeometriaLab\Stdlib\Extractor\Fields,
     GeometriaLab\Api\Exception\WrongFields;
 
 abstract class Extractor
@@ -59,12 +59,10 @@ abstract class Extractor
     public function extract($object, $fields = array())
     {
         $result = array();
-        $selectProperties = $schemaProperties = $this->schema->getProperties();
 
-        $allFields = true;
-        if (count($fields) && !isset($fields['*'])) {
-            $allFields = false;
-        }
+        $allFields = !count($fields);
+
+        $schemaProperties = $this->getSchema()->getProperties();
 
         if (!$allFields) {
             foreach ($fields as $name => $value) {
@@ -75,7 +73,7 @@ abstract class Extractor
             }
         }
 
-        foreach ($selectProperties as $property) {
+        foreach ($schemaProperties as $property) {
             // get initial value
             $source = $property->getSource();
             $propertyName = $property->getName();
@@ -83,20 +81,8 @@ abstract class Extractor
             if (!$allFields && !isset($fields[$propertyName])) {
                 continue;
             }
-            if (is_subclass_of($source, get_class())) {
-                /* @var Extractor $extractor */
-                $extractor = new $source();
-                if (!method_exists($extractor, 'extract')) {
-                    throw new ZendBadMethodCallException("Invalid extractor for property '$propertyName'");
-                }
 
-                $childFields = array();
-                if (isset($fields[$propertyName]) && $fields[$propertyName] !== true) {
-                    $childFields = $fields[$propertyName];
-                }
-
-                $result[$propertyName] = isset($object->$propertyName) ? $extractor->extract($object->$propertyName, $childFields) : null;
-            } elseif (is_callable($source)) {
+            if (is_callable($source)) {
                 $result[$propertyName] = call_user_func($source, $object);
             } else {
                 $result[$propertyName] = $object->$source;
