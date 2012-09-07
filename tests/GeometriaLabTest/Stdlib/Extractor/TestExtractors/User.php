@@ -2,8 +2,8 @@
 
 namespace GeometriaLabTest\Stdlib\Extractor\TestExtractors;
 
-use GeometriaLab\Stdlib\Extractor\Schema,
-    GeometriaLab\Stdlib\Extractor\Extractor;
+use GeometriaLab\Api\Stdlib\Extractor\Schema,
+    GeometriaLab\Api\Stdlib\Extractor\Extractor;
 
 
 class User extends Extractor

@@ -8,7 +8,7 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Model\ModelInterface,
-    GeometriaLab\Stdlib\Extractor\Extractor,
+    GeometriaLab\Api\Stdlib\Extractor\Extractor,
     GeometriaLab\Api\Exception\WrongFields;
 
 class Service implements ZendFactoryInterface
@@ -77,7 +77,7 @@ class Service implements ZendFactoryInterface
         $extractorName = $this->extractorsNamespace . '\\' . array_pop($parts);
 
         if (!isset(static::$extractorInstances[$extractorName])) {
-            if (!is_subclass_of($extractorName, '\GeometriaLab\Stdlib\Extractor\Extractor')) {
+            if (!is_subclass_of($extractorName, '\GeometriaLab\Api\Stdlib\Extractor\Extractor')) {
                 throw new ZendBadMethodCallException("Invalid extractor for model '" . get_class($model) . "'");
             }
             static::$extractorInstances[$extractorName] = new $extractorName;

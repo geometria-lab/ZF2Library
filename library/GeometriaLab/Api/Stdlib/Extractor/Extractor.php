@@ -7,12 +7,12 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Stdlib\Extractor;
+namespace GeometriaLab\Api\Stdlib\Extractor;
 
 use Zend\Stdlib\Hydrator\HydratorInterface as ZendHydratorInterface,
     Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
-use GeometriaLab\Stdlib\Extractor\Schema,
+use GeometriaLab\Api\Stdlib\Extractor\Schema,
     GeometriaLab\Api\Exception\WrongFields;
 
 abstract class Extractor

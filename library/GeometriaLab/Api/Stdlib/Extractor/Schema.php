@@ -7,9 +7,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Stdlib\Extractor;
+namespace GeometriaLab\Api\Stdlib\Extractor;
 
-use GeometriaLab\Stdlib\Extractor\Schema\Property;
+use GeometriaLab\Api\Stdlib\Extractor\Schema\Property;
 
 /**
  *
