@@ -5,10 +5,9 @@ namespace GeometriaLab\Api\Mvc\Controller;
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEvents,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
-    Zend\Stdlib\RequestInterface as ZendRequestInterface,
-    Zend\Mvc\Exception\DomainException as ZendDomainException;
+    Zend\Stdlib\RequestInterface as ZendRequestInterface;
 
-use GeometriaLab\Api\Mvc\Controller\Action\Params,
+use GeometriaLab\Api\Mvc\Controller\Action\Params\Params,
     GeometriaLab\Api\Exception\WrongFields;
 
 class Listener implements ZendListenerAggregateInterface
@@ -28,7 +27,6 @@ class Listener implements ZendListenerAggregateInterface
      */
     public function attach(ZendEvents $events)
     {
-        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'prepareAction'),  -20);
         $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'createParams'),  -30);
     }
 
@@ -45,73 +43,6 @@ class Listener implements ZendListenerAggregateInterface
                 unset($this->listeners[$index]);
             }
         }
-    }
-
-    /**
-     * @param ZendMvcEvent $e
-     * @throws ZendDomainException
-     */
-    public function prepareAction(ZendMvcEvent $e)
-    {
-        $routeMatch = $e->getRouteMatch();
-        $request = $e->getRequest();
-
-        $id = $routeMatch->getParam('id');
-        if ($id === null) {
-            $id = $request->getQuery()->get('id');
-        }
-
-        $subResource = $routeMatch->getParam('subResource');
-
-        switch (strtolower($request->getMethod())) {
-            case 'get':
-                if (null !== $id) {
-                    if (null !== $subResource) {
-                        $action = 'get' . ucfirst($subResource);
-                    } else {
-                        $action = 'get';
-                    }
-                } else {
-                    if (null !== $subResource) {
-                        $action = 'get' . ucfirst($subResource) . 'List';
-                    } else {
-                        $action = 'getList';
-                    }
-                }
-                break;
-            case 'post':
-                if (null !== $id) {
-                    throw new ZendDomainException('Post is allowed on resources only');
-                }
-                if (null !== $subResource) {
-                    $action = 'create' . ucfirst($subResource);
-                } else {
-                    $action = 'create';
-                }
-                break;
-            case 'put':
-                if (null === $id) {
-                    throw new ZendDomainException('Missing identifier');
-                }
-                if (null !== $subResource) {
-                    throw new ZendDomainException('Put is allowed on root resource object only');
-                }
-                $action = 'update';
-                break;
-            case 'delete':
-                if (null === $id) {
-                    throw new ZendDomainException('Missing identifier');
-                }
-                if (null !== $subResource) {
-                    throw new ZendDomainException('Delete is allowed on root resource object only');
-                }
-                $action = 'delete';
-                break;
-            default:
-                throw new ZendDomainException('Invalid HTTP method!');
-        }
-
-        $routeMatch->setParam('action', $action);
     }
 
     /**
