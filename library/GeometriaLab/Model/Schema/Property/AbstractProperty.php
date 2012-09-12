@@ -4,6 +4,8 @@ namespace GeometriaLab\Model\Schema\Property;
 
 use Zend\Filter\FilterInterface as ZendFilterInterface,
     Zend\Filter\FilterChain as ZendFilterChain,
+    Zend\Validator\ValidatorInterface as ZendValidatorInterface,
+    Zend\Validator\ValidatorChain as ZendValidatorChain,
     Zend\Filter\Exception\RuntimeException as ZendRuntimeException;
 
 abstract class AbstractProperty implements PropertyInterface
@@ -23,11 +25,14 @@ abstract class AbstractProperty implements PropertyInterface
     protected $defaultValue;
 
     /**
-     * Filters chain
-     *
      * @var ZendFilterChain
      */
     protected $filterChain;
+
+    /**
+     * @var ZendValidatorChain
+     */
+    protected $validatorChain;
 
     /**
      * Constructor
@@ -37,6 +42,7 @@ abstract class AbstractProperty implements PropertyInterface
     public function __construct(array $options = array())
     {
         $this->filterChain = new ZendFilterChain();
+        $this->validatorChain = new ZendValidatorChain();
 
         $this->setOptions($options);
     }
@@ -113,6 +119,11 @@ abstract class AbstractProperty implements PropertyInterface
     public function setFilters(array $filters)
     {
         foreach ($filters as $filter) {
+            if (is_string($filter)) {
+                $filter = array(
+                    'name' => $filter,
+                );
+            }
             if (is_array($filter)) {
                 if (!isset($filter['name'])) {
                     throw new ZendRuntimeException('Invalid filter specification provided; does not include "name" key');
@@ -126,6 +137,8 @@ abstract class AbstractProperty implements PropertyInterface
                     $priority = intval($filter['priority']);
                 }
                 $this->filterChain->attachByName($filter['name'], $options, $priority);
+            } else {
+                throw new ZendRuntimeException('Invalid filter declaration: need string or array');
             }
         }
 
@@ -138,5 +151,47 @@ abstract class AbstractProperty implements PropertyInterface
     public function getFilterChain()
     {
         return $this->filterChain;
+    }
+
+    /**
+     * @param ZendValidatorInterface[] $validators
+     * @return AbstractProperty
+     * @throws ZendRuntimeException
+     */
+    public function setValidators(array $validators)
+    {
+        foreach ($validators as $validator) {
+            if (is_string($validator)) {
+                $validator = array(
+                    'name' => $validator,
+                );
+            }
+            if (is_array($validator)) {
+                if (!isset($validator['name'])) {
+                    throw new ZendRuntimeException('Invalid validator specification provided; does not include "name" key');
+                }
+                $options = array();
+                if (isset($validator['options'])) {
+                    $options = $validator['options'];
+                }
+                $breakOnFailure = false;
+                if (isset($validator['breakOnFailure'])) {
+                    $breakOnFailure = intval($validator['breakOnFailure']);
+                }
+                $this->validatorChain->addByName($validator['name'], $options, $breakOnFailure);
+            } else {
+                throw new ZendRuntimeException('Invalid validator declaration: need string or array');
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ZendValidatorChain
+     */
+    public function getValidatorChain()
+    {
+        return $this->validatorChain;
     }
 }
