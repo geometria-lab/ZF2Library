@@ -7,9 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Api\Mvc\Params;
-
-use GeometriaLab\Api\Mvc\Controller\Action\Params;
+namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 use Zend\Mvc\Router\RouteMatch as ZendRouteMatch,
     Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,

@@ -164,7 +164,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     }
 
     /**
-     * @param array $pathPart
+     * @param array $pathParts
      * @return null|string
      */
     protected function getNamespace($pathParts)
@@ -177,7 +177,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     }
 
     /**
-     * @param array $pathPart
+     * @param array $pathParts
      * @return null|string
      */
     protected function getController($pathParts)
