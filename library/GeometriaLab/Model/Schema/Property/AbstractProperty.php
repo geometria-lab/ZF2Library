@@ -2,6 +2,10 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
+use Zend\Filter\FilterInterface as ZendFilterInterface,
+    Zend\Filter\FilterChain as ZendFilterChain,
+    Zend\Filter\Exception\RuntimeException as ZendRuntimeException;
+
 abstract class AbstractProperty implements PropertyInterface
 {
     /**
@@ -19,12 +23,21 @@ abstract class AbstractProperty implements PropertyInterface
     protected $defaultValue;
 
     /**
+     * Filters chain
+     *
+     * @var ZendFilterChain
+     */
+    protected $filterChain;
+
+    /**
      * Constructor
      *
      * @param array $options
      */
     public function __construct(array $options = array())
     {
+        $this->filterChain = new ZendFilterChain();
+
         $this->setOptions($options);
     }
 
@@ -90,5 +103,40 @@ abstract class AbstractProperty implements PropertyInterface
         $this->defaultValue = $value;
 
         return $this;
+    }
+
+    /**
+     * @param ZendFilterInterface[] $filters
+     * @return AbstractProperty
+     * @throws ZendRuntimeException
+     */
+    public function setFilters(array $filters)
+    {
+        foreach ($filters as $filter) {
+            if (is_array($filter)) {
+                if (!isset($filter['name'])) {
+                    throw new ZendRuntimeException('Invalid filter specification provided; does not include "name" key');
+                }
+                $options = array();
+                if (isset($filter['options'])) {
+                    $options = $filter['options'];
+                }
+                $priority = ZendFilterChain::DEFAULT_PRIORITY;
+                if (isset($filter['priority'])) {
+                    $priority = intval($filter['priority']);
+                }
+                $this->filterChain->attachByName($filter['name'], $options, $priority);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ZendFilterChain
+     */
+    public function getFilterChain()
+    {
+        return $this->filterChain;
     }
 }

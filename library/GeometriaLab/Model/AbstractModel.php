@@ -68,7 +68,9 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
             $property = $schema->getProperty($name);
 
             try {
-                $value = $property->prepare($value);
+                $filteredValue = $property->getFilterChain()->filter($value);
+
+                $value = $property->prepare($filteredValue);
             } catch (\InvalidArgumentException $e) {
                 throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
             }
