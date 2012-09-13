@@ -148,6 +148,14 @@ class Model implements ModelInterface
     }
 
     /**
+     * IteratorAggregate implementation
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->toArray());
+    }
+
+    /**
      * Get properties
      *
      * @return array
