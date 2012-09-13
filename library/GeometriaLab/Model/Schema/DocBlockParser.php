@@ -111,11 +111,9 @@ class DocBlockParser
         }
 
         foreach (array_reverse($docBlocks) as $docBlock) {
-            /**
-             * @var \Zend\Code\Reflection\DocBlockReflection
-             * @var \Zend\Code\Reflection\DocBlock\Tag\TagInterface $tag
-             */
+            /* @var \Zend\Code\Reflection\DocBlockReflection $docBlock */
             foreach($docBlock->getTags() as $tag) {
+                /* @var \Zend\Code\Reflection\DocBlock\Tag\TagInterface $tag */
                 $methodName = "parse{$tag->getName()}Tag";
                 if (method_exists($this, $methodName)) {
                     call_user_func(array($this, $methodName), $tag, $schema);
@@ -138,10 +136,6 @@ class DocBlockParser
     {
         $name = substr($tag->getPropertyName(), 1);
 
-        /*if ($schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property with name '$name' already exists");
-        }*/
-
         $params = $this->getParamsFromTag($tag);
         $params['name'] = $name;
 
@@ -153,7 +147,7 @@ class DocBlockParser
             $type = 'array';
         }
         $property = static::createProperty($type, $params);
-        $schema->setProperty($property);
+        $schema->addProperty($property);
 
         return $property;
     }

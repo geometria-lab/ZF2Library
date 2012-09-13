@@ -2,14 +2,20 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Schema\DocBlockParser,
-    GeometriaLab\Model\Schema\SchemaInterface,
+use GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
 abstract class AbstractModel extends Schemaless\Model implements ModelInterface
 {
     static protected $parserClassName = 'GeometriaLab\Model\Schema\DocBlockParser';
+
+    /**
+     * Validation error messages
+     *
+     * @var array
+     */
+    protected $errorMessages = array();
 
     /**
      * Constructor
@@ -21,6 +27,26 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
         $this->setup();
 
         parent::__construct($data);
+    }
+
+    /**
+     * Populate model from array or iterable object
+     *
+     * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
+     * @return AbstractModel
+     * @throws \InvalidArgumentException
+     */
+    public function populateSilent($data)
+    {
+        if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
+            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
+        }
+
+        foreach ($data as $key => $value) {
+            $this->setSilent($key, $value);
+        }
+
+        return $this;
     }
 
     /**
@@ -36,16 +62,7 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
-        $method = "get{$name}";
-        if (method_exists($this, $method)) {
-            return call_user_func(array($this, $method));
-        }
-
-        if (isset($this->propertyValues[$name])) {
-            return $this->propertyValues[$name];
-        } else {
-            return null;
-        }
+        return parent::get($name);
     }
 
     /**
@@ -61,30 +78,38 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
         $schema = static::getSchema();
 
         if (!$schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property '$name' does not exists");
+            throw new \InvalidArgumentException("Property '$name' does not exists", 1);
         }
 
         if ($value !== null) {
             $property = $schema->getProperty($name);
 
-            try {
-                $filteredValue = $property->getFilterChain()->filter($value);
+            $value = $property->getFilterChain()->filter($value);
 
-                if (!$property->getValidatorChain()->isValid($filteredValue)) {
-                    throw new \InvalidArgumentException(implode("\r\n", $property->getValidatorChain()->getMessages()));
-                }
-
-                $value = $property->prepare($filteredValue);
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            if (!$property->getValidatorChain()->isValid($value)) {
+                throw new \InvalidArgumentException("Invalid property '$name' value: " . implode("\r\n", $property->getValidatorChain()->getMessages()), 2);
             }
         }
 
-        $method = "set{$name}";
-        if (method_exists($this, $method)) {
-            call_user_func(array($this, $method), $value);
-        } else {
-            $this->propertyValues[$name] = $value;
+        return parent::set($name, $value);
+    }
+
+    /**
+     * Set property value without throwing exception on validation
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return AbstractModel|ModelInterface
+     * @throws \InvalidArgumentException
+     */
+    public function setSilent($name, $value)
+    {
+        try {
+            $this->set($name, $value);
+        } catch (\InvalidArgumentException $e) {
+            if ($e->getCode() === 1) {
+                throw $e;
+            }
         }
 
         return $this;
@@ -99,6 +124,45 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     public function has($name)
     {
         return static::getSchema()->hasProperty($name);
+    }
+
+    /**
+     * Is Valid model data
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        $this->errorMessages = array();
+        $result = true;
+
+        foreach ($this->getSchema()->getProperties() as $property) {
+            $name = $property->getName();
+            $value = $this->get($name);
+            $messages = $property->getValidatorChain()->getMessages();
+
+            if (!empty($messages)) {
+                $this->errorMessages[$name] = $messages;
+                $result = false;
+            }
+
+            if ($property->isRequired() && empty($value)) {
+                $this->errorMessages[$name]['Required'] = "Is required";
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get validation error messages (after isValid called)
+     *
+     * @return array
+     */
+    public function getErrorMessages()
+    {
+        return $this->errorMessages;
     }
 
     /**

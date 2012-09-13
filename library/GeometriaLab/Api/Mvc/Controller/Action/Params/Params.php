@@ -14,5 +14,5 @@ namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
  */
 class Params extends \GeometriaLab\Model\AbstractModel
 {
-    static protected $parserClassName = 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\DocBlockParser';
+
 }

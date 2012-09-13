@@ -25,6 +25,13 @@ abstract class AbstractProperty implements PropertyInterface
     protected $defaultValue;
 
     /**
+     * Required property
+     *
+     * @var boolean
+     */
+    protected $isRequired = false;
+
+    /**
      * @var ZendFilterChain
      */
     protected $filterChain;
@@ -44,7 +51,14 @@ abstract class AbstractProperty implements PropertyInterface
         $this->filterChain = new ZendFilterChain();
         $this->validatorChain = new ZendValidatorChain();
 
+        $this->setup();
+
         $this->setOptions($options);
+    }
+
+    public function setup()
+    {
+
     }
 
     /**
@@ -89,6 +103,29 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
+     * Mark property as Required
+     *
+     * @param boolean $required
+     * @return PropertyInterface
+     */
+    public function setRequired($required)
+    {
+        $this->isRequired = $required;
+
+        return $this;
+    }
+
+    /**
+     * Is required
+     *
+     * @return boolean
+     */
+    public function isRequired()
+    {
+        return $this->isRequired;
+    }
+
+    /**
      * Get default value
      *
      * @return mixed
@@ -107,6 +144,17 @@ abstract class AbstractProperty implements PropertyInterface
     public function setDefaultValue($value)
     {
         $this->defaultValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param ZendFilterChain $filterChain
+     * @return AbstractProperty
+     */
+    public function setFilterChain(ZendFilterChain $filterChain)
+    {
+        $this->filterChain = $filterChain;
 
         return $this;
     }
@@ -136,7 +184,7 @@ abstract class AbstractProperty implements PropertyInterface
                 if (isset($filter['priority'])) {
                     $priority = intval($filter['priority']);
                 }
-                $this->filterChain->attachByName($filter['name'], $options, $priority);
+                $this->getFilterChain()->attachByName($filter['name'], $options, $priority);
             } else {
                 throw new ZendRuntimeException('Invalid filter declaration: need string or array');
             }
@@ -151,6 +199,17 @@ abstract class AbstractProperty implements PropertyInterface
     public function getFilterChain()
     {
         return $this->filterChain;
+    }
+
+    /**
+     * @param ZendValidatorChain $validatorChain
+     * @return AbstractProperty
+     */
+    public function setValidatorChain(ZendValidatorChain $validatorChain)
+    {
+        $this->validatorChain = $validatorChain;
+
+        return $this;
     }
 
     /**
@@ -178,7 +237,7 @@ abstract class AbstractProperty implements PropertyInterface
                 if (isset($validator['breakOnFailure'])) {
                     $breakOnFailure = intval($validator['breakOnFailure']);
                 }
-                $this->validatorChain->addByName($validator['name'], $options, $breakOnFailure);
+                $this->getValidatorChain()->addByName($validator['name'], $options, $breakOnFailure);
             } else {
                 throw new ZendRuntimeException('Invalid validator declaration: need string or array');
             }

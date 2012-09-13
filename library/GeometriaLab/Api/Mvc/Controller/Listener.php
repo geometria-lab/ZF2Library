@@ -55,14 +55,23 @@ class Listener implements ZendListenerAggregateInterface
         $request = $e->getRequest();
         $queryParams = self::getParamsFromRequest($request);
 
+        // @TODO Stub
+        $id = $routeMatch->getParam('id');
+        if ($id !== null) {
+            $queryParams['id'] = $id;
+        }
+
         /* @var Params $params */
         $params = $e->getApplication()->getServiceManager()->get('Params');
+        $params->populate($queryParams, false);
 
-        try {
-            $params->populate($queryParams);
-        } catch (\InvalidArgumentException $ex) {
-            throw new WrongFields($ex->getMessage());
-        };
+        if (!$params->isValid()) {
+            $errorString = '';
+            foreach ($params->getErrorMessages() as $fieldName => $errors) {
+                $errorString .= "Field $fieldName:\r\n" . implode("\r\n", $errors) . "\r\n";
+            }
+            throw new WrongFields($errorString);
+        }
 
         $routeMatch->setParam('params', $params);
     }

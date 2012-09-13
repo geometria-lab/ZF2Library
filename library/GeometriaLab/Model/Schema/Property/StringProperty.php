@@ -2,21 +2,29 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
+use Zend\Validator\Callback as ZendValidatorCallback;
+
 class StringProperty extends AbstractProperty
 {
     /**
-     * Prepare value
-     *
-     * @param string $value
-     * @return string
-     * @throws \InvalidArgumentException
+     * @var ZendValidatorCallback
      */
-    public function prepare($value)
+    static protected $isStringValidator;
+
+    public function setup()
     {
-        if (!is_string($value)) {
-            throw new \InvalidArgumentException("must be string");
+        if (static::$isStringValidator === null) {
+            $validator = new ZendValidatorCallback();
+            $validator->setOptions(array(
+                'messageTemplates' => array(
+                    ZendValidatorCallback::INVALID_VALUE => 'Value must be a string',
+                ),
+            ));
+            $validator->setCallback(array(null, 'is_string'));
+
+            static::$isStringValidator = $validator;
         }
 
-        return $value;
+        $this->getValidatorChain()->addValidator(static::$isStringValidator);
     }
 }

@@ -64,10 +64,17 @@ class Schema implements SchemaInterface
      *
      * @param PropertyInterface $property
      * @return Schema
+     * @throws \InvalidArgumentException
      */
-    public function setProperty(PropertyInterface $property)
+    public function addProperty(PropertyInterface $property)
     {
-        $this->properties[$property->getName()] = $property;
+        $name = $property->getName();
+
+        if (!$this->hasProperty($name)) {
+            throw new \InvalidArgumentException("Property '$name' already exist in model '$this->className'");
+        }
+
+        $this->properties[$name] = $property;
 
         return $this;
     }
@@ -81,6 +88,24 @@ class Schema implements SchemaInterface
     public function hasProperty($name)
     {
         return isset($this->properties[$name]);
+    }
+
+    /**
+     * Remove property
+     *
+     * @param string $name
+     * @return Schema
+     * @throws \InvalidArgumentException
+     */
+    public function removeProperty($name)
+    {
+        if (!$this->hasProperty($name)) {
+            throw new \InvalidArgumentException("Property '$name' not present in model '$this->className'");
+        }
+
+        unset($this->properties[$name]);
+
+        return $this;
     }
 
     /**

@@ -3,9 +3,7 @@
 namespace GeometriaLab\Model\Schema\Property;
 
 use Zend\Filter\FilterChain as ZendFilterChain,
-    Zend\Filter\FilterInterface as ZendFilterInterface,
-    Zend\Validator\ValidatorChain as ZendValidatorChain,
-    Zend\Validator\ValidatorInterface as ZendValidatorInterface;
+    Zend\Validator\ValidatorChain as ZendValidatorChain;
 
 interface PropertyInterface
 {
@@ -15,12 +13,14 @@ interface PropertyInterface
     public function setDefaultValue($value);
     public function getDefaultValue();
 
-    public function prepare($value);
+    public function setRequired($required);
+    public function isRequired();
+
     /**
      * @abstract
-     * @param ZendFilterInterface[] $filters
+     * @param ZendFilterChain $filterChain
      */
-    public function setFilters(array $filters);
+    public function setFilterChain(ZendFilterChain $filterChain);
     /**
      * @abstract
      * @return ZendFilterChain
@@ -29,9 +29,9 @@ interface PropertyInterface
 
     /**
      * @abstract
-     * @param ZendValidatorInterface[] $validators
+     * @param ZendValidatorChain $validatorChain
      */
-    public function setValidators(array $validators);
+    public function setValidatorChain(ZendValidatorChain $validatorChain);
     /**
      * @abstract
      * @return ZendValidatorChain
