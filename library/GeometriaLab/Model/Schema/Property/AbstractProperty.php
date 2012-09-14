@@ -191,11 +191,9 @@ abstract class AbstractProperty implements PropertyInterface
         return $this->validatorChain;
     }
 
-    protected function setup()
-    {
-
-    }
-
+    /**
+     * @param $type
+     */
     protected function addTypeValidator($type)
     {
         if (!isset(static::$typeValidators[$type])) {
@@ -203,5 +201,23 @@ abstract class AbstractProperty implements PropertyInterface
         }
 
         $this->getValidatorChain()->addValidator(static::$typeValidators[$type]);
+    }
+
+    /**
+     * Attach filter for casting value
+     *
+     * @param callable $callback
+     */
+    protected function addTypeFilter($callback)
+    {
+        $this->getFilterChain()->attach($callback, 10000);
+    }
+
+    /**
+     * Setup something
+     */
+    protected function setup()
+    {
+
     }
 }
