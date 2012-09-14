@@ -400,7 +400,8 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
         if ($result) {
-            // Remove target relations
+            // Remove target relations\
+            // @todo implement via events
             foreach($model->getSchema()->getProperties() as $property) {
                 if ($property instanceof HasOneProperty) {
                     $model->getRelation($property->getName())->removeTargetRelation();

@@ -85,7 +85,7 @@ class ApiStrategy implements ZendListenerAggregateInterface
 
     /**
      * @param \Zend\View\ViewEvent $e
-     * @return \GeometriaLab\Api\View\Renderer\XmlRenderer|\Zend\View\Renderer\JsonRenderer
+     * @return \GeometriaLab\Api\Mvc\View\Renderer\XmlRenderer|\Zend\View\Renderer\JsonRenderer
      */
     public function selectRenderer(ZendViewEvent $e)
     {
