@@ -153,7 +153,7 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
                     if (!isset($this->errorMessages[$name])) {
                         $this->errorMessages[$name] = array();
                     }
-                    $this->errorMessages[$name]['Model'] = $subModelMessages;
+                    $this->errorMessages[$name]['InvalidModel'] = $subModelMessages;
                     $result = false;
                 }
             }

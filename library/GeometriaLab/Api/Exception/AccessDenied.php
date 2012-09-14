@@ -12,16 +12,16 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class AccessDenied extends Exception
+class AccessDenied extends AbstractException
 {
     /**
      * @var int
      */
-    protected $errorCode = 44;
+    protected $code = 44;
     /**
      * @var string
      */
-    protected $errorMessage = 'Access denied';
+    protected $message = 'Access denied';
     /**
      * @var int
      */

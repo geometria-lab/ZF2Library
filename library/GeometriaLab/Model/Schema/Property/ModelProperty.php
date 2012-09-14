@@ -17,11 +17,6 @@ class ModelProperty extends AbstractProperty
     protected static $filterValidator;
 
     /**
-     * @var ZendValidatorCallback
-     */
-    protected static $modelValidator;
-
-    /**
      * Set model class
      *
      * @param string $modelClass
@@ -77,30 +72,7 @@ class ModelProperty extends AbstractProperty
 
         $this->getFilterChain()->attach(self::$modelFilter);
 
-        if (self::$modelValidator === null) {
-            $validator = new ZendValidatorCallback();
-            $validator->setOptions(array(
-                'messageTemplates' => array(
-                    ZendValidatorCallback::INVALID_VALUE => "Value must be a model object of '{$this->getModelClass()}'",
-                ),
-            ));
-            $property = $this;
-            $validator->setCallback(function($value) use ($property) {
-                if (!is_object($value) || !is_a($value, $property->getModelClass())) {
-                    return false;
-                }
-
-                if ($value instanceof \GeometriaLab\Model\ModelInterface) {
-                    /** @var \GeometriaLab\Model\ModelInterface $model */
-                    return $value->isValid();
-                }
-
-                return true;
-            });
-
-            self::$modelValidator = $validator;
-        }
-
-        $this->getValidatorChain()->addValidator(self::$modelValidator);
+        $validator = new Validator\Model($this);
+        $this->getValidatorChain()->addValidator($validator);
     }
 }

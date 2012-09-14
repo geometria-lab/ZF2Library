@@ -1,14 +1,15 @@
 <?php
 
-namespace GeometriaLab\Api\View\Http;
+namespace GeometriaLab\Api\Mvc\View\Http;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface as ZendEvents;
 use Zend\Mvc\MvcEvent as ZendMvcEvent;
 
 use GeometriaLab\Model,
-    GeometriaLab\Model\ModelInterface,
-    GeometriaLab\Api\View\Model\ApiModel,
+    GeometriaLab\Model\ModelInterface;
+
+use GeometriaLab\Api\Mvc\View\Model\ApiModel,
     GeometriaLab\Api\Exception\WrongFields;
 
 /**
@@ -89,14 +90,19 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
         // set error code and message (if any)
         if ($apiException) {
-            $errorCode = $apiException->getErrorCode();
-            $errorMessage = $apiException->getErrorMessage();
+            $errorCode    = $apiException->getCode();
+            $errorMessage = $apiException->getMessage();
         } else {
-            $errorCode = null;
+            $errorCode    = null;
             $errorMessage = null;
         }
-        $apiModel->setVariable(ApiModel::FIELD_ERRORCODE, $errorCode);
+
+        $apiModel->setVariable(ApiModel::FIELD_ERRORCODE,    $errorCode);
         $apiModel->setVariable(ApiModel::FIELD_ERRORMESSAGE, $errorMessage);
+
+        if ($apiException) {
+            $apiModel->setVariable(ApiModel::FIELD_DATA, $apiException->getData());
+        }
 
         $e->setResult($apiModel);
     }
