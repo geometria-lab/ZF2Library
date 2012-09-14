@@ -13,11 +13,17 @@ class SchemaTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($s->getProperty('foo'));
     }
 
-    public function testParseDocblock()
+    public function testParseDocBlock()
     {
         $this->setExpectedException('InvalidArgumentException');
         DocBlockParser::getInstance()->createSchema('stdClass');
     }
+
+    public function testParseDuplicatePropertyTag()
+    {
+        $this->setExpectedException('InvalidArgumentException', 'Property \'foo\' already exist in model \'GeometriaLabTest\Model\Schema\TestModels\ModelWithDoubleProperty\'');
+        DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\Schema\TestModels\ModelWithDoubleProperty');
+     }
 
     public function testGetParamsFromTag()
     {
