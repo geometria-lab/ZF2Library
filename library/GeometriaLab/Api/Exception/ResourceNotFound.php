@@ -12,16 +12,16 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class ResourceNotFound extends Exception
+class ResourceNotFound extends AbstractException
 {
     /**
      * @var int
      */
-    protected $errorCode = 46;
+    protected $code = 46;
     /**
      * @var string
      */
-    protected $errorMessage = 'Resource not found';
+    protected $message = 'Resource not found';
     /**
      * @var int
      */

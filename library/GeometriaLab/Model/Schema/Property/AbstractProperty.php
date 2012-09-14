@@ -2,12 +2,13 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
+use GeometriaLab\Validator\IsType;
+
 use Zend\Filter\FilterInterface as ZendFilterInterface,
     Zend\Filter\FilterChain as ZendFilterChain,
     Zend\Filter\Exception\RuntimeException as ZendRuntimeException;
 
-use Zend\Validator\Callback as ZendValidatorCallback,
-    Zend\Validator\ValidatorInterface as ZendValidatorInterface,
+use Zend\Validator\ValidatorInterface as ZendValidatorInterface,
     Zend\Validator\ValidatorChain as ZendValidatorChain;
 
 abstract class AbstractProperty implements PropertyInterface
@@ -266,15 +267,7 @@ abstract class AbstractProperty implements PropertyInterface
     protected function addTypeValidator($type)
     {
         if (!isset(static::$typeValidators[$type])) {
-            $validator = new ZendValidatorCallback();
-            $validator->setOptions(array(
-                'messageTemplates' => array(
-                    ZendValidatorCallback::INVALID_VALUE => "Value must be a $type",
-                ),
-            ));
-            $validator->setCallback(array(null, "is_$type"));
-
-            static::$typeValidators[$type] = $validator;
+            static::$typeValidators[$type] = new IsType($type);
         }
 
         $this->getValidatorChain()->addValidator(static::$typeValidators[$type]);

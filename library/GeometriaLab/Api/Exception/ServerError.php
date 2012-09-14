@@ -12,16 +12,16 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class ServerError extends Exception
+class ServerError extends AbstractException
 {
     /**
      * @var int
      */
-    protected $errorCode = 50;
+    protected $code = 50;
     /**
      * @var string
      */
-    protected $errorMessage = 'Server error';
+    protected $message = 'Server error';
     /**
      * @var int
      */

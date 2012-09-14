@@ -1,13 +1,14 @@
 <?php
 
-namespace GeometriaLab\Api\View\Strategy;
+namespace GeometriaLab\Api\Mvc\View\Strategy;
 
-use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
-use Zend\View\Renderer\JsonRenderer as ZendJsonRenderer;
-use Zend\EventManager\EventManagerInterface as ZendEventManagerInterface;
-use Zend\View\ViewEvent as ZendViewEvent;
+use GeometriaLab\Api\Mvc\View\Renderer\XmlRenderer;
 
-use GeometriaLab\Api\View\Renderer\XmlRenderer;
+use Zend\View\ViewEvent as ZendViewEvent,
+    Zend\View\Renderer\JsonRenderer as ZendJsonRenderer;
+
+use Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
+    Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
 
 /**
  *
@@ -35,13 +36,13 @@ class ApiStrategy implements ZendListenerAggregateInterface
     protected $jsonRenderer;
 
     /**
-     * @var \GeometriaLab\Api\View\Renderer\XmlRenderer
+     * @var XmlRenderer
      */
     protected $xmlRenderer;
 
     /**
      * @param \Zend\View\Renderer\JsonRenderer            $jsonRenderer
-     * @param \GeometriaLab\Api\View\Renderer\XmlRenderer $xmlRenderer
+     * @param XmlRenderer $xmlRenderer
      */
     public function __construct(ZendJsonRenderer $jsonRenderer, XmlRenderer $xmlRenderer)
     {

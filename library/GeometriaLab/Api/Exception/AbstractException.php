@@ -12,18 +12,18 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class ValidationError extends AbstractException
+abstract class AbstractException extends \Exception
 {
     /**
-     * @var int
+     * @var integer
      */
-    protected $code = 42;
+    protected $httpCode;
+
     /**
-     * @var string
+     * @return integer
      */
-    protected $message = 'Validation error';
-    /**
-     * @var int
-     */
-    protected $httpCode = 400;
+    public function getHttpCode()
+    {
+        return $this->httpCode;
+    }
 }
