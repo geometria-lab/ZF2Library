@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Model;
 
+use GeometriaLab\Model\Schema\Schema;
+
 interface ModelInterface extends Schemaless\ModelInterface
 {
     /**

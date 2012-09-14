@@ -146,7 +146,7 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
                 $result = false;
             }
 
-            if ($property->isRequired() && empty($value)) {
+            if ($property->isRequired() && $value === null) {
                 $this->errorMessages[$name]['Required'] = "Is required";
                 $result = false;
             }

@@ -70,7 +70,7 @@ class Schema implements SchemaInterface
     {
         $name = $property->getName();
 
-        if (!$this->hasProperty($name)) {
+        if ($this->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' already exist in model '$this->className'");
         }
 
