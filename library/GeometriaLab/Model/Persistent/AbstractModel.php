@@ -15,14 +15,16 @@ use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as A
 
 abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implements ModelInterface
 {
-    static protected $parserClassName = 'GeometriaLab\Model\Persistent\Schema\DocBlockParser';
-
     /**
      * Clean property values
      *
      * @var array
      */
     protected $cleanPropertyValues = array();
+    /**
+     * @var string
+     */
+    static protected $parserClassName = 'GeometriaLab\Model\Persistent\Schema\DocBlockParser';
 
     /**
      * Get property value
@@ -53,6 +55,26 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
         }
 
         return $value;
+    }
+
+    /**
+     * Is property has relation
+     *
+     * @param string $name
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    public function isRelation($name)
+    {
+        $schema = static::getSchema();
+
+        if (!$schema->hasProperty($name)) {
+            throw new \InvalidArgumentException("Relation '$name' does not exists");
+        }
+
+        $property = $schema->getProperty($name);
+
+        return (bool)($property instanceof AbstractRelationProperty);
     }
 
     /**
@@ -89,35 +111,23 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
      */
     public function set($name, $value)
     {
+        parent::set($name, $value);
+
         $schema = static::getSchema();
 
-        if (!$schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property '$name' does not exists");
-        }
+        if ($this->isRelation($name)) {
+            $this->propertyValues[$name] = null;
+            $property = $schema->getProperty($name);
 
-        $property = $schema->getProperty($name);
-
-        if ($value !== null) {
-            try {
-                $value = $property->prepare($value);
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
+            if ($property instanceof BelongsToProperty) {
+                $this->propertyValues[$name] = $property->setTargetModel($value);
+            } else if ($property instanceof HasOneProperty) {
+                $this->propertyValues[$name] = $property->setTargetModel($value);
+            } else if ($property instanceof HasManyProperty) {
+                $this->propertyValues[$name] = $property->setTargetModels($value);
             }
-        }
-
-        $method = "set{$name}";
-        if (method_exists($this, $method)) {
-            call_user_func(array($this, $method), $value);
-        } else if ($property instanceof BelongsToProperty) {
-            $this->propertyValues[$name]->setTargetModel($value);
-        } else if ($property instanceof HasOneProperty) {
-            $this->propertyValues[$name]->setTargetModel($value);
-        } else if ($property instanceof HasManyProperty) {
-            $this->propertyValues[$name]->setTargetModels($value);
         } else {
-            $this->propertyValues[$name] = $value;
-
-            foreach($schema->getProperties() as $property) {
+            foreach ($schema->getProperties() as $property) {
                 // @todo If changed referenced key?
                 /**
                  * @var BelongsToProperty $property

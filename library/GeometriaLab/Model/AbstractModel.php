@@ -77,10 +77,6 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     {
         $schema = static::getSchema();
 
-        if (!$schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property '$name' does not exists", 1);
-        }
-
         if ($value !== null) {
             $property = $schema->getProperty($name);
 

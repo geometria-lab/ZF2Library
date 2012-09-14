@@ -14,7 +14,7 @@ class ModelProperty extends AbstractProperty
     /**
      * @var \Closure
      */
-    protected static $filterValidator;
+    protected static $modelFilter;
 
     /**
      * Set model class
