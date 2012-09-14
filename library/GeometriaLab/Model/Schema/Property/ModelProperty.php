@@ -12,11 +12,6 @@ class ModelProperty extends AbstractProperty
     protected $modelClass;
 
     /**
-     * @var \Closure
-     */
-    protected static $modelFilter;
-
-    /**
      * Set model class
      *
      * @param string $modelClass
@@ -48,29 +43,26 @@ class ModelProperty extends AbstractProperty
 
     protected function setup()
     {
-        if (self::$modelFilter === null) {
-            $property = $this;
-            self::$modelFilter = function($value) use ($property) {
-                if (is_array($value) || (is_object($value) && $value instanceof \stdClass)) {
+        $property = $this;
+        $this->getFilterChain()->attach(function($value) use ($property) {
+            if (is_array($value) || (is_object($value) && $value instanceof \stdClass)) {
+                /** @var \GeometriaLab\Model\Schemaless\ModelInterface $model */
+                $modelClass = $property->getModelClass();
+                $model = new $modelClass;
+
+                if ($model instanceof \GeometriaLab\Model\ModelInterface) {
+                    /** @var \GeometriaLab\Model\ModelInterface $model */
+                    $model->populateSilent($value);
+                } else {
                     /** @var \GeometriaLab\Model\Schemaless\ModelInterface $model */
-                    $model = new $property->getModelClass();
-
-                    if ($model instanceof \GeometriaLab\Model\ModelInterface) {
-                        /** @var \GeometriaLab\Model\ModelInterface $model */
-                        $model->populateSilent($value);
-                    } else {
-                        /** @var \GeometriaLab\Model\Schemaless\ModelInterface $model */
-                        $model->populate($value);
-                    }
-
-                    $value = $model;
+                    $model->populate($value);
                 }
 
-                return $value;
-            };
-        }
+                $value = $model;
+            }
 
-        $this->getFilterChain()->attach(self::$modelFilter);
+            return $value;
+        });
 
         $validator = new Validator\Model($this);
         $this->getValidatorChain()->addValidator($validator);

@@ -21,6 +21,14 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
      * @var array
      */
     protected $cleanPropertyValues = array();
+
+    /**
+     * Relations
+     *
+     * @var array
+     */
+    protected $relations = array();
+
     /**
      * @var string
      */
@@ -58,23 +66,38 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
     }
 
     /**
-     * Is property has relation
+     * Set property value
      *
      * @param string $name
-     * @return bool
+     * @param mixed $value
+     * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
-    public function isRelation($name)
+    public function set($name, $value)
     {
-        $schema = static::getSchema();
+        if ($this->hasRelation($name)) {
+            $relation = $this->getRelation($name);
 
-        if (!$schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Relation '$name' does not exists");
+            if ($relation instanceof BelongsTo || $relation instanceof HasOne) {
+                $relation->setTargetModel($value);
+            } else if ($relation instanceof HasMany) {
+                $relation->setTargetModels($value);
+            }
+        } else {
+            parent::set($name, $value);
+
+            foreach ($this->getRelations() as $relation) {
+                // @todo If changed referenced key?
+                /**
+                 * @var BelongsTo $relation
+                 */
+                if ($relation instanceof BelongsTo && $relation->getProperty()->getOriginProperty() === $name) {
+                    $relation->resetTargetModel();
+                }
+            }
         }
 
-        $property = $schema->getProperty($name);
-
-        return (bool)($property instanceof AbstractRelationProperty);
+        return $this;
     }
 
     /**
@@ -88,57 +111,43 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
     {
         $schema = static::getSchema();
 
-        if (!$schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Relation '$name' does not exists");
-        }
-
         $property = $schema->getProperty($name);
 
         if (!$property instanceof AbstractRelationProperty) {
             throw new \InvalidArgumentException("'$name' is not relation");
         }
 
-        return $this->propertyValues[$name];
+        return $this->relations[$name];
     }
 
     /**
-     * Set property value
+     * Get relations
+     *
+     * @return array
+     */
+    public function getRelations()
+    {
+        return $this->relations;
+    }
+
+    /**
+     * Has relation
      *
      * @param string $name
-     * @param mixed $value
-     * @return AbstractModel|ModelInterface
+     * @return bool
      * @throws \InvalidArgumentException
      */
-    public function set($name, $value)
+    public function hasRelation($name)
     {
-        parent::set($name, $value);
-
         $schema = static::getSchema();
 
-        if ($this->isRelation($name)) {
-            $this->propertyValues[$name] = null;
-            $property = $schema->getProperty($name);
-
-            if ($property instanceof BelongsToProperty) {
-                $this->propertyValues[$name] = $property->setTargetModel($value);
-            } else if ($property instanceof HasOneProperty) {
-                $this->propertyValues[$name] = $property->setTargetModel($value);
-            } else if ($property instanceof HasManyProperty) {
-                $this->propertyValues[$name] = $property->setTargetModels($value);
-            }
-        } else {
-            foreach ($schema->getProperties() as $property) {
-                // @todo If changed referenced key?
-                /**
-                 * @var BelongsToProperty $property
-                 */
-                if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
-                    $this->propertyValues[$property->getName()] = null;
-                }
-            }
+        if (!$schema->hasProperty($name)) {
+            return false;
         }
 
-        return $this;
+        $property = $schema->getProperty($name);
+
+        return ($property instanceof AbstractRelationProperty);
     }
 
     /**
@@ -329,7 +338,7 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
                  * @var AbstractRelationProperty $property
                  */
                 $relationClassName = $property->getRelationClass();
-                $this->propertyValues[$name] = new $relationClassName($this, $property);
+                $this->relations[$name] = new $relationClassName($this, $property);
             } else if ($property->getDefaultValue() !== null) {
                 $this->set($name, $property->getDefaultValue());
             }

@@ -18,7 +18,7 @@ class IsType extends ZendAbstractValidator
     /**
      * Types
      */
-    const TYPE_BOOL    = 'boolean';
+    const TYPE_BOOLEAN = 'boolean';
     const TYPE_STRING  = 'string';
     const TYPE_INTEGER = 'integer';
     const TYPE_FLOAT   = 'float';
@@ -27,7 +27,7 @@ class IsType extends ZendAbstractValidator
     /**
      * Error codes
      */
-    const NOT_BOOL    = 'notBoolean';
+    const NOT_BOOLEAN = 'notBoolean';
     const NOT_STRING  = 'notString';
     const NOT_INTEGER = 'notInteger';
     const NOT_FLOAT   = 'notFloat';
@@ -38,18 +38,18 @@ class IsType extends ZendAbstractValidator
      *
      * @var array
      */
-    protected $supportedTypes = array('bool', 'string', 'integer', 'float', 'array');
+    protected $supportedTypes = array('boolean', 'string', 'integer', 'float', 'array');
 
     /**
      * Error messages
      * @var array
      */
     protected $messageTemplates = array(
-        self::NOT_BOOL     => 'Value must be a boolean',
-        self::NOT_STRING   => 'Value must be a string',
-        self::NOT_INTEGER  => 'Value must be a integer',
-        self::NOT_FLOAT    => 'Value must be a float',
-        self::NOT_ARRAY    => 'Value must be a array',
+        self::NOT_BOOLEAN  => 'Value must be a boolean, %valueType% is present',
+        self::NOT_STRING   => 'Value must be a string, %valueType% is present',
+        self::NOT_INTEGER  => 'Value must be a integer, %valueType% is present',
+        self::NOT_FLOAT    => 'Value must be a float, %valueType% is present',
+        self::NOT_ARRAY    => 'Value must be a array, %valueType% is present',
     );
 
     /**
@@ -132,6 +132,10 @@ class IsType extends ZendAbstractValidator
         }
 
         $this->valueType = gettype($value);
+
+        if ($this->valueType === 'double') {
+            $this->valueType = 'float';
+        }
 
         if ($this->valueType !== $this->type) {
             $this->error('not' . ucfirst($this->type));

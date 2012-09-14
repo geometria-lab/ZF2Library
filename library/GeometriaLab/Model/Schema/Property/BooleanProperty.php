@@ -6,6 +6,6 @@ class BooleanProperty extends AbstractProperty
 {
     protected function setup()
     {
-        $this->addTypeValidator('bool');
+        $this->addTypeValidator('boolean');
     }
 }
