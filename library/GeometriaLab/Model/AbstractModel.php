@@ -142,19 +142,19 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
                 $result = false;
             }
 
-            if ($property instanceof \GeometriaLab\Model\Schema\Property\ModelProperty) {
-                /** @var ModelInterface $value */
-                $subModelMessages = $value->getErrorMessages();
-                if (!empty($subModelMessages)) {
-                    if (!isset($this->errorMessages[$name])) {
-                        $this->errorMessages[$name] = array();
+            if ($value !== null) {
+                if ($property instanceof \GeometriaLab\Model\Schema\Property\ModelProperty) {
+                    /** @var ModelInterface $value */
+                    $subModelMessages = $value->getErrorMessages();
+                    if (!empty($subModelMessages)) {
+                        if (!isset($this->errorMessages[$name])) {
+                            $this->errorMessages[$name] = array();
+                        }
+                        $this->errorMessages[$name]['InvalidModel'] = $subModelMessages;
+                        $result = false;
                     }
-                    $this->errorMessages[$name]['InvalidModel'] = $subModelMessages;
-                    $result = false;
                 }
-            }
-
-            if ($property->isRequired() && $value === null) {
+            } elseif ($property->isRequired()) {
                 $this->errorMessages[$name]['Required'] = "Is required";
                 $result = false;
             }
