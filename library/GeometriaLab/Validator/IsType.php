@@ -113,7 +113,7 @@ class IsType extends ZendAbstractValidator
             throw new ZendInvalidArgumentException("Invalid type '$type'. Supported types: " . implode(', ', $this->supportedTypes));
         }
 
-        $this->neededType = $type;
+        $this->type = $type;
 
         return $this;
     }

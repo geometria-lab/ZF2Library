@@ -9,7 +9,7 @@ use Zend\Stdlib\ArrayUtils as ZendArrayUtils,
     Zend\Mvc\Router\Exception\RuntimeException as ZendRuntimeException,
     Zend\Mvc\Exception\DomainException as ZendDomainException;
 
-use GeometriaLab\Api\View\Strategy\ApiStrategy;
+use GeometriaLab\Api\Mvc\View\Strategy\ApiStrategy;
 
 /**
  *
