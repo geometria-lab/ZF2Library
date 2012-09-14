@@ -35,5 +35,6 @@ class XmlRenderer implements ZendViewRendererInterface
 
     public function render($nameOrModel, $values = null)
     {
+        throw new \RuntimeException('Not implemented yet');
     }
 }

@@ -2,12 +2,24 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
+use Zend\Validator\Callback as ZendValidatorCallback;
+
 class ModelProperty extends AbstractProperty
 {
     /**
      * @var string
      */
     protected $modelClass;
+
+    /**
+     * @var \Closure
+     */
+    protected static $filterValidator;
+
+    /**
+     * @var ZendValidatorCallback
+     */
+    protected static $modelValidator;
 
     /**
      * Set model class
@@ -39,19 +51,56 @@ class ModelProperty extends AbstractProperty
         return $this->modelClass;
     }
 
-    /**
-     * Prepare value
-     *
-     * @param array|\Traversable|\stdClass|\GeometriaLab\Model\ModelInterface $value
-     * @return \GeometriaLab\Model\ModelInterface
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (is_a($value, $this->getModelClass())) {
-            return $value;
-        } else {
-            $className = $this->getModelClass();
-            return new $className($value);
+        if (self::$modelFilter === null) {
+            $property = $this;
+            self::$modelFilter = function($value) use ($property) {
+                if (is_array($value) || (is_object($value) && $value instanceof \stdClass)) {
+                    /** @var \GeometriaLab\Model\Schemaless\ModelInterface $model */
+                    $model = new $property->getModelClass();
+
+                    if ($model instanceof \GeometriaLab\Model\ModelInterface) {
+                        /** @var \GeometriaLab\Model\ModelInterface $model */
+                        $model->populateSilent($value);
+                    } else {
+                        /** @var \GeometriaLab\Model\Schemaless\ModelInterface $model */
+                        $model->populate($value);
+                    }
+
+                    $value = $model;
+                }
+
+                return $value;
+            };
         }
+
+        $this->getFilterChain()->attach(self::$modelFilter);
+
+        if (self::$modelValidator === null) {
+            $validator = new ZendValidatorCallback();
+            $validator->setOptions(array(
+                'messageTemplates' => array(
+                    ZendValidatorCallback::INVALID_VALUE => "Value must be a model object of '{$this->getModelClass()}'",
+                ),
+            ));
+            $property = $this;
+            $validator->setCallback(function($value) use ($property) {
+                if (!is_object($value) || !is_a($value, $property->getModelClass())) {
+                    return false;
+                }
+
+                if ($value instanceof \GeometriaLab\Model\ModelInterface) {
+                    /** @var \GeometriaLab\Model\ModelInterface $model */
+                    return $value->isValid();
+                }
+
+                return true;
+            });
+
+            self::$modelValidator = $validator;
+        }
+
+        $this->getValidatorChain()->addValidator(self::$modelValidator);
     }
 }

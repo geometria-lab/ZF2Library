@@ -4,19 +4,8 @@ namespace GeometriaLab\Model\Schema\Property;
 
 class BooleanProperty extends AbstractProperty
 {
-    /**
-     * Prepare value
-     *
-     * @param boolean $value
-     * @return boolean mixed
-     * @throws \InvalidArgumentException
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (!is_bool($value)) {
-            throw new \InvalidArgumentException("must be boolean");
-        }
-
-        return $value;
+        $this->addTypeValidator('bool');
     }
 }

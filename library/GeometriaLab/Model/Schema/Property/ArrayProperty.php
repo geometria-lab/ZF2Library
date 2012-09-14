@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
-use GeometriaLab\Model\Schema\Schema;
+use Zend\Validator\Callback as ZendValidatorCallback;
 
 class ArrayProperty extends AbstractProperty
 {
@@ -10,6 +10,11 @@ class ArrayProperty extends AbstractProperty
      * @var PropertyInterface
      */
     protected $itemProperty;
+
+    /**
+     * @var ZendValidatorCallback
+     */
+    protected static $isArrayValidator;
 
     /**
      * Set item property
@@ -34,24 +39,46 @@ class ArrayProperty extends AbstractProperty
         return $this->itemProperty;
     }
 
-    /**
-     * Prepare value
-     *
-     * @todo Separate validation and filter
-     * @param array $value
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (!is_array($value)) {
-            throw new \InvalidArgumentException("must be array");
+        $this->addTypeValidator('array');
+
+        if (!isset(static::$isArrayValidator)) {
+            $validator = new ZendValidatorCallback();
+            $validator->setOptions(array(
+                'messageTemplates' => array(
+                    ZendValidatorCallback::INVALID_VALUE => "Value must be a array of type '%type%'",
+                ),
+                'messageVariables' => array(
+                    'type' => 'type'
+                )
+            ));
+
+            $property = $this;
+            $validator->setCallback(function($value) use ($property, $validator) {
+                if ($property->getItemProperty() === null) {
+                    return true;
+                }
+
+                $isValid = true;
+                foreach($value as $item) {
+                    if (!$property->getItemProperty()->getValidatorChain()->isValid($item)) {
+                        $isValid = false;
+                        break;
+                    }
+                }
+
+                if (!$isValid) {
+                    $type = str_replace('Property', '', get_class($property->getItemProperty()));
+                    $validator->type = strtolower($type);
+                }
+
+                return $isValid;
+            });
+
+            static::$isArrayValidator = $validator;
         }
 
-        if ($this->getItemProperty() !== null) {
-            $value = array_map(array($this->getItemProperty(), 'prepare'), $value);
-        }
-
-        return $value;
+        $this->getValidatorChain()->addValidator(static::$isArrayValidator);
     }
 }
