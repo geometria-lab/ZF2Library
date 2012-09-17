@@ -8,10 +8,7 @@ use GeometriaLab\Model\Persistent\Relation\BelongsTo,
     GeometriaLab\Model\Persistent\Relation\HasOne,
     GeometriaLab\Model\Persistent\Relation\HasMany;
 
-use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo        as BelongsToProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne           as HasOneProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany          as HasManyProperty;
+use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty;
 
 abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implements ModelInterface
 {
