@@ -84,8 +84,7 @@ class Model extends ZendAbstractValidator
                     $this->error(self::INVALID_MODEL);
                 } else {
                     $errorMessages = $value->getErrorMessages();
-                    // @TODO Really need all messages?
-                    $this->abstractOptions['messages'][self::INVALID_MODEL] = $errorMessages[0];
+                    $this->abstractOptions['messages'][self::INVALID_MODEL] = $errorMessages;
                 }
 
                 return false;
