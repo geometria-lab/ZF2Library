@@ -55,7 +55,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testSetInvalidDataToBoolean()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        $this->model->booleanProperty = 1;
+        $this->model->booleanProperty = 'foo';
     }
 
     public function testSetInvalidDataToFloat()
