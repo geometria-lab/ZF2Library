@@ -135,14 +135,14 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
         foreach ($this->getSchema()->getProperties() as $property) {
             $name = $property->getName();
             $value = $this->get($name);
-            $messages = $property->getValidatorChain()->getMessages();
-
-            if (!empty($messages)) {
-                $this->errorMessages[$name] = $messages;
-                $result = false;
-            }
 
             if ($value !== null) {
+                $messages = $property->getValidatorChain()->getMessages();
+                if (!empty($messages)) {
+                    $this->errorMessages[$name] = $messages;
+                    $result = false;
+                }
+
                 if ($property instanceof \GeometriaLab\Model\Schema\Property\ModelProperty) {
                     /** @var ModelInterface $value */
                     $subModelMessages = $value->getErrorMessages();
