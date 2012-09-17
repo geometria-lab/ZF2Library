@@ -9,12 +9,27 @@ class BooleanProperty extends AbstractProperty
         $this->addTypeValidator('boolean');
 
         $this->addTypeFilter(function($value) {
-            if ($value === 'true' || $value === '1') {
-                return true;
-            } elseif ($value === 'false' || $value === '0') {
-                return false;
-            } else {
-                return $value;
+            switch (gettype($value)) {
+                case 'boolean':
+                    return $value;
+                case 'integer':
+                    if ($value === 1) {
+                        return true;
+                    } elseif ($value === 0) {
+                        return false;
+                    } else {
+                        return $value;
+                    }
+                case 'string':
+                    if ($value === 'true') {
+                        return true;
+                    } elseif ($value === 'false') {
+                        return false;
+                    } else {
+                        return $value;
+                    }
+                default:
+                    return $value;
             }
         });
     }
