@@ -40,7 +40,11 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
      */
     public function get($name)
     {
-        $value = parent::get($name);
+        if ($this->hasRelation($name)) {
+            $value = $this->getRelation($name);
+        } else {
+            $value = parent::get($name);
+        }
 
         if ($value instanceof BelongsTo) {
             /**
