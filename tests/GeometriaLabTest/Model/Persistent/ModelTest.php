@@ -22,7 +22,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRelationNotExists()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Relation \'foo\' does not exists');
+        $this->setExpectedException('\InvalidArgumentException', 'Property \'foo\' not present in model');
         $model = new TestModels\WithInvalidRelations\NotExists();
         $model->getRelation('foo');
     }
@@ -36,7 +36,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetNotExists()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Property \'bar\' does not exists');
+        $this->setExpectedException('\InvalidArgumentException', 'Property \'bar\' not present in model');
         $model = new TestModels\Model();
         $model->set('bar', 'baz');
     }
@@ -49,7 +49,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetInvalidProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Invalid value for property \'id\': must be integer');
+        $this->setExpectedException('\InvalidArgumentException', 'Invalid property \'id\' value: Value must be a integer, string is present');
         $model = new TestModels\Model();
         $model->set('id', 'foo');
     }
