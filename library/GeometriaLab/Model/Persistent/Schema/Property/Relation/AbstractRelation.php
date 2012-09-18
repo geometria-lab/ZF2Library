@@ -12,6 +12,11 @@ abstract class AbstractRelation extends AbstractProperty
 
     protected $targetProperty;
 
+    public function setRequired($required)
+    {
+        throw new \RuntimeException('Required is not supported for relations');
+    }
+
     public function setTargetModelClass($referencedModelClass)
     {
         $this->targetModelClass = $referencedModelClass;
