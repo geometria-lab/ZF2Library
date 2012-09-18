@@ -34,6 +34,21 @@ class ArrayProperty extends AbstractProperty
 
     protected function setup()
     {
+        $property = $this;
+        $this->getFilterChain()->attach(function($value) use ($property) {
+            if (is_array($value)) {
+                foreach($value as &$item) {
+                    $item = $property->getItemProperty()->getFilterChain()->filter($item);
+
+                    $validator = new Validator\ArrayItem($property);
+                    $property->getValidatorChain()->addValidator($validator);
+                }
+            }
+
+            return $value;
+        });
+
+
         $validator = new Validator\ArrayItem($this);
         $this->getValidatorChain()->addValidator($validator);
     }
