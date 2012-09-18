@@ -81,7 +81,7 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
 
             if ($relation instanceof BelongsTo || $relation instanceof HasOne) {
                 $relation->setTargetModel($value);
-            } else if ($relation instanceof HasMany) {
+            } elseif ($relation instanceof HasMany) {
                 $relation->setTargetModels($value);
             }
         } else {
@@ -154,20 +154,11 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
     /**
      * Save model to storage
      *
-     * @param bool $validate
      * @return bool
      * @throws \RuntimeException
      */
-    public function save($validate = true)
+    public function save()
     {
-        if ($validate && !$this->isValid()) {
-            $errorString = '';
-            foreach ($this->getErrorMessages() as $fieldName => $errors) {
-                $errorString .= "Field $fieldName:\r\n" . implode("\r\n", $errors) . "\r\n";
-            }
-            throw new \RuntimeException("Model is invalid: $errorString");
-        }
-
         if ($this->isNew()) {
             return static::getMapper()->create($this);
         } else if ($this->isChanged()) {
