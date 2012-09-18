@@ -36,12 +36,10 @@ class ArrayProperty extends AbstractProperty
     {
         $property = $this;
         $this->getFilterChain()->attach(function($value) use ($property) {
-            if (is_array($value)) {
+            $itemProperty = $property->getItemProperty();
+            if (is_array($value) && $itemProperty !== null) {
                 foreach($value as &$item) {
-                    $item = $property->getItemProperty()->getFilterChain()->filter($item);
-
-                    $validator = new Validator\ArrayItem($property);
-                    $property->getValidatorChain()->addValidator($validator);
+                    $item = $itemProperty->getFilterChain()->filter($item);
                 }
             }
 
