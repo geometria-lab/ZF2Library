@@ -103,7 +103,7 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
         try {
             $this->set($name, $value);
         } catch (\InvalidArgumentException $e) {
-            if ($e->getCode() === 1) {
+            if ($e->getCode() !== 2) {
                 throw $e;
             }
         }
