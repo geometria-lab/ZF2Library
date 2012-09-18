@@ -4,7 +4,8 @@ namespace GeometriaLab\Model;
 
 use GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Model\Schema\Property\PropertyInterface,
-    GeometriaLab\Model\Schema\Manager as SchemaManager;
+    GeometriaLab\Model\Schema\Manager as SchemaManager,
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation;
 
 abstract class AbstractModel extends Schemaless\Model implements ModelInterface
 {
@@ -133,6 +134,10 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
         $result = true;
 
         foreach ($this->getSchema()->getProperties() as $property) {
+            if ($property instanceof AbstractRelation) {
+                continue;
+            }
+
             $name = $property->getName();
             $value = $this->get($name);
 
