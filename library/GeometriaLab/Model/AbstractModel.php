@@ -134,39 +134,22 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
 
         foreach ($this->getSchema()->getProperties() as $property) {
             $name = $property->getName();
+            $value = $this->get($name);
 
-            if ($property->getValidatorChain()->count()) {
-                $value = $this->get($name);
+            if ($value !== null) {
                 if ($value !== null) {
                     $messages = $property->getValidatorChain()->getMessages();
                     if (!empty($messages)) {
                         $this->errorMessages[$name] = $messages;
                         $result = false;
                     }
-
-                    if ($property instanceof \GeometriaLab\Model\Schema\Property\ModelProperty) {
-                        /** @var ModelInterface $value */
-                        $subModelMessages = $value->getErrorMessages();
-                        if (!empty($subModelMessages)) {
-                            if (!isset($this->errorMessages[$name])) {
-                                $this->errorMessages[$name] = array();
-                            }
-                            $this->errorMessages[$name]['InvalidModel'] = $subModelMessages;
-                            $result = false;
-                        }
-                    }
                 }
-            }
-
-            if ($property->isRequired()) {
-                $value = $this->get($name);
-                if ($value !== null) {
-                    if (!isset($this->errorMessages[$name])) {
-                        $this->errorMessages[$name] = array();
-                    }
-                    $this->errorMessages[$name]['Required'] = "Is required";
-                    $result = false;
+            } elseif ($property->isRequired()) {
+                if (!isset($this->errorMessages[$name])) {
+                    $this->errorMessages[$name] = array();
                 }
+                $this->errorMessages[$name]['isRequired'] = "Value is required";
+                $result = false;
             }
         }
 
