@@ -63,7 +63,7 @@ class Listener implements ZendListenerAggregateInterface
 
         /* @var Params $params */
         $params = $e->getApplication()->getServiceManager()->get('Params');
-        $params->populate($queryParams, false);
+        $params->populateSilent($queryParams, false);
 
         if (!$params->isValid()) {
             $errorString = '';
