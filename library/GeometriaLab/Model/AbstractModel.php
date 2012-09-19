@@ -30,26 +30,6 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     }
 
     /**
-     * Populate model from array or iterable object
-     *
-     * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
-     * @return AbstractModel
-     * @throws \InvalidArgumentException
-     */
-    public function populateSilent($data)
-    {
-        if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
-            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
-        }
-
-        foreach ($data as $key => $value) {
-            $this->setSilent($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
      * Get property value
      *
      * @param $name
@@ -83,32 +63,11 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
             $value = $property->getFilterChain()->filter($value);
 
             if (!$property->getValidatorChain()->isValid($value)) {
-                throw new \InvalidArgumentException("Invalid property '$name' value: " . implode("\r\n", $property->getValidatorChain()->getMessages()), 2);
+                throw new \InvalidArgumentException("Invalid property '$name' value: " . implode("\r\n", $property->getValidatorChain()->getMessages()));
             }
         }
 
         return parent::set($name, $value);
-    }
-
-    /**
-     * Set property value without throwing exception on validation
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return AbstractModel|ModelInterface
-     * @throws \InvalidArgumentException
-     */
-    public function setSilent($name, $value)
-    {
-        try {
-            $this->set($name, $value);
-        } catch (\InvalidArgumentException $e) {
-            if ($e->getCode() !== 2) {
-                throw $e;
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -130,30 +89,25 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     public function isValid()
     {
         $this->errorMessages = array();
-        $result = true;
 
-        foreach ($this->getSchema()->getProperties() as $property) {
+        foreach ($this->getPropertiesForValidation() as $property) {
             $name = $property->getName();
             $value = $this->get($name);
 
-            if ($value !== null) {
-                if ($value !== null) {
-                    $messages = $property->getValidatorChain()->getMessages();
-                    if (!empty($messages)) {
-                        $this->errorMessages[$name] = $messages;
-                        $result = false;
-                    }
-                }
-            } elseif ($property->isRequired()) {
+            $messages = $property->getValidatorChain()->getMessages();
+            if (!empty($messages)) {
+                $this->errorMessages[$name] = $messages;
+            }
+
+            if ($value === null && $property->isRequired()) {
                 if (!isset($this->errorMessages[$name])) {
                     $this->errorMessages[$name] = array();
                 }
                 $this->errorMessages[$name]['isRequired'] = "Value is required";
-                $result = false;
             }
         }
 
-        return $result;
+        return empty($this->errorMessages);
     }
 
     /**
@@ -210,5 +164,15 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     protected function getProperties()
     {
         return static::getSchema()->getProperties();
+    }
+
+    /**
+     * Get properties for validation
+     *
+     * @return PropertyInterface[]
+     */
+    public function getPropertiesForValidation()
+    {
+        return $this->getProperties();
     }
 }

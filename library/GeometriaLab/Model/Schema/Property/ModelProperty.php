@@ -50,13 +50,7 @@ class ModelProperty extends AbstractProperty
                 $modelClass = $property->getModelClass();
                 $model = new $modelClass;
 
-                if ($model instanceof \GeometriaLab\Model\ModelInterface) {
-                    /** @var \GeometriaLab\Model\ModelInterface $model */
-                    $model->populateSilent($value);
-                } else {
-                    /** @var \GeometriaLab\Model\Schemaless\ModelInterface $model */
-                    $model->populate($value);
-                }
+                $model->populate($value);
 
                 $value = $model;
             }

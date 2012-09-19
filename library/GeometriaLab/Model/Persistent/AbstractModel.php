@@ -315,45 +315,6 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
     }
 
     /**
-     * Is Valid model data
-     * @TODO Refactor it!
-     *
-     * @return bool
-     */
-    public function isValid()
-    {
-        $this->errorMessages = array();
-        $result = true;
-
-        foreach ($this->getSchema()->getProperties() as $property) {
-            if ($property instanceof AbstractRelationProperty) {
-                continue;
-            }
-
-            $name = $property->getName();
-            $value = $this->get($name);
-
-            if ($value !== null) {
-                if ($value !== null) {
-                    $messages = $property->getValidatorChain()->getMessages();
-                    if (!empty($messages)) {
-                        $this->errorMessages[$name] = $messages;
-                        $result = false;
-                    }
-                }
-            } elseif ($property->isRequired()) {
-                if (!isset($this->errorMessages[$name])) {
-                    $this->errorMessages[$name] = array();
-                }
-                $this->errorMessages[$name]['isRequired'] = "Value is required";
-                $result = false;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Setup model
      */
     protected function setup()
@@ -374,5 +335,22 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
                 $this->set($name, $property->getDefaultValue());
             }
         }
+    }
+
+    /**
+     * Get properties for validation
+     *
+     * @return \GeometriaLab\Model\Schema\Property\PropertyInterface[]
+     */
+    public function getPropertiesForValidation()
+    {
+        $properties = array();
+        foreach(self::getSchema()->getProperties() as $property) {
+            if (!$property instanceof AbstractRelationProperty) {
+                $properties[] = $property;
+            }
+        }
+
+        return $properties;
     }
 }

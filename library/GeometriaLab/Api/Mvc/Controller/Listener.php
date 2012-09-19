@@ -27,7 +27,7 @@ class Listener implements ZendListenerAggregateInterface
      */
     public function attach(ZendEvents $events)
     {
-        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'createParams'),  -30);
+        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array('\GeometriaLab\Api\Mvc\Controller\Listener', 'createParams'),  -30);
     }
 
     /**
@@ -49,7 +49,7 @@ class Listener implements ZendListenerAggregateInterface
      * @param ZendMvcEvent $e
      * @throws WrongFields
      */
-    public function createParams(ZendMvcEvent $e)
+    static public function createParams(ZendMvcEvent $e)
     {
         $routeMatch = $e->getRouteMatch();
         $request = $e->getRequest();
@@ -63,12 +63,12 @@ class Listener implements ZendListenerAggregateInterface
 
         /* @var Params $params */
         $params = $e->getApplication()->getServiceManager()->get('Params');
-        $params->populateSilent($queryParams, false);
+        $params->populate($queryParams);
 
         if (!$params->isValid()) {
             $errorString = '';
             foreach ($params->getErrorMessages() as $fieldName => $errors) {
-                $errorString .= "Field $fieldName:\r\n" . implode("\r\n", $errors) . "\r\n";
+                $errorString .= "Field '$fieldName':\r\n" . implode("\r\n", $errors) . "\r\n";
             }
             throw new WrongFields($errorString);
         }
