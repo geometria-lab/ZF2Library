@@ -30,32 +30,15 @@ class Params extends AbstractModel
         }
 
         foreach ($data as $key => $value) {
-            $this->set($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set property value without throwing exception on validation
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return AbstractModel|\GeometriaLab\Model\ModelInterface
-     * @throws \InvalidArgumentException
-     */
-    public function set($name, $value)
-    {
-        if (!$this->has($name)) {
-            $this->notPresentProperties[$name] = $value;
-
-            return $this;
-        }
-
-        try {
-            parent::set($name, $value);
-        } catch (\InvalidArgumentException $e) {
-            // Do nothing, keep silent...
+            if (!$this->has($key)) {
+                $this->notPresentProperties[$key] = $value;
+                continue;
+            }
+            try {
+                $this->set($key, $value);
+            } catch (\InvalidArgumentException $e) {
+                // Do nothing, keep silent...
+            }
         }
 
         return $this;

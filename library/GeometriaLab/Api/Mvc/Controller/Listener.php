@@ -8,7 +8,7 @@ use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterfa
     Zend\Stdlib\RequestInterface as ZendRequestInterface;
 
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Params,
-    GeometriaLab\Api\Exception\WrongFields;
+    GeometriaLab\Api\Exception\InvalidParams;
 
 class Listener implements ZendListenerAggregateInterface
 {
@@ -70,7 +70,7 @@ class Listener implements ZendListenerAggregateInterface
             foreach ($params->getErrorMessages() as $fieldName => $errors) {
                 $errorString .= "Field '$fieldName':\r\n" . implode("\r\n", $errors) . "\r\n";
             }
-            throw new WrongFields($errorString);
+            throw new InvalidParams($errorString);
         }
 
         $routeMatch->setParam('params', $params);

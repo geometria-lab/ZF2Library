@@ -12,7 +12,7 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class ValidationError extends AbstractException
+class InvalidParams extends AbstractException
 {
     /**
      * @var int
@@ -21,7 +21,7 @@ class ValidationError extends AbstractException
     /**
      * @var string
      */
-    protected $message = 'Validation error';
+    protected $message = 'Invalid params';
     /**
      * @var int
      */
