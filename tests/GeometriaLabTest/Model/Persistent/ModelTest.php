@@ -41,12 +41,6 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $model->set('bar', 'baz');
     }
 
-    public function testGetInheritProperty()
-    {
-        $model = new TestModels\WithInvalidRelations\Inherit();
-        $this->assertTrue($model->has('stringProperty'));
-    }
-
     public function testSetInvalidProperty()
     {
         $this->setExpectedException('\InvalidArgumentException', 'Invalid property \'id\' value: Value must be a integer, string is present');

@@ -3,7 +3,8 @@
 namespace GeometriaLabTest\Model;
 
 use GeometriaLabTest\Model\TestModels\Model,
-    GeometriaLabTest\Model\TestModels\SubModel;
+    GeometriaLabTest\Model\TestModels\SubModel,
+    GeometriaLabTest\Model\TestModels\InheritModel;
 
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -117,6 +118,30 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(true, $this->model->has('booleanProperty'));
         $this->assertEquals(false, $this->model->has('nonExistsProperty'));
+    }
+
+    public function testHasInheritProperty()
+    {
+        $inheritModel = new InheritModel();
+        $this->assertTrue($inheritModel->has('stringProperty'));
+    }
+
+    public function testGetDefaultInheritProperty()
+    {
+        $inheritModel = new InheritModel();
+        $this->assertEquals('default', $inheritModel->stringProperty);
+    }
+
+    public function testGetFilteredProperty()
+    {
+        $this->model->trimmedProperty = ' need trim ';
+        $this->assertEquals('need trim', $this->model->trimmedProperty);
+    }
+
+    public function testSetInvalidValidationProperty()
+    {
+        $this->setExpectedException('\InvalidArgumentException', 'Invalid property \'emailProperty\' value: The input is not a valid email address. Use the basic format local-part@hostname');
+        $this->model->emailProperty = 'invalid email';
     }
 
     protected function getData()

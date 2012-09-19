@@ -14,6 +14,10 @@ namespace GeometriaLabTest\Model\TestModels;
  * @property string[]                                           $arrayOfString
  * @property \GeometriaLabTest\Model\TestModels\SubModel[]      $arrayOfSubTest
  * @property string                                             $nonSetProperty
+ *
+ * @property string                                             $requiredProperty {"required": "true"}
+ * @property string                                             $trimmedProperty {"filters": ["StringTrim"]}
+ * @property string                                             $emailProperty {"validators": ["EmailAddress"]}
  */
 class Model extends \GeometriaLab\Model\AbstractModel
 {
