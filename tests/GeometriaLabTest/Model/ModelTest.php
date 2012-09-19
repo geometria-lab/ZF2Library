@@ -138,6 +138,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('need trim', $this->model->trimmedProperty);
     }
 
+    public function testSetValidValidationProperty()
+    {
+        $this->model->emailProperty = 'email@example.com';
+        $this->assertEquals('email@example.com', $this->model->emailProperty);
+    }
+
     public function testSetInvalidValidationProperty()
     {
         $this->setExpectedException('\InvalidArgumentException', 'Invalid property \'emailProperty\' value: The input is not a valid email address. Use the basic format local-part@hostname');
