@@ -35,6 +35,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $this->model->nonSetProperty);
     }
 
+    public function testPopulateInvalidProperty()
+    {
+        $this->setExpectedException('\InvalidArgumentException', 'Invalid property \'booleanProperty\' value: Value must be a boolean, string is present');
+
+        $data = $this->getData();
+        $data['booleanProperty'] = 'foo';
+        $this->model->populate($data);
+    }
+
     public function testGetNotPresentProperty()
     {
         $this->setExpectedException('\InvalidArgumentException');
