@@ -8,6 +8,11 @@ use GeometriaLab\Model\Schema\SchemaInterface,
 
 abstract class AbstractModel extends Schemaless\Model implements ModelInterface
 {
+    /**
+     * Parser class name
+     *
+     * @var string
+     */
     static protected $parserClassName = 'GeometriaLab\Model\Schema\DocBlockParser';
 
     /**

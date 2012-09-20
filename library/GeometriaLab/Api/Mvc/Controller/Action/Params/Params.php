@@ -10,6 +10,13 @@ use \GeometriaLab\Model\AbstractModel;
 class Params extends AbstractModel
 {
     /**
+     * Parser class name
+     *
+     * @var string
+     */
+    static protected $parserClassName = 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\DocBlockParser';
+
+    /**
      * Non-existent properties, which was set
      *
      * @var array

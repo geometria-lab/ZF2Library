@@ -7,6 +7,15 @@ use GeometriaLab\Model\Schema\Property\PropertyInterface;
 class Schema implements SchemaInterface
 {
     /**
+     * Expected properties namespaces
+     *
+     * @var array
+     */
+    static protected $propertyNamespaces = array(
+        'GeometriaLab\Model\Schema\Property',
+    );
+
+    /**
      * Class name
      *
      * @var string
@@ -64,11 +73,18 @@ class Schema implements SchemaInterface
      *
      * @param PropertyInterface $property
      * @return Schema
+     * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
     public function addProperty(PropertyInterface $property)
     {
         $name = $property->getName();
+        $propertyReflection = new \ReflectionClass($property);
+        $propertyNamespace = $propertyReflection->getNamespaceName();
+
+        if (!in_array($propertyNamespace, static::$propertyNamespaces)) {
+            throw new \RuntimeException("Property '$name' must be in '" . implode(', ', static::$propertyNamespaces) . "' namespaces, but $propertyNamespace is given");
+        }
 
         if ($this->hasProperty($name)) {
             throw new \InvalidArgumentException("Property '$name' already exist in model '$this->className'");

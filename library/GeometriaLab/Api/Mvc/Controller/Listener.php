@@ -47,7 +47,7 @@ class Listener implements ZendListenerAggregateInterface
 
     /**
      * @param ZendMvcEvent $e
-     * @throws WrongFieldsException
+     * @throws InvalidParamsException
      */
     static public function createParams(ZendMvcEvent $e)
     {

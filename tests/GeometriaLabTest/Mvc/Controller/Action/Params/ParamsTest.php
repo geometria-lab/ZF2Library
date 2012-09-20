@@ -2,6 +2,8 @@
 
 namespace GeometriaLabTest\Mvc\Controller\Action\Params;
 
+use GeometriaLab\Api\Mvc\Controller\Listener as ControllerListener;
+
 use Zend\Config\Config as ZendConfig,
     Zend\Http\Request as ZendRequest,
     Zend\Http\Response as ZendResponse,
@@ -84,7 +86,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => true
         )));
 
-        \GeometriaLab\Api\Mvc\Controller\Listener::createParams(static::$event);
+        ControllerListener::createParams(static::$event);
 
         /* @var \GeometriaLab\Api\Mvc\Controller\Action\Params\Params $params */
         $params = static::$event->getrouteMatch()->getParam('params');
@@ -114,7 +116,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => true,
         )));
 
-        \GeometriaLab\Api\Mvc\Controller\Listener::createParams(static::$event);
+        ControllerListener::createParams(static::$event);
 
         /* @var \GeometriaLab\Api\Mvc\Controller\Action\Params\Params $params */
         $params = static::$event->getrouteMatch()->getParam('params');
@@ -144,7 +146,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => 'foo',
         )));
 
-        \GeometriaLab\Api\Mvc\Controller\Listener::createParams(static::$event);
+        ControllerListener::createParams(static::$event);
     }
 
     public function testNotPresentProperty()
@@ -161,7 +163,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'invalid' => 'foo'
         )));
 
-        \GeometriaLab\Api\Mvc\Controller\Listener::createParams(static::$event);
+        ControllerListener::createParams(static::$event);
     }
 
     public function testRequiredProperty()
@@ -177,7 +179,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'invalid' => 'foo'
         )));
 
-        \GeometriaLab\Api\Mvc\Controller\Listener::createParams(static::$event);
+        ControllerListener::createParams(static::$event);
     }
 
     public function testNotValidProperty()
@@ -193,6 +195,6 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => true,
         )));
 
-        \GeometriaLab\Api\Mvc\Controller\Listener::createParams(static::$event);
+        ControllerListener::createParams(static::$event);
     }
 }
