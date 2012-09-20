@@ -60,11 +60,11 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
             $error = new \Shiterator\Error\Exception($exception);
             $shiterator = \Shiterator\ErrorHandler::getInstance();
             $shiterator->getClient()->addError($error);
-        } else {
-            $config = $e->getApplication()->getServiceManager()->get('Config');
-            if (!empty($config['throwExceptions'])) {
-                throw $exception;
-            }
+        }
+
+        $config = $e->getApplication()->getServiceManager()->get('Config');
+        if (!empty($config['throwExceptions'])) {
+            throw $exception;
         }
 
         switch ($error) {

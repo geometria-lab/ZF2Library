@@ -89,8 +89,7 @@ class ArrayItem extends ZendAbstractValidator
                     $this->error(self::INVALID_ARRAY_ITEM);
                 } else {
                     $itemMessages = $itemProperty->getValidatorChain()->getMessages();
-                    // @TODO Really need all messages?
-                    $this->abstractOptions['messages'][self::INVALID_ARRAY_ITEM] = array_shift($itemMessages);
+                    $this->abstractOptions['messages'][self::INVALID_ARRAY_ITEM] = $itemMessages;
                 }
 
                 return false;

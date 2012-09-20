@@ -20,10 +20,27 @@ abstract class AbstractException extends \Exception
     protected $httpCode;
 
     /**
+     * @var mixed
+     */
+    protected $data;
+
+    /**
      * @return integer
      */
     public function getHttpCode()
     {
         return $this->httpCode;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function getData()
+    {
+        return $this->data;
     }
 }

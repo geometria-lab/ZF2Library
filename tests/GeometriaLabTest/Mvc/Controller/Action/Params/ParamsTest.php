@@ -133,7 +133,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidProperty()
     {
-        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields', "Field 'bool':\r\nValue must be a boolean, string is present\r\n");
+        $this->setExpectedException('\GeometriaLab\Api\Exception\InvalidParamsException');
 
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,
@@ -149,7 +149,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testNotPresentProperty()
     {
-        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields', "Field 'invalid':\r\nProperty does not exists\r\n");
+        $this->setExpectedException('\GeometriaLab\Api\Exception\InvalidParamsException');
 
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,
@@ -166,7 +166,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testRequiredProperty()
     {
-        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields', "Field 'invalid':\r\nProperty does not exists\r\n");
+        $this->setExpectedException('\GeometriaLab\Api\Exception\InvalidParamsException');
 
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,
@@ -182,7 +182,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testNotValidProperty()
     {
-        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields', "Field 'email':\r\nThe input is not a valid email address. Use the basic format local-part@hostname\r\n");
+        $this->setExpectedException('\GeometriaLab\Api\Exception\InvalidParamsException');
 
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,

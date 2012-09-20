@@ -37,7 +37,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testPopulateInvalidProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Invalid property \'booleanProperty\' value: Value must be a boolean, string is present');
+        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'booleanProperty':\r\nValue must be a boolean, string is present");
 
         $data = $this->getData();
         $data['booleanProperty'] = 'foo';
@@ -155,7 +155,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetInvalidValidationProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Invalid property \'emailProperty\' value: The input is not a valid email address. Use the basic format local-part@hostname');
+        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'emailProperty':\r\nThe input is not a valid email address. Use the basic format local-part@hostname");
         $this->model->emailProperty = 'invalid email';
     }
 

@@ -175,6 +175,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
                     }
                     unset($stack[$level--]);
                     if ($level < 0) {
+                        // @TODO Need all messages with name
                         throw new WrongFields('Bad _fields syntax');
                     }
                     $field = '';

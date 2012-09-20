@@ -8,7 +8,7 @@ use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterfa
     Zend\Stdlib\RequestInterface as ZendRequestInterface;
 
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Params,
-    GeometriaLab\Api\Exception\InvalidParams;
+    GeometriaLab\Api\Exception\InvalidParamsException;
 
 class Listener implements ZendListenerAggregateInterface
 {
@@ -66,11 +66,9 @@ class Listener implements ZendListenerAggregateInterface
         $params->populate($queryParams);
 
         if (!$params->isValid()) {
-            $errorString = '';
-            foreach ($params->getErrorMessages() as $fieldName => $errors) {
-                $errorString .= "Field '$fieldName':\r\n" . implode("\r\n", $errors) . "\r\n";
-            }
-            throw new InvalidParams($errorString);
+            $exception = new InvalidParamsException();
+            $exception->getParams($params);
+            throw $exception;
         }
 
         $routeMatch->setParam('params', $params);

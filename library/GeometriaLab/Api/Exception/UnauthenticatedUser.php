@@ -10,7 +10,7 @@
 namespace GeometriaLab\Api\Exception;
 
 /**
- *
+ * @todo Move it to Application
  */
 class UnauthenticatedUser extends AbstractException
 {
