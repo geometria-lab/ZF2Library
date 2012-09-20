@@ -78,19 +78,8 @@ class Schema implements SchemaInterface
      */
     public function addProperty(PropertyInterface $property)
     {
-        $name = $property->getName();
-        $propertyReflection = new \ReflectionClass($property);
-        $propertyNamespace = $propertyReflection->getNamespaceName();
-
-        if (!in_array($propertyNamespace, static::$propertyNamespaces)) {
-            throw new \RuntimeException("Property '$name' must be in '" . implode(', ', static::$propertyNamespaces) . "' namespaces, but $propertyNamespace is given");
-        }
-
-        if ($this->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property '$name' already exist in model '$this->className'");
-        }
-
-        $this->properties[$name] = $property;
+        $this->validateProperty($property);
+        $this->properties[$property->getName()] = $property;
 
         return $this;
     }
@@ -132,5 +121,28 @@ class Schema implements SchemaInterface
     public function getProperties()
     {
         return $this->properties;
+    }
+
+    /**
+     * Validate property
+     *
+     * @param PropertyInterface $property
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    protected function validateProperty(PropertyInterface $property)
+    {
+        $name = $property->getName();
+
+        if ($this->hasProperty($name)) {
+            throw new \InvalidArgumentException("Property '$name' already exist in model '$this->className'");
+        }
+
+        $propertyReflection = new \ReflectionClass($property);
+        $propertyNamespace = $propertyReflection->getNamespaceName();
+
+        if (!in_array($propertyNamespace, static::$propertyNamespaces)) {
+            throw new \RuntimeException("Property '$name' must be in '" . implode(', ', static::$propertyNamespaces) . "' namespaces, but $propertyNamespace is given");
+        }
     }
 }
