@@ -27,6 +27,13 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
             throw new \RuntimeException("Property '{$property->getName()}' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
         }
 
+        if (is_a($property, '\GeometriaLab\Model\Schema\Property\ArrayProperty')) {
+            $itemProperty = $property->getItemProperty();
+            if (is_a($itemProperty, '\GeometriaLab\Model\Schema\Property\ModelProperty')) {
+                throw new \RuntimeException("Item of array property '{$property->getName()}' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
+            }
+        }
+
         parent::validateProperty($property);
     }
 }

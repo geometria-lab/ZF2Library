@@ -4,7 +4,8 @@ namespace GeometriaLabTest\Mvc\Controller\Action\Params;
 
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Params as ControllerParams,
     GeometriaLab\Api\Mvc\Controller\Listener as ControllerListener,
-    GeometriaLab\Model\Schema\Property\ModelProperty;
+    GeometriaLab\Model\Schema\Property\ModelProperty,
+    GeometriaLab\Model\Schema\Property\ArrayProperty;
 
 use Zend\Config\Config as ZendConfig,
     Zend\Http\Request as ZendRequest,
@@ -208,5 +209,18 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         $model = new ModelProperty(array('name' => 'modelProperty'));
 
         $params->getSchema()->addProperty($model);
+    }
+
+    public function testArrayOfModelsPropertySet()
+    {
+        $this->setExpectedException('\RuntimeException', "Item of array property 'arrayProperty' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
+
+        $params = new ControllerParams();
+        $arrayProperty = new ArrayProperty(array(
+            'name'         => 'arrayProperty',
+            'itemProperty' => new ModelProperty(),
+        ));
+
+        $params->getSchema()->addProperty($arrayProperty);
     }
 }
