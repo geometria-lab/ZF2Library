@@ -13,7 +13,7 @@ use Zend\Stdlib\Hydrator\HydratorInterface as ZendHydratorInterface,
     Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Api\Stdlib\Extractor\Schema,
-    GeometriaLab\Api\Exception\WrongFields;
+    GeometriaLab\Api\Exception\WrongFieldsException;
 
 abstract class Extractor
 {
@@ -53,7 +53,7 @@ abstract class Extractor
      * @param  object $object
      * @param  array $fields
      * @return array
-     * @throws WrongFields
+     * @throws WrongFieldsException
      * @throws ZendBadMethodCallException
      */
     public function extract($object, $fields = array())
@@ -67,7 +67,7 @@ abstract class Extractor
         if (!$allFields) {
             foreach ($fields as $name => $value) {
                 if (!isset($schemaProperties[$name])) {
-                    throw new WrongFields('Wrong fields provided');
+                    throw new WrongFieldsException('Wrong fields provided');
                 }
                 $selectProperties[$name] = $schemaProperties[$name];
             }

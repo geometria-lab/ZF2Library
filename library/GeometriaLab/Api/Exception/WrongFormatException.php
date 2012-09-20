@@ -12,7 +12,7 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class WrongFormat extends AbstractException
+class WrongFormatException extends AbstractException
 {
     /**
      * @var int

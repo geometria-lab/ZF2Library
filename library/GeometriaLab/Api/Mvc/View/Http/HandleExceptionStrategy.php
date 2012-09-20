@@ -71,11 +71,11 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
             case ZendApplication::ERROR_CONTROLLER_NOT_FOUND:
             case ZendApplication::ERROR_CONTROLLER_INVALID:
             case ZendApplication::ERROR_ROUTER_NO_MATCH:
-                $apiException = new ApiException\ResourceNotFound();
+                $apiException = new ApiException\ResourceNotFoundException();
                 break;
             default:
                 if (!$exception instanceof ApiException\AbstractException) {
-                    $apiException = new ApiException\ServerError();
+                    $apiException = new ApiException\ServerErrorException();
                 } else {
                     $apiException = $exception;
                 }

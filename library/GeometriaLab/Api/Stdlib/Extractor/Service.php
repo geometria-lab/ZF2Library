@@ -9,7 +9,7 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
 
 use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Api\Stdlib\Extractor\Extractor,
-    GeometriaLab\Api\Exception\WrongFields;
+    GeometriaLab\Api\Exception\WrongFieldsException;
 
 class Service implements ZendFactoryInterface
 {
@@ -58,7 +58,7 @@ class Service implements ZendFactoryInterface
      * @param ModelInterface $model
      * @param array $fields
      * @return array
-     * @throws WrongFields
+     * @throws WrongFieldsException
      * @throws ZendBadMethodCallException
      * @throws \InvalidArgumentException
      */

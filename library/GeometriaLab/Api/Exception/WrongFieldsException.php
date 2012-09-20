@@ -12,18 +12,18 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class ResourceNotFound extends AbstractException
+class WrongFieldsException extends AbstractException
 {
     /**
      * @var int
      */
-    protected $code = 46;
+    protected $code = 41;
     /**
      * @var string
      */
-    protected $message = 'Resource not found';
+    protected $message = 'Wrong fields';
     /**
      * @var int
      */
-    protected $httpCode = 404;
+    protected $httpCode = 400;
 }

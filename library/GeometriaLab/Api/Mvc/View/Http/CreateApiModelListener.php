@@ -10,7 +10,7 @@ use GeometriaLab\Model,
     GeometriaLab\Model\ModelInterface;
 
 use GeometriaLab\Api\Mvc\View\Model\ApiModel,
-    GeometriaLab\Api\Exception\WrongFields;
+    GeometriaLab\Api\Exception\WrongFieldsException;
 
 /**
  *
@@ -142,7 +142,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
      * @static
      * @param $fieldsString
      * @return array
-     * @throws WrongFields
+     * @throws WrongFieldsException
      */
     static public function createFieldsFromString($fieldsString)
     {
@@ -176,7 +176,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
                     unset($stack[$level--]);
                     if ($level < 0) {
                         // @TODO Need all messages with name
-                        throw new WrongFields('Bad _fields syntax');
+                        throw new WrongFieldsException('Bad _fields syntax');
                     }
                     $field = '';
                     break;
@@ -189,7 +189,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             }
         }
         if (count($stack) > 1) {
-            throw new WrongFields('Bad _fields syntax');
+            throw new WrongFieldsException('Bad _fields syntax');
         }
 
         return $fields;
