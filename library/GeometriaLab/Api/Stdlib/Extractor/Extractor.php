@@ -59,18 +59,24 @@ abstract class Extractor
     public function extract($object, $fields = array())
     {
         $result = array();
-
+        $badFields = array();
         $allFields = !count($fields);
-
         $schemaProperties = $this->getSchema()->getProperties();
 
         if (!$allFields) {
             foreach ($fields as $name => $value) {
                 if (!isset($schemaProperties[$name])) {
-                    throw new WrongFieldsException('Wrong fields provided');
+                    $badFields[] = $name;
+                    continue;
                 }
                 $selectProperties[$name] = $schemaProperties[$name];
             }
+        }
+
+        if (!empty($badFields)) {
+            $exception = new WrongFieldsException('Wrong fields provided');
+            $exception->setData($badFields);
+            throw $exception;
         }
 
         foreach ($schemaProperties as $property) {
