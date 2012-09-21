@@ -109,6 +109,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
     /**
      * @param ZendMvcEvent $e
+     * @throws WrongFieldsException
      */
     public function hydrateData(ZendMvcEvent $e)
     {
@@ -123,8 +124,16 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         if ($data instanceof Model\ModelInterface || $data instanceof Model\CollectionInterface) {
             $fields = $e->getRequest()->getQuery()->get('_fields');
             $fieldsData = self::createFieldsFromString($fields);
+            /* @var \GeometriaLab\Api\Stdlib\Extractor\Service $extractor */
+            $extractor = $e->getApplication()->getServiceManager()->get('Extractor');
+            $extractedData = $extractor->extract($data, $fieldsData);
+            $wrongProperties = $extractor->getWrongFields();
 
-            $extractedData = $e->getApplication()->getServiceManager()->get('Extractor')->extract($data, $fieldsData);
+            if (!empty($wrongProperties)) {
+                $exception = new WrongFieldsException('Wrong fields provided');
+                $exception->setData($wrongProperties);
+                throw $exception;
+            }
 
             if ($result instanceof ApiModel) {
                 $result->setVariable(ApiModel::FIELD_DATA, $extractedData);

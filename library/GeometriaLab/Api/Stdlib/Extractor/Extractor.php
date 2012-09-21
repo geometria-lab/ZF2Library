@@ -21,6 +21,12 @@ abstract class Extractor
      * @var Schema
      */
     protected $schema;
+    /**
+     * Array of wrong fields
+     *
+     * @var array
+     */
+    protected $wrongFields = array();
 
     public function __construct()
     {
@@ -42,6 +48,9 @@ abstract class Extractor
         return $this->schema;
     }
 
+    /**
+     * @param Schema $schema
+     */
     public function setSchema(Schema $schema)
     {
         $this->schema = $schema;
@@ -59,24 +68,18 @@ abstract class Extractor
     public function extract($object, $fields = array())
     {
         $result = array();
-        $badFields = array();
         $allFields = !count($fields);
         $schemaProperties = $this->getSchema()->getProperties();
+        $this->wrongFields = array();
 
         if (!$allFields) {
             foreach ($fields as $name => $value) {
                 if (!isset($schemaProperties[$name])) {
-                    $badFields[] = $name;
+                    $this->wrongFields[] = $name;
                     continue;
                 }
                 $selectProperties[$name] = $schemaProperties[$name];
             }
-        }
-
-        if (!empty($badFields)) {
-            $exception = new WrongFieldsException('Wrong fields provided');
-            $exception->setData($badFields);
-            throw $exception;
         }
 
         foreach ($schemaProperties as $property) {
@@ -101,5 +104,15 @@ abstract class Extractor
         }
 
         return $result;
+    }
+
+    /**
+     * Get wrong fields
+     *
+     * @return array
+     */
+    public function getWrongFields()
+    {
+        return $this->wrongFields;
     }
 }

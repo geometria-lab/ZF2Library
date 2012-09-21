@@ -17,11 +17,16 @@ class Service implements ZendFactoryInterface
      * @var Extractor[]
      */
     static private $extractorInstances;
-
     /**
      * @var string
      */
     private $extractorsNamespace;
+    /**
+     * Wrong fields
+     *
+     * @var array
+     */
+    private $wrongFields = array();
 
     /**
      * @param ZendServiceLocatorInterface $serviceLocator
@@ -85,14 +90,31 @@ class Service implements ZendFactoryInterface
 
         $extractor = static::$extractorInstances[$extractorName];
         $data = $extractor->extract($model, $extractFields);
+        $wrongFields = $extractor->getWrongFields();
 
         foreach ($data as $name => $field) {
             if ($field instanceof \GeometriaLab\Model\ModelInterface) {
                 $parentExtractFields = isset($fields[$name]) ? $fields[$name] : array();
                 $data[$name] = $this->extract($field, $parentExtractFields);
+                $subWrongFields = $this->getWrongFields();
+                if (!empty($subWrongFields)) {
+                    $wrongFields[$name] = $subWrongFields;
+                }
             }
         }
 
+        $this->wrongFields = $wrongFields;
+
         return $data;
+    }
+
+    /**
+     * Get wrong fields
+     *
+     * @return array
+     */
+    public function getWrongFields()
+    {
+        return $this->wrongFields;
     }
 }
