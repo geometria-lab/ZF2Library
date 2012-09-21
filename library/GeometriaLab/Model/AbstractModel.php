@@ -115,7 +115,7 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
                 $this->errorMessages[$name] = $messages;
             }
 
-            if ($value === null && $property->isRequired()) {
+            if ($value === null && $property->isRequired() && !isset($this->errorMessages[$name])) {
                 if (!isset($this->errorMessages[$name])) {
                     $this->errorMessages[$name] = array();
                 }
