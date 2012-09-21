@@ -25,23 +25,7 @@ class InvalidParamsException extends AbstractException
     /**
      * @var Params
      */
-    protected $params;
-
-    /**
-     * @param $params
-     */
-    public function setParams(Params $params)
-    {
-        $this->params = $params;
-    }
-
-    /**
-     * @return Params
-     */
-    public function getParams()
-    {
-        return $this->params;
-    }
+    protected $data;
 
     /**
      * @return mixed|void
@@ -50,7 +34,7 @@ class InvalidParamsException extends AbstractException
     {
         $result = array();
 
-        foreach ($this->getParams()->getErrorMessages() as $fieldName => $errors) {
+        foreach ($this->data->getErrorMessages() as $fieldName => $errors) {
             foreach ($errors as $type => $message) {
                 $result[] = array(
                     'field' => $fieldName,

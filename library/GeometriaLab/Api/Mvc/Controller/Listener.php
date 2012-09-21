@@ -67,8 +67,12 @@ class Listener implements ZendListenerAggregateInterface
 
         if (!$params->isValid()) {
             $exception = new InvalidParamsException();
-            $exception->getParams($params);
-            throw $exception;
+            $exception->setData($params);
+
+            $e->setParam('exception', $exception);
+            $e->setError($exception->getMessage());
+
+            $e->getApplication()->getEventManager()->trigger(ZendMvcEvent::EVENT_DISPATCH_ERROR, $e);
         }
 
         $routeMatch->setParam('params', $params);
