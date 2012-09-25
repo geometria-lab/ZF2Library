@@ -4,22 +4,32 @@ namespace GeometriaLab\Model\Persistent\Schema\Property\Relation;
 
 use GeometriaLab\Model\Persistent\CollectionInterface;
 
+use Zend\Validator\Callback as ZendCallback;
+
 class HasMany extends AbstractHasRelation
 {
     protected $relationClass = '\GeometriaLab\Model\Persistent\Relation\HasMany';
 
-    public function prepare($value)
+    public function setup() {
+        $validator = new ZendCallback(array(
+            'callback' => array($this, 'validate'),
+            'message' => 'Must implement GeometriaLab\Model\Persistent\ModelInterface',
+        ));
+        $this->getValidatorChain()->addValidator($validator);
+    }
+
+    public function validate($value)
     {
         if (!$value instanceof CollectionInterface) {
-            throw new \InvalidArgumentException('must implements GeometriaLab\Model\Persistent\CollectionInterface');
+            return false;
         }
 
         $model = $value->getFirst();
 
         if ($model !== null && !is_a($model, $this->getTargetModelClass())) {
-            throw new \InvalidArgumentException("must be collection of {$this->getTargetModelClass()}");
+            return false;
         }
 
-        return $value;
+        return true;
     }
 }

@@ -9,7 +9,7 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
 
 use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Api\Stdlib\Extractor\Extractor,
-    GeometriaLab\Api\Exception\WrongFields;
+    GeometriaLab\Api\Exception\InvalidFieldsException;
 
 class Service implements ZendFactoryInterface
 {
@@ -17,11 +17,16 @@ class Service implements ZendFactoryInterface
      * @var Extractor[]
      */
     static private $extractorInstances;
-
     /**
      * @var string
      */
     private $extractorsNamespace;
+    /**
+     * Invalid fields
+     *
+     * @var array
+     */
+    private $invalidFields = array();
 
     /**
      * @param ZendServiceLocatorInterface $serviceLocator
@@ -58,7 +63,7 @@ class Service implements ZendFactoryInterface
      * @param ModelInterface $model
      * @param array $fields
      * @return array
-     * @throws WrongFields
+     * @throws InvalidFieldsException
      * @throws ZendBadMethodCallException
      * @throws \InvalidArgumentException
      */
@@ -85,14 +90,31 @@ class Service implements ZendFactoryInterface
 
         $extractor = static::$extractorInstances[$extractorName];
         $data = $extractor->extract($model, $extractFields);
+        $invalidFields = $extractor->getInvalidFields();
 
         foreach ($data as $name => $field) {
             if ($field instanceof \GeometriaLab\Model\ModelInterface) {
                 $parentExtractFields = isset($fields[$name]) ? $fields[$name] : array();
                 $data[$name] = $this->extract($field, $parentExtractFields);
+                $subInvalidFields = $this->getInvalidFields();
+                if (!empty($subInvalidFields)) {
+                    $invalidFields[$name] = $subInvalidFields;
+                }
             }
         }
 
+        $this->invalidFields = $invalidFields;
+
         return $data;
+    }
+
+    /**
+     * Get invalid fields
+     *
+     * @return array
+     */
+    public function getInvalidFields()
+    {
+        return $this->invalidFields;
     }
 }

@@ -12,18 +12,18 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class UnconfirmedUser extends Exception
+class ResourceNotFoundException extends AbstractException
 {
     /**
      * @var int
      */
-    protected $errorCode = 43;
+    protected $code = 46;
     /**
      * @var string
      */
-    protected $errorMessage = 'Unconfirmed user';
+    protected $message = 'Resource not found';
     /**
      * @var int
      */
-    protected $httpCode = 401;
+    protected $httpCode = 404;
 }

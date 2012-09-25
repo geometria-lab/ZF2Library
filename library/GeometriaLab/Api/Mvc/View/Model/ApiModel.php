@@ -7,9 +7,11 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLab\Api\View\Model;
+namespace GeometriaLab\Api\Mvc\View\Model;
 
-class ApiModel extends \Zend\View\Model\ViewModel
+use Zend\View\Model\ViewModel as ZendViewModel;
+
+class ApiModel extends ZendViewModel
 {
     const FIELD_DATA = 'data';
     const FIELD_HTTPCODE = 'httpCode';

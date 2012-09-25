@@ -1,14 +1,9 @@
 <?php
 
-namespace GeometriaLab\Api\View\Renderer;
+namespace GeometriaLab\Api\Mvc\View\Renderer;
 
-use Zend\View\Renderer\RendererInterface as ZendViewRendererInterface;
-use Zend\View\Resolver\ResolverInterface as ZendViewResolver;
-
-//use Zend\View\Exception;
-//use Zend\View\Model\FeedModel;
-//use Zend\View\Model\ModelInterface as Model;
-
+use Zend\View\Renderer\RendererInterface as ZendViewRendererInterface,
+    Zend\View\Resolver\ResolverInterface as ZendViewResolver;
 
 class XmlRenderer implements ZendViewRendererInterface
 {
@@ -35,5 +30,6 @@ class XmlRenderer implements ZendViewRendererInterface
 
     public function render($nameOrModel, $values = null)
     {
+        throw new \RuntimeException('Not implemented yet');
     }
 }

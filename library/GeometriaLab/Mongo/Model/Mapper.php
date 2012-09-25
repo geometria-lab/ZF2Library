@@ -238,11 +238,20 @@ class Mapper extends AbstractMapper
      * @param ModelInterface $model
      * @return boolean
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function create(ModelInterface $model)
     {
         if (!is_a($model, $this->getModelClass())) {
             throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
+        }
+
+        if (!$model->isValid()) {
+            $errorString = '';
+            foreach ($model->getErrorMessages() as $fieldName => $errors) {
+                $errorString .= "Field $fieldName:\r\n" . implode("\r\n", $errors) . "\r\n";
+            }
+            throw new \RuntimeException("Model is invalid: $errorString");
         }
 
         $data = array();
@@ -302,12 +311,21 @@ class Mapper extends AbstractMapper
      * @todo Refactor
      * @param ModelInterface $model
      * @return bool
+     * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
     public function update(ModelInterface $model)
     {
         if (!is_a($model, $this->getModelClass())) {
             throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
+        }
+
+        if (!$model->isValid()) {
+            $errorString = '';
+            foreach ($model->getErrorMessages() as $fieldName => $errors) {
+                $errorString .= "Field $fieldName:\r\n" . implode("\r\n", $errors) . "\r\n";
+            }
+            throw new \RuntimeException("Model is invalid: $errorString");
         }
 
         $setData = array();
@@ -390,6 +408,10 @@ class Mapper extends AbstractMapper
      */
     public function delete(ModelInterface $model)
     {
+        if (!is_a($model, $this->getModelClass())) {
+            throw new \InvalidArgumentException("Model must be {$this->getModelClass()}");
+        }
+
         $id = $model->get('id');
 
         if ($id === null) {
@@ -400,7 +422,8 @@ class Mapper extends AbstractMapper
         $result = $this->getMongoCollection()->remove($condition, array('safe' => true));
 
         if ($result) {
-            // Remove target relations
+            // Remove target relations\
+            // @todo implement via events
             foreach($model->getSchema()->getProperties() as $property) {
                 if ($property instanceof HasOneProperty) {
                     $model->getRelation($property->getName())->removeTargetRelation();

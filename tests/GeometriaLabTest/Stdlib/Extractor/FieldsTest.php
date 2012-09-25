@@ -50,10 +50,11 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractWrongField()
     {
-        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
-
         $fields = array('id' => true, 'foo' => true);
         self::$extractorService->extract(self::$order, $fields);
+        $invalidFields = self::$extractorService->getInvalidFields();
+
+        $this->assertEquals(array('foo'), $invalidFields);
     }
 
     public function testExtractAllFields()
@@ -103,14 +104,16 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractWrongNestedField()
     {
-        $this->setExpectedException('\GeometriaLab\Api\Exception\WrongFields');
-
         $fields = array(
             'id' => true,
+            'foo' => true,
             'order' => array(
                 'foo' => true,
             ),
         );
         self::$extractorService->extract(self::$user, $fields);
+        $invalidFields = self::$extractorService->getInvalidFields();
+
+        $this->assertEquals(array('foo', 'order' => array('foo')), $invalidFields);
     }
 }

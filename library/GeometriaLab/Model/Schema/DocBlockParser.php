@@ -7,8 +7,13 @@ use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ZendTagInterface,
     Zend\Code\Reflection\DocBlock\Tag\PropertyTag as ZendPropertyTag,
     Zend\Code\Reflection\ClassReflection as ZendClassReflection,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
-    Zend\Code\Reflection\DocBlockReflection as ZendDocBlockReflection,
-    Zend\Serializer\Serializer as ZendSerializer;
+    Zend\Code\Reflection\DocBlockReflection as ZendDocBlockReflection;
+
+use Zend\Validator\ValidatorChain as ZendValidatorChain,
+    Zend\Filter\FilterChain as ZendFilterChain,
+    Zend\Filter\Exception\RuntimeException as ZendRuntimeException;
+
+use Zend\Serializer\Serializer as ZendSerializer;
 
 class DocBlockParser
 {
@@ -95,6 +100,7 @@ class DocBlockParser
      */
     protected function parseDocBlock($className)
     {
+        /* @var SchemaInterface $schema */
         $schema = new static::$schemaClassName();
         $schema->setClassName($className);
 
@@ -111,11 +117,9 @@ class DocBlockParser
         }
 
         foreach (array_reverse($docBlocks) as $docBlock) {
-            /**
-             * @var \Zend\Code\Reflection\DocBlockReflection
-             * @var \Zend\Code\Reflection\DocBlock\Tag\TagInterface $tag
-             */
+            /* @var \Zend\Code\Reflection\DocBlockReflection $docBlock */
             foreach($docBlock->getTags() as $tag) {
+                /* @var \Zend\Code\Reflection\DocBlock\Tag\TagInterface $tag */
                 $methodName = "parse{$tag->getName()}Tag";
                 if (method_exists($this, $methodName)) {
                     call_user_func(array($this, $methodName), $tag, $schema);
@@ -138,10 +142,6 @@ class DocBlockParser
     {
         $name = substr($tag->getPropertyName(), 1);
 
-        /*if ($schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property with name '$name' already exists");
-        }*/
-
         $params = $this->getParamsFromTag($tag);
         $params['name'] = $name;
 
@@ -152,8 +152,29 @@ class DocBlockParser
             $params['itemProperty'] = static::createProperty($itemPropertyType);
             $type = 'array';
         }
+
+        $validatorChain = null;
+        if (isset($params['validators'])) {
+            $validatorChain = $this->createValidatorChain($params['validators']);
+            unset($params['validators']);
+        }
+
+        $filterChain = null;
+        if (isset($params['filters'])) {
+            $filterChain = $this->createFilterChain($params['filters']);
+            unset($params['filters']);
+        }
+
         $property = static::createProperty($type, $params);
-        $schema->setProperty($property);
+
+        if ($validatorChain !== null) {
+            $property->setValidatorChain($validatorChain);
+        }
+        if ($filterChain !== null) {
+            $property->setFilterChain($filterChain);
+        }
+
+        $schema->addProperty($property);
 
         return $property;
     }
@@ -207,5 +228,77 @@ class DocBlockParser
         }
 
         return $property;
+    }
+
+    /**
+     * @param array $validators
+     * @return ZendValidatorChain(
+     * @throws ZendRuntimeException
+     */
+    public function createValidatorChain(array $validators)
+    {
+        $validatorChain = new ZendValidatorChain();
+
+        foreach ($validators as $validator) {
+            if (is_string($validator)) {
+                $validator = array(
+                    'name' => $validator,
+                );
+            }
+            if (is_array($validator)) {
+                if (!isset($validator['name'])) {
+                    throw new ZendRuntimeException('Invalid validator specification provided; does not include "name" key');
+                }
+                $options = array();
+                if (isset($validator['options'])) {
+                    $options = $validator['options'];
+                }
+                $breakOnFailure = false;
+                if (isset($validator['breakOnFailure'])) {
+                    $breakOnFailure = intval($validator['breakOnFailure']);
+                }
+                $validatorChain->addByName($validator['name'], $options, $breakOnFailure);
+            } else {
+                throw new ZendRuntimeException('Invalid validator declaration: need string or array');
+            }
+        }
+
+        return $validatorChain;
+    }
+
+    /**
+     * @param array $filters
+     * @return ZendFilterChain
+     * @throws ZendRuntimeException
+     */
+    public function createFilterChain(array $filters)
+    {
+        $filterChain = new ZendFilterChain();
+
+        foreach ($filters as $filter) {
+            if (is_string($filter)) {
+                $filter = array(
+                    'name' => $filter,
+                );
+            }
+            if (is_array($filter)) {
+                if (!isset($filter['name'])) {
+                    throw new ZendRuntimeException('Invalid filter specification provided; does not include "name" key');
+                }
+                $options = array();
+                if (isset($filter['options'])) {
+                    $options = $filter['options'];
+                }
+                $priority = ZendFilterChain::DEFAULT_PRIORITY;
+                if (isset($filter['priority'])) {
+                    $priority = intval($filter['priority']);
+                }
+                $filterChain->attachByName($filter['name'], $options, $priority);
+            } else {
+                throw new ZendRuntimeException('Invalid filter declaration: need string or array');
+            }
+        }
+
+        return $filterChain;
     }
 }

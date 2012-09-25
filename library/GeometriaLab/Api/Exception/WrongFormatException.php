@@ -12,16 +12,16 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class WrongFormat extends Exception
+class WrongFormatException extends AbstractException
 {
     /**
      * @var int
      */
-    protected $errorCode = 40;
+    protected $code = 40;
     /**
      * @var string
      */
-    protected $errorMessage = 'Wrong format';
+    protected $message = 'Wrong format';
     /**
      * @var int
      */

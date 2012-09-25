@@ -35,7 +35,16 @@ interface SchemaInterface
      * @param PropertyInterface $property
      * @return SchemaInterface
      */
-    public function setProperty(PropertyInterface $property);
+    public function addProperty(PropertyInterface $property);
+
+    /**
+     * Remove property
+     *
+     * @param string $name
+     * @return Schema
+     * @throws \InvalidArgumentException
+     */
+    public function removeProperty($name);
 
     /**
      * Has property?

@@ -62,7 +62,7 @@ class DocBlockParser extends ModelDocBlockParser
      */
     protected function parseDocBlock($className)
     {
-        $schema = parent::parseDocblock($className);
+        $schema = parent::parseDocBlock($className);
 
         if ($schema->getMapperClass() === null) {
             throw new \InvalidArgumentException('Mapper method tag not present in docblock!');

@@ -4,19 +4,8 @@ namespace GeometriaLab\Model\Schema\Property;
 
 class StringProperty extends AbstractProperty
 {
-    /**
-     * Prepare value
-     *
-     * @param string $value
-     * @return string
-     * @throws \InvalidArgumentException
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (!is_string($value)) {
-            throw new \InvalidArgumentException("must be string");
-        }
-
-        return $value;
+        $this->addTypeValidator('string');
     }
 }

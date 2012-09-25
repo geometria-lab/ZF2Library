@@ -2,6 +2,11 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
+use GeometriaLab\Validator\IsType;
+
+use Zend\Filter\FilterChain as ZendFilterChain,
+    Zend\Validator\ValidatorChain as ZendValidatorChain;
+
 abstract class AbstractProperty implements PropertyInterface
 {
     /**
@@ -19,12 +24,37 @@ abstract class AbstractProperty implements PropertyInterface
     protected $defaultValue;
 
     /**
+     * Required property
+     *
+     * @var boolean
+     */
+    protected $isRequired = false;
+
+    /**
+     * @var ZendFilterChain
+     */
+    protected $filterChain;
+
+    /**
+     * @var ZendValidatorChain
+     */
+    protected $validatorChain;
+
+    /**
+     * Type validators
+     *
+     * @var array
+     */
+    static protected $typeValidators = array();
+
+    /**
      * Constructor
      *
      * @param array $options
      */
     public function __construct(array $options = array())
     {
+        $this->setup();
         $this->setOptions($options);
     }
 
@@ -70,6 +100,29 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
+     * Mark property as Required
+     *
+     * @param boolean $required
+     * @return PropertyInterface
+     */
+    public function setRequired($required)
+    {
+        $this->isRequired = $required;
+
+        return $this;
+    }
+
+    /**
+     * Is required
+     *
+     * @return boolean
+     */
+    public function isRequired()
+    {
+        return $this->isRequired;
+    }
+
+    /**
      * Get default value
      *
      * @return mixed
@@ -90,5 +143,71 @@ abstract class AbstractProperty implements PropertyInterface
         $this->defaultValue = $value;
 
         return $this;
+    }
+
+    /**
+     * @param ZendFilterChain $filterChain
+     * @return AbstractProperty
+     */
+    public function setFilterChain(ZendFilterChain $filterChain)
+    {
+        $this->filterChain = $filterChain;
+
+        return $this;
+    }
+
+    /**
+     * @return ZendFilterChain
+     */
+    public function getFilterChain()
+    {
+        if ($this->filterChain === null) {
+            $this->filterChain = new ZendFilterChain();
+        }
+
+        return $this->filterChain;
+    }
+
+    /**
+     * @param ZendValidatorChain $validatorChain
+     * @return AbstractProperty
+     */
+    public function setValidatorChain(ZendValidatorChain $validatorChain)
+    {
+        $this->validatorChain = $validatorChain;
+
+        return $this;
+    }
+
+    /**
+     * @return ZendValidatorChain
+     */
+    public function getValidatorChain()
+    {
+        if ($this->validatorChain === null) {
+            $this->validatorChain = new ZendValidatorChain();
+        }
+
+        return $this->validatorChain;
+    }
+
+    /**
+     * @param $type
+     */
+    protected function addTypeValidator($type)
+    {
+        if (!isset(static::$typeValidators[$type])) {
+            static::$typeValidators[$type] = new IsType($type);
+        }
+
+        $this->getValidatorChain()->addValidator(static::$typeValidators[$type]);
+    }
+
+    /**
+     * Setup something
+     */
+    protected function setup()
+    {
+
     }
 }

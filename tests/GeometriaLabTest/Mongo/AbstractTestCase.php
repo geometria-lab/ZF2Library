@@ -17,10 +17,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @var ZendServiceManager
      */
     static protected $sm;
-    /**
-     * @var ZendServiceManager
-     */
-    static protected $serviceManager;
 
     public function tearDown()
     {

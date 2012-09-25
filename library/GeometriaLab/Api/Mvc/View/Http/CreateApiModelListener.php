@@ -1,15 +1,16 @@
 <?php
 
-namespace GeometriaLab\Api\View\Http;
+namespace GeometriaLab\Api\Mvc\View\Http;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
 use Zend\EventManager\EventManagerInterface as ZendEvents;
 use Zend\Mvc\MvcEvent as ZendMvcEvent;
 
 use GeometriaLab\Model,
-    GeometriaLab\Model\ModelInterface,
-    GeometriaLab\Api\View\Model\ApiModel,
-    GeometriaLab\Api\Exception\WrongFields;
+    GeometriaLab\Model\ModelInterface;
+
+use GeometriaLab\Api\Mvc\View\Model\ApiModel,
+    GeometriaLab\Api\Exception\InvalidFieldsException;
 
 /**
  *
@@ -89,20 +90,26 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
         // set error code and message (if any)
         if ($apiException) {
-            $errorCode = $apiException->getErrorCode();
-            $errorMessage = $apiException->getErrorMessage();
+            $errorCode    = $apiException->getCode();
+            $errorMessage = $apiException->getMessage();
         } else {
-            $errorCode = null;
+            $errorCode    = null;
             $errorMessage = null;
         }
-        $apiModel->setVariable(ApiModel::FIELD_ERRORCODE, $errorCode);
+
+        $apiModel->setVariable(ApiModel::FIELD_ERRORCODE,    $errorCode);
         $apiModel->setVariable(ApiModel::FIELD_ERRORMESSAGE, $errorMessage);
+
+        if ($apiException) {
+            $apiModel->setVariable(ApiModel::FIELD_DATA, $apiException->getData());
+        }
 
         $e->setResult($apiModel);
     }
 
     /**
      * @param ZendMvcEvent $e
+     * @throws InvalidFieldsException
      */
     public function hydrateData(ZendMvcEvent $e)
     {
@@ -117,8 +124,16 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         if ($data instanceof Model\ModelInterface || $data instanceof Model\CollectionInterface) {
             $fields = $e->getRequest()->getQuery()->get('_fields');
             $fieldsData = self::createFieldsFromString($fields);
+            /* @var \GeometriaLab\Api\Stdlib\Extractor\Service $extractor */
+            $extractor = $e->getApplication()->getServiceManager()->get('Extractor');
+            $extractedData = $extractor->extract($data, $fieldsData);
+            $wrongProperties = $extractor->getInvalidFields();
 
-            $extractedData = $e->getApplication()->getServiceManager()->get('Extractor')->extract($data, $fieldsData);
+            if (!empty($wrongProperties)) {
+                $exception = new InvalidFieldsException('Invalid fields');
+                $exception->setFields($wrongProperties);
+                throw $exception;
+            }
 
             if ($result instanceof ApiModel) {
                 $result->setVariable(ApiModel::FIELD_DATA, $extractedData);
@@ -136,7 +151,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
      * @static
      * @param $fieldsString
      * @return array
-     * @throws WrongFields
+     * @throws InvalidFieldsException
      */
     static public function createFieldsFromString($fieldsString)
     {
@@ -169,7 +184,8 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
                     }
                     unset($stack[$level--]);
                     if ($level < 0) {
-                        throw new WrongFields('Bad _fields syntax');
+                        // @TODO Need all messages with name
+                        throw new InvalidFieldsException('Bad _fields syntax');
                     }
                     $field = '';
                     break;
@@ -182,7 +198,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             }
         }
         if (count($stack) > 1) {
-            throw new WrongFields('Bad _fields syntax');
+            throw new InvalidFieldsException('Bad _fields syntax');
         }
 
         return $fields;

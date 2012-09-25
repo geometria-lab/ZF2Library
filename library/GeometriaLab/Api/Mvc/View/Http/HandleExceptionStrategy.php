@@ -55,26 +55,27 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
             return;
         }
 
+        // @todo Remove shiterator from library and use via events
         if (APPLICATION_ENV === 'production') {
             $error = new \Shiterator\Error\Exception($exception);
             $shiterator = \Shiterator\ErrorHandler::getInstance();
             $shiterator->getClient()->addError($error);
-        } else {
-            $config = $e->getApplication()->getServiceManager()->get('Config');
-            if (!empty($config['throwExceptions'])) {
-                throw $exception;
-            }
+        }
+
+        $config = $e->getApplication()->getServiceManager()->get('Config');
+        if (!empty($config['throwExceptions'])) {
+            throw $exception;
         }
 
         switch ($error) {
             case ZendApplication::ERROR_CONTROLLER_NOT_FOUND:
             case ZendApplication::ERROR_CONTROLLER_INVALID:
             case ZendApplication::ERROR_ROUTER_NO_MATCH:
-                $apiException = new ApiException\ResourceNotFound();
+                $apiException = new ApiException\ResourceNotFoundException();
                 break;
             default:
-                if (!$exception instanceof ApiException\Exception) {
-                    $apiException = new ApiException\ServerError();
+                if (!$exception instanceof ApiException\AbstractException) {
+                    $apiException = new ApiException\ServerErrorException();
                 } else {
                     $apiException = $exception;
                 }

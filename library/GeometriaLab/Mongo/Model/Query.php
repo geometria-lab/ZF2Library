@@ -177,7 +177,11 @@ class Query extends AbstractQuery
         }
 
         try {
-            $value = $property->prepare($value);
+            $value = $property->getFilterChain()->filter($value);
+
+            if (!$property->getValidatorChain()->isValid($value)) {
+                throw new \InvalidArgumentException("Invalid property '$field' value: " . implode("\r\n", $property->getValidatorChain()->getMessages()));
+            }
         } catch (\InvalidArgumentException $e) {
             throw new \InvalidArgumentException("Invalid value for field '$field': " . $e->getMessage());
         }
