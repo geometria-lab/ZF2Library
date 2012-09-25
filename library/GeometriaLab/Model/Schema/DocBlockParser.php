@@ -155,13 +155,13 @@ class DocBlockParser
 
         $validatorChain = null;
         if (isset($params['validators'])) {
-            $validatorChain = $this->getValidatorChain($params['validators']);
+            $validatorChain = $this->createValidatorChain($params['validators']);
             unset($params['validators']);
         }
 
         $filterChain = null;
         if (isset($params['filters'])) {
-            $filterChain = $this->getFilterChain($params['filters']);
+            $filterChain = $this->createFilterChain($params['filters']);
             unset($params['filters']);
         }
 
@@ -235,7 +235,7 @@ class DocBlockParser
      * @return ZendValidatorChain(
      * @throws ZendRuntimeException
      */
-    public function getValidatorChain(array $validators)
+    public function createValidatorChain(array $validators)
     {
         $validatorChain = new ZendValidatorChain();
 
@@ -271,7 +271,7 @@ class DocBlockParser
      * @return ZendFilterChain
      * @throws ZendRuntimeException
      */
-    public function getFilterChain(array $filters)
+    public function createFilterChain(array $filters)
     {
         $filterChain = new ZendFilterChain();
 
