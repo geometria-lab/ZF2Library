@@ -97,7 +97,19 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $subResource = null;
         $routeMatch = new ZendRouteMatch(array());
         $method = $request->getMethod();
-        $pathParts = $this->getPathParts($request);
+        $uri  = $request->getUri();
+        $path = trim($uri->getPath(), '/');
+
+        foreach (array(ApiStrategy::FORMAT_JSON, ApiStrategy::FORMAT_XML) as $format) {
+            $needle = '.' . $format;
+            if (strpos($path, $needle) === strlen($path) - strlen($needle)) {
+                $request->setMetadata('format', $format);
+                $path = substr($path, 0, -strlen($needle));
+                break;
+            }
+        }
+
+        $pathParts = explode('/', $path);
 
         if (isset($pathParts[3])) {
             if ($this->isValidId($pathParts[2])) {
@@ -151,28 +163,6 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     public function getAssembledParams()
     {
         return $this->assembledParams;
-    }
-
-    /**
-     * @param ZendRequestInterface $request
-     * @return string
-     */
-    protected function getPathParts(ZendRequestInterface $request)
-    {
-        $uri  = $request->getUri();
-        $path = $uri->getPath();
-        $path = trim($path, '/');
-
-        foreach (array(ApiStrategy::FORMAT_JSON, ApiStrategy::FORMAT_XML) as $format) {
-            $needle = '.' . $format;
-            if (strpos($path, $needle) === strlen($path) - strlen($needle)) {
-                $request->setMetadata('format', $format);
-                $path = substr($path, 0, -strlen($needle));
-                break;
-            }
-        }
-
-        return explode('/', $path);
     }
 
     /**
