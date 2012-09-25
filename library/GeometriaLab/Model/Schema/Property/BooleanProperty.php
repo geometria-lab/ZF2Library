@@ -8,7 +8,7 @@ class BooleanProperty extends AbstractProperty
     {
         $this->addTypeValidator('boolean');
 
-        $this->addTypeFilter(function($value) {
+        $this->getFilterChain()->attach(function($value) {
             switch (gettype($value)) {
                 case 'boolean':
                     return $value;
@@ -31,6 +31,6 @@ class BooleanProperty extends AbstractProperty
                 default:
                     return $value;
             }
-        });
+        }, 10000);
     }
 }

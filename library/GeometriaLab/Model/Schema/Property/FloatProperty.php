@@ -8,12 +8,12 @@ class FloatProperty extends AbstractProperty
     {
         $this->addTypeValidator('float');
 
-        $this->addTypeFilter(function ($value) {
+        $this->getFilterChain()->attach(function ($value) {
             $filteredValue = (float)$value;
             if ((string)$filteredValue === $value) {
                 return $filteredValue;
             }
             return $value;
-        });
+        }, 10000);
     }
 }

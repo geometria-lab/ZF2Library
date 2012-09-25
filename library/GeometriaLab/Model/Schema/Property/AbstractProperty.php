@@ -204,16 +204,6 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
-     * Attach filter for casting value
-     *
-     * @param callable $callback
-     */
-    protected function addTypeFilter($callback)
-    {
-        $this->getFilterChain()->attach($callback, 10000);
-    }
-
-    /**
      * Setup something
      */
     protected function setup()

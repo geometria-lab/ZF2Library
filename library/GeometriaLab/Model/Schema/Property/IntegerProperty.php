@@ -8,12 +8,12 @@ class IntegerProperty extends AbstractProperty
     {
         $this->addTypeValidator('integer');
 
-        $this->addTypeFilter(function ($value) {
+        $this->getFilterChain()->attach(function ($value) {
             $filteredValue = (int)$value;
             if ((string)$filteredValue === $value) {
                 return $filteredValue;
             }
             return $value;
-        });
+        }, 10000);
     }
 }
