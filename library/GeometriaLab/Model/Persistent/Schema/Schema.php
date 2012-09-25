@@ -5,6 +5,13 @@ namespace GeometriaLab\Model\Persistent\Schema;
 class Schema extends \GeometriaLab\Model\Schema\Schema
 {
     /**
+     * Expected properties interface
+     *
+     * @var array
+     */
+    static protected $propertyInterface = 'GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface';
+
+    /**
      * Mapper class
      *
      * @var string

@@ -2,8 +2,6 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
-use GeometriaLab\Model\Schema\Schema;
-
 class ArrayProperty extends AbstractProperty
 {
     /**
@@ -34,24 +32,22 @@ class ArrayProperty extends AbstractProperty
         return $this->itemProperty;
     }
 
-    /**
-     * Prepare value
-     *
-     * @todo Separate validation and filter
-     * @param array $value
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (!is_array($value)) {
-            throw new \InvalidArgumentException("must be array");
-        }
+        $property = $this;
+        $this->getFilterChain()->attach(function($value) use ($property) {
+            $itemProperty = $property->getItemProperty();
+            if (is_array($value) && $itemProperty !== null) {
+                foreach($value as &$item) {
+                    $item = $itemProperty->getFilterChain()->filter($item);
+                }
+            }
 
-        if ($this->getItemProperty() !== null) {
-            $value = array_map(array($this->getItemProperty(), 'prepare'), $value);
-        }
+            return $value;
+        });
 
-        return $value;
+
+        $validator = new Validator\ArrayItem($this);
+        $this->getValidatorChain()->addValidator($validator);
     }
 }

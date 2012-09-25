@@ -51,6 +51,11 @@ class Model implements ModelInterface
      */
     public function get($name)
     {
+        $method = "get{$name}";
+        if (method_exists($this, $method)) {
+            return call_user_func(array($this, $method));
+        }
+
         if (isset($this->propertyValues[$name])) {
             return $this->propertyValues[$name];
         } else {
@@ -78,7 +83,12 @@ class Model implements ModelInterface
      */
     public function set($name, $value)
     {
-        $this->propertyValues[$name] = $value;
+        $method = "set{$name}";
+        if (method_exists($this, $method)) {
+            call_user_func(array($this, $method), $value);
+        } else {
+            $this->propertyValues[$name] = $value;
+        }
 
         return $this;
     }
@@ -135,6 +145,14 @@ class Model implements ModelInterface
         }
 
         return $array;
+    }
+
+    /**
+     * IteratorAggregate implementation
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->toArray());
     }
 
     /**

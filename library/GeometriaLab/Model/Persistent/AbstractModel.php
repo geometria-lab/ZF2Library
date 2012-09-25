@@ -8,21 +8,28 @@ use GeometriaLab\Model\Persistent\Relation\BelongsTo,
     GeometriaLab\Model\Persistent\Relation\HasOne,
     GeometriaLab\Model\Persistent\Relation\HasMany;
 
-use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo        as BelongsToProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne           as HasOneProperty,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany          as HasManyProperty;
+use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty;
 
 abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implements ModelInterface
 {
-    static protected $parserClassName = 'GeometriaLab\Model\Persistent\Schema\DocBlockParser';
-
     /**
      * Clean property values
      *
      * @var array
      */
     protected $cleanPropertyValues = array();
+
+    /**
+     * Relations
+     *
+     * @var array
+     */
+    protected $relations = array();
+
+    /**
+     * @var string
+     */
+    static protected $parserClassName = 'GeometriaLab\Model\Persistent\Schema\DocBlockParser';
 
     /**
      * Get property value
@@ -33,7 +40,11 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
      */
     public function get($name)
     {
-        $value = parent::get($name);
+        if ($this->hasRelation($name)) {
+            $value = $this->getRelation($name);
+        } else {
+            $value = parent::get($name);
+        }
 
         if ($value instanceof BelongsTo) {
             /**
@@ -56,6 +67,41 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
     }
 
     /**
+     * Set property value
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return AbstractModel|ModelInterface
+     * @throws \InvalidArgumentException
+     */
+    public function set($name, $value)
+    {
+        if ($this->hasRelation($name)) {
+            $relation = $this->getRelation($name);
+
+            if ($relation instanceof BelongsTo || $relation instanceof HasOne) {
+                $relation->setTargetModel($value);
+            } elseif ($relation instanceof HasMany) {
+                $relation->setTargetModels($value);
+            }
+        } else {
+            parent::set($name, $value);
+
+            foreach ($this->getRelations() as $relation) {
+                // @todo If changed referenced key?
+                /**
+                 * @var BelongsTo $relation
+                 */
+                if ($relation instanceof BelongsTo && $relation->getProperty()->getOriginProperty() === $name) {
+                    $relation->resetTargetModel();
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Get relation
      *
      * @param string $name
@@ -66,75 +112,50 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
     {
         $schema = static::getSchema();
 
-        if (!$schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Relation '$name' does not exists");
-        }
-
         $property = $schema->getProperty($name);
 
         if (!$property instanceof AbstractRelationProperty) {
             throw new \InvalidArgumentException("'$name' is not relation");
         }
 
-        return $this->propertyValues[$name];
+        return $this->relations[$name];
     }
 
     /**
-     * Set property value
+     * Get relations
+     *
+     * @return array
+     */
+    public function getRelations()
+    {
+        return $this->relations;
+    }
+
+    /**
+     * Has relation
      *
      * @param string $name
-     * @param mixed $value
-     * @return AbstractModel|ModelInterface
+     * @return bool
      * @throws \InvalidArgumentException
      */
-    public function set($name, $value)
+    public function hasRelation($name)
     {
         $schema = static::getSchema();
 
         if (!$schema->hasProperty($name)) {
-            throw new \InvalidArgumentException("Property '$name' does not exists");
+            return false;
         }
 
         $property = $schema->getProperty($name);
 
-        if ($value !== null) {
-            try {
-                $value = $property->prepare($value);
-            } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException("Invalid value for property '$name': " . $e->getMessage());
-            }
-        }
-
-        $method = "set{$name}";
-        if (method_exists($this, $method)) {
-            call_user_func(array($this, $method), $value);
-        } else if ($property instanceof BelongsToProperty) {
-            $this->propertyValues[$name]->setTargetModel($value);
-        } else if ($property instanceof HasOneProperty) {
-            $this->propertyValues[$name]->setTargetModel($value);
-        } else if ($property instanceof HasManyProperty) {
-            $this->propertyValues[$name]->setTargetModels($value);
-        } else {
-            $this->propertyValues[$name] = $value;
-
-            foreach($schema->getProperties() as $property) {
-                // @todo If changed referenced key?
-                /**
-                 * @var BelongsToProperty $property
-                 */
-                if ($property instanceof BelongsTo && $property->getOriginProperty() === $name) {
-                    $this->propertyValues[$property->getName()] = null;
-                }
-            }
-        }
-
-        return $this;
+        return ($property instanceof AbstractRelationProperty);
     }
 
     /**
      * Save model to storage
      *
-     * @return boolean
+     * @return bool
+     * @throws \RuntimeException
      */
     public function save()
     {
@@ -309,10 +330,27 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
                  * @var AbstractRelationProperty $property
                  */
                 $relationClassName = $property->getRelationClass();
-                $this->propertyValues[$name] = new $relationClassName($this, $property);
+                $this->relations[$name] = new $relationClassName($this, $property);
             } else if ($property->getDefaultValue() !== null) {
                 $this->set($name, $property->getDefaultValue());
             }
         }
+    }
+
+    /**
+     * Get properties for validation
+     *
+     * @return \GeometriaLab\Model\Schema\Property\PropertyInterface[]
+     */
+    public function getPropertiesForValidation()
+    {
+        $properties = array();
+        foreach(self::getSchema()->getProperties() as $property) {
+            if (!$property instanceof AbstractRelationProperty) {
+                $properties[] = $property;
+            }
+        }
+
+        return $properties;
     }
 }

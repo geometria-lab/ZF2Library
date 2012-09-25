@@ -3,7 +3,8 @@
 namespace GeometriaLabTest\Model;
 
 use GeometriaLabTest\Model\TestModels\Model,
-    GeometriaLabTest\Model\TestModels\SubModel;
+    GeometriaLabTest\Model\TestModels\SubModel,
+    GeometriaLabTest\Model\TestModels\InheritModel;
 
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,6 +35,15 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $this->model->nonSetProperty);
     }
 
+    public function testPopulateInvalidProperty()
+    {
+        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'booleanProperty':\r\nValue must be a boolean, string is present");
+
+        $data = $this->getData();
+        $data['booleanProperty'] = 'foo';
+        $this->model->populate($data);
+    }
+
     public function testGetNotPresentProperty()
     {
         $this->setExpectedException('\InvalidArgumentException');
@@ -55,7 +65,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     public function testSetInvalidDataToBoolean()
     {
         $this->setExpectedException('\InvalidArgumentException');
-        $this->model->booleanProperty = 1;
+        $this->model->booleanProperty = 'foo';
     }
 
     public function testSetInvalidDataToFloat()
@@ -117,6 +127,36 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(true, $this->model->has('booleanProperty'));
         $this->assertEquals(false, $this->model->has('nonExistsProperty'));
+    }
+
+    public function testHasInheritProperty()
+    {
+        $inheritModel = new InheritModel();
+        $this->assertTrue($inheritModel->has('stringProperty'));
+    }
+
+    public function testGetDefaultInheritProperty()
+    {
+        $inheritModel = new InheritModel();
+        $this->assertEquals('default', $inheritModel->stringProperty);
+    }
+
+    public function testGetFilteredProperty()
+    {
+        $this->model->trimmedProperty = ' need trim ';
+        $this->assertEquals('need trim', $this->model->trimmedProperty);
+    }
+
+    public function testSetValidValidationProperty()
+    {
+        $this->model->emailProperty = 'email@example.com';
+        $this->assertEquals('email@example.com', $this->model->emailProperty);
+    }
+
+    public function testSetInvalidValidationProperty()
+    {
+        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'emailProperty':\r\nThe input is not a valid email address. Use the basic format local-part@hostname");
+        $this->model->emailProperty = 'invalid email';
     }
 
     protected function getData()

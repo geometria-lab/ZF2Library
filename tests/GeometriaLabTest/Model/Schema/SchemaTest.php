@@ -2,33 +2,24 @@
 
 namespace GeometriaLabTest\Model\Schema;
 
-use GeometriaLab\Model\Schema\DocBlockParser;
-
 class SchemaTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetPropertyNotExists()
+    public function testAddProperty()
     {
-        $this->setExpectedException('InvalidArgumentException', 'Property \'foo\' not present in model \'GeometriaLabTest\Model\TestModels\Model\'');
-        $s = DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\TestModels\Model');
-        $this->assertNull($s->getProperty('foo'));
+        $modelSchema = new \GeometriaLab\Model\Schema\Schema();
+        $persistentModelProperty = new \GeometriaLab\Model\Schema\Property\IntegerProperty(array('name' => 'integerProperty'));
+        $modelSchema->addProperty($persistentModelProperty);
+
+        $this->assertTrue($modelSchema->hasProperty('integerProperty'));
     }
 
-    public function testParseDocblock()
+    public function testAddBadProperty()
     {
-        $this->setExpectedException('InvalidArgumentException');
-        DocBlockParser::getInstance()->createSchema('stdClass');
-    }
+        $this->setExpectedException('RuntimeException', 'Property \'integerProperty\' must implement \'GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface\' interface, but \'GeometriaLab\Model\Schema\Property\PropertyInterface\' is given');
 
-    public function testGetParamsFromTag()
-    {
-        $this->setExpectedException('InvalidArgumentException', 'Not valid params for property \'foo\'');
-        DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\Schema\TestModels\ModelWithInvalidParams');
-    }
-
-    public function testCreateProperty()
-    {
-        $this->setExpectedException('InvalidArgumentException', 'Invalid property type \'bulean\'');
-        DocBlockParser::getInstance()->createSchema('GeometriaLabTest\Model\Schema\TestModels\ModelWithInvalidType');
+        $persistentModelSchema = new \GeometriaLab\Model\Persistent\Schema\Schema();
+        $modelProperty = new \GeometriaLab\Model\Schema\Property\IntegerProperty(array('name' => 'integerProperty'));
+        $persistentModelSchema->addProperty($modelProperty);
     }
 }
 

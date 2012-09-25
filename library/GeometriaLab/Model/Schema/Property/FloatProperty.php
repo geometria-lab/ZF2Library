@@ -4,19 +4,16 @@ namespace GeometriaLab\Model\Schema\Property;
 
 class FloatProperty extends AbstractProperty
 {
-    /**
-     * Validate property
-     *
-     * @param float $value
-     * @return float
-     * @throws \InvalidArgumentException
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (!is_float($value)) {
-            throw new \InvalidArgumentException("must be float");
-        }
+        $this->addTypeValidator('float');
 
-        return $value;
+        $this->getFilterChain()->attach(function ($value) {
+            $filteredValue = (float)$value;
+            if ((string)$filteredValue === $value) {
+                return $filteredValue;
+            }
+            return $value;
+        }, 10000);
     }
 }

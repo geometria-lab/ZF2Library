@@ -61,7 +61,7 @@ class HasOne extends AbstractRelation
             return 0;
         }
 
-        $targetModel = $this->getTargetModel();
+        $targetModel = $this->getTargetModel(true);
 
         if ($targetModel === null) {
             return 0;

@@ -4,19 +4,16 @@ namespace GeometriaLab\Model\Schema\Property;
 
 class IntegerProperty extends AbstractProperty
 {
-    /**
-     * Prepare value
-     *
-     * @param integer $value
-     * @return integer
-     * @throws \InvalidArgumentException
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (!is_integer($value)) {
-            throw new \InvalidArgumentException("must be integer");
-        }
+        $this->addTypeValidator('integer');
 
-        return $value;
+        $this->getFilterChain()->attach(function ($value) {
+            $filteredValue = (int)$value;
+            if ((string)$filteredValue === $value) {
+                return $filteredValue;
+            }
+            return $value;
+        }, 10000);
     }
 }

@@ -348,11 +348,14 @@ class Query implements QueryInterface
      */
     protected function prepareFieldValue($field, $value)
     {
-        if (!$this->getModelSchema()->hasProperty($field)) {
-            throw new \InvalidArgumentException("Field in where '$field' not present in model!");
+        $property = $this->getModelSchema()->getProperty($field);
+        $value = $property->getFilterChain()->filter($value);
+
+        if (!$property->getValidatorChain()->isValid($value)) {
+            throw new \InvalidArgumentException("Invalid property '$field' value: " . implode("\r\n", $property->getValidatorChain()->getMessages()));
         }
 
-        return $this->getModelSchema()->getProperty($field)->prepare($value);
+        return $value;
     }
 
     /**

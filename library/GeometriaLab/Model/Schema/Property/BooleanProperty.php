@@ -4,19 +4,33 @@ namespace GeometriaLab\Model\Schema\Property;
 
 class BooleanProperty extends AbstractProperty
 {
-    /**
-     * Prepare value
-     *
-     * @param boolean $value
-     * @return boolean mixed
-     * @throws \InvalidArgumentException
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (!is_bool($value)) {
-            throw new \InvalidArgumentException("must be boolean");
-        }
+        $this->addTypeValidator('boolean');
 
-        return $value;
+        $this->getFilterChain()->attach(function($value) {
+            switch (gettype($value)) {
+                case 'boolean':
+                    return $value;
+                case 'integer':
+                    if ($value === 1) {
+                        return true;
+                    } elseif ($value === 0) {
+                        return false;
+                    } else {
+                        return $value;
+                    }
+                case 'string':
+                    if ($value === 'true') {
+                        return true;
+                    } elseif ($value === 'false') {
+                        return false;
+                    } else {
+                        return $value;
+                    }
+                default:
+                    return $value;
+            }
+        }, 10000);
     }
 }

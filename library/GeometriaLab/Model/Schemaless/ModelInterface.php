@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Schemaless;
 
-interface ModelInterface
+interface ModelInterface extends \IteratorAggregate
 {
     /**
      * Populate model from array or iterable object

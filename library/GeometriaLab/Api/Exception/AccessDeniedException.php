@@ -12,18 +12,18 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class UnauthenticatedUser extends Exception
+class AccessDeniedException extends AbstractException
 {
     /**
      * @var int
      */
-    protected $errorCode = 45;
+    protected $code = 44;
     /**
      * @var string
      */
-    protected $errorMessage = 'Unauthenticated user';
+    protected $message = 'Access denied';
     /**
      * @var int
      */
-    protected $httpCode = 403;
+    protected $httpCode = 401;
 }

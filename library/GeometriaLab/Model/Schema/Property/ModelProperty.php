@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
+use Zend\Validator\Callback as ZendValidatorCallback;
+
 class ModelProperty extends AbstractProperty
 {
     /**
@@ -39,19 +41,24 @@ class ModelProperty extends AbstractProperty
         return $this->modelClass;
     }
 
-    /**
-     * Prepare value
-     *
-     * @param array|\Traversable|\stdClass|\GeometriaLab\Model\ModelInterface $value
-     * @return \GeometriaLab\Model\ModelInterface
-     */
-    public function prepare($value)
+    protected function setup()
     {
-        if (is_a($value, $this->getModelClass())) {
+        $property = $this;
+        $this->getFilterChain()->attach(function($value) use ($property) {
+            if (is_array($value) || (is_object($value) && $value instanceof \stdClass)) {
+                /** @var \GeometriaLab\Model\Schemaless\ModelInterface $model */
+                $modelClass = $property->getModelClass();
+                $model = new $modelClass;
+
+                $model->populate($value);
+
+                $value = $model;
+            }
+
             return $value;
-        } else {
-            $className = $this->getModelClass();
-            return new $className($value);
-        }
+        });
+
+        $validator = new Validator\Model($this);
+        $this->getValidatorChain()->addValidator($validator);
     }
 }

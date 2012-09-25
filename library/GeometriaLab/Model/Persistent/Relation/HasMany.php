@@ -59,7 +59,7 @@ class HasMany extends AbstractRelation
             return 0;
         }
 
-        $targetModels = $this->getTargetModels();
+        $targetModels = $this->getTargetModels(true);
 
         if ($targetModels->isEmpty()) {
             return 0;
