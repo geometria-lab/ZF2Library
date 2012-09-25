@@ -113,6 +113,8 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
                 $subResource = $pathParts[2];
             }
         }
+
+        $routeMatch->setParam('id', $id);
         
         $namespace = $this->getNamespace($pathParts);
         $routeMatch->setParam('__NAMESPACE__', $namespace);
@@ -122,8 +124,6 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
 
         $action = $this->getAction($id, $method, $subResource);
         $routeMatch->setParam('action', $action);
-
-        $routeMatch->setParam('id', $id);
 
         return $routeMatch;
     }
