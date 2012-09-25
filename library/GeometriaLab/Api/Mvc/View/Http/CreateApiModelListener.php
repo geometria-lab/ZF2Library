@@ -131,7 +131,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
             if (!empty($wrongProperties)) {
                 $exception = new WrongFieldsException('Wrong fields provided');
-                $exception->setData($wrongProperties);
+                $exception->setFields($wrongProperties);
                 throw $exception;
             }
 

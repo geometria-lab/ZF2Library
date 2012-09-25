@@ -26,13 +26,48 @@ class WrongFieldsException extends AbstractException
      * @var int
      */
     protected $httpCode = 400;
+    /**
+     * Fields array
+     *
+     * @var array
+     */
+    protected $fields = array();
 
     /**
      * @return array
      */
     public function getData()
     {
-        return $this->prepareData($this->data);
+        $data = parent::getData();
+        if ($data !== null) {
+            return $data;
+        }
+
+        $fields = $this->getFields();
+
+        return $this->prepareFields($fields);
+    }
+
+    /**
+     * Set fields
+     *
+     * @param array $fields
+     * @return WrongFieldsException
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+
+    /**
+     * Get fields
+     *
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 
     /**
@@ -40,7 +75,7 @@ class WrongFieldsException extends AbstractException
      * @param string $parentKey
      * @return array
      */
-    private function prepareData($data, $parentKey = '')
+    private function prepareFields($data, $parentKey = '')
     {
         $result = array();
 
@@ -49,7 +84,7 @@ class WrongFieldsException extends AbstractException
                 if ($parentKey !== '') {
                     $key = "$parentKey.$key";
                 }
-                $result = array_merge($result, $this->prepareData($value, $key));
+                $result = array_merge($result, $this->prepareFields($value, $key));
             } else {
                 if ($parentKey !== '') {
                     $result[] = "$parentKey.$value";
@@ -60,18 +95,5 @@ class WrongFieldsException extends AbstractException
         }
 
         return $result;
-
-
-        if (is_array($field)) {
-            foreach ($field as $childKey => $childField) {
-                if (is_array($childField)) {
-                    $result = $this->prepareData($childKey, $childField);
-                } else {
-                    //$result =
-                }
-            }
-        } else {
-            return $field;
-        }
     }
 }
