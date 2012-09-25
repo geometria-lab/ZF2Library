@@ -217,7 +217,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayOfModelsPropertySet()
     {
-        $this->setExpectedException('\RuntimeException', "Item of array property 'arrayProperty' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
+        $this->setExpectedException('\RuntimeException', "Item of array property must be an instance of \\GeometriaLab\\Api\\Mvc\\Controller\\Action\\Params\\Schema\\Property\\PropertyInterface");
 
         $params = new ControllerParams();
         $arrayProperty = new ParamsArrayProperty(array(
