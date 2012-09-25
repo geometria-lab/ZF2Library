@@ -67,7 +67,7 @@ class Listener implements ZendListenerAggregateInterface
 
         if (!$params->isValid()) {
             $exception = new InvalidParamsException();
-            $exception->setData($params);
+            $exception->setParams($params);
 
             $e->setParam('exception', $exception);
             $e->setError($exception->getMessage());
