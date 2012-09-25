@@ -22,6 +22,6 @@ class BelongsTo extends AbstractRelation
 
     public function validate($value)
     {
-        return ($value instanceof ModelInterface);
+        return is_a($value, $this->getTargetModelClass());
     }
 }
