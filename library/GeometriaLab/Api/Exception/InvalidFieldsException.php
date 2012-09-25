@@ -12,7 +12,7 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class WrongFieldsException extends AbstractException
+class InvalidFieldsException extends AbstractException
 {
     /**
      * @var int
@@ -21,7 +21,7 @@ class WrongFieldsException extends AbstractException
     /**
      * @var string
      */
-    protected $message = 'Wrong fields';
+    protected $message = 'Invalid fields';
     /**
      * @var int
      */
@@ -52,7 +52,7 @@ class WrongFieldsException extends AbstractException
      * Set fields
      *
      * @param array $fields
-     * @return WrongFieldsException
+     * @return InvalidFieldsException
      */
     public function setFields($fields)
     {

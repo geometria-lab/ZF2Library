@@ -10,7 +10,7 @@ use GeometriaLab\Model,
     GeometriaLab\Model\ModelInterface;
 
 use GeometriaLab\Api\Mvc\View\Model\ApiModel,
-    GeometriaLab\Api\Exception\WrongFieldsException;
+    GeometriaLab\Api\Exception\InvalidFieldsException;
 
 /**
  *
@@ -109,7 +109,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
     /**
      * @param ZendMvcEvent $e
-     * @throws WrongFieldsException
+     * @throws InvalidFieldsException
      */
     public function hydrateData(ZendMvcEvent $e)
     {
@@ -127,10 +127,10 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             /* @var \GeometriaLab\Api\Stdlib\Extractor\Service $extractor */
             $extractor = $e->getApplication()->getServiceManager()->get('Extractor');
             $extractedData = $extractor->extract($data, $fieldsData);
-            $wrongProperties = $extractor->getWrongFields();
+            $wrongProperties = $extractor->getInvalidFields();
 
             if (!empty($wrongProperties)) {
-                $exception = new WrongFieldsException('Wrong fields provided');
+                $exception = new InvalidFieldsException('Invalid fields');
                 $exception->setFields($wrongProperties);
                 throw $exception;
             }
@@ -151,7 +151,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
      * @static
      * @param $fieldsString
      * @return array
-     * @throws WrongFieldsException
+     * @throws InvalidFieldsException
      */
     static public function createFieldsFromString($fieldsString)
     {
@@ -185,7 +185,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
                     unset($stack[$level--]);
                     if ($level < 0) {
                         // @TODO Need all messages with name
-                        throw new WrongFieldsException('Bad _fields syntax');
+                        throw new InvalidFieldsException('Bad _fields syntax');
                     }
                     $field = '';
                     break;
@@ -198,7 +198,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             }
         }
         if (count($stack) > 1) {
-            throw new WrongFieldsException('Bad _fields syntax');
+            throw new InvalidFieldsException('Bad _fields syntax');
         }
 
         return $fields;

@@ -13,7 +13,7 @@ use Zend\Stdlib\Hydrator\HydratorInterface as ZendHydratorInterface,
     Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Api\Stdlib\Extractor\Schema,
-    GeometriaLab\Api\Exception\WrongFieldsException;
+    GeometriaLab\Api\Exception\InvalidFieldsException;
 
 abstract class Extractor
 {
@@ -22,11 +22,11 @@ abstract class Extractor
      */
     protected $schema;
     /**
-     * Array of wrong fields
+     * Array of invalid fields
      *
      * @var array
      */
-    protected $wrongFields = array();
+    protected $invalidFields = array();
 
     public function __construct()
     {
@@ -62,7 +62,7 @@ abstract class Extractor
      * @param  object $object
      * @param  array $fields
      * @return array
-     * @throws WrongFieldsException
+     * @throws InvalidFieldsException
      * @throws ZendBadMethodCallException
      */
     public function extract($object, $fields = array())
@@ -70,12 +70,12 @@ abstract class Extractor
         $result = array();
         $allFields = !count($fields);
         $schemaProperties = $this->getSchema()->getProperties();
-        $this->wrongFields = array();
+        $this->invalidFields = array();
 
         if (!$allFields) {
             foreach ($fields as $name => $value) {
                 if (!isset($schemaProperties[$name])) {
-                    $this->wrongFields[] = $name;
+                    $this->invalidFields[] = $name;
                     continue;
                 }
                 $selectProperties[$name] = $schemaProperties[$name];
@@ -107,12 +107,12 @@ abstract class Extractor
     }
 
     /**
-     * Get wrong fields
+     * Get invalid fields
      *
      * @return array
      */
-    public function getWrongFields()
+    public function getInvalidFields()
     {
-        return $this->wrongFields;
+        return $this->invalidFields;
     }
 }

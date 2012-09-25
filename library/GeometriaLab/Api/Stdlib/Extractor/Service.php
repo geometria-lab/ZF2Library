@@ -9,7 +9,7 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
 
 use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Api\Stdlib\Extractor\Extractor,
-    GeometriaLab\Api\Exception\WrongFieldsException;
+    GeometriaLab\Api\Exception\InvalidFieldsException;
 
 class Service implements ZendFactoryInterface
 {
@@ -22,11 +22,11 @@ class Service implements ZendFactoryInterface
      */
     private $extractorsNamespace;
     /**
-     * Wrong fields
+     * Invalid fields
      *
      * @var array
      */
-    private $wrongFields = array();
+    private $invalidFields = array();
 
     /**
      * @param ZendServiceLocatorInterface $serviceLocator
@@ -63,7 +63,7 @@ class Service implements ZendFactoryInterface
      * @param ModelInterface $model
      * @param array $fields
      * @return array
-     * @throws WrongFieldsException
+     * @throws InvalidFieldsException
      * @throws ZendBadMethodCallException
      * @throws \InvalidArgumentException
      */
@@ -90,31 +90,31 @@ class Service implements ZendFactoryInterface
 
         $extractor = static::$extractorInstances[$extractorName];
         $data = $extractor->extract($model, $extractFields);
-        $wrongFields = $extractor->getWrongFields();
+        $invalidFields = $extractor->getInvalidFields();
 
         foreach ($data as $name => $field) {
             if ($field instanceof \GeometriaLab\Model\ModelInterface) {
                 $parentExtractFields = isset($fields[$name]) ? $fields[$name] : array();
                 $data[$name] = $this->extract($field, $parentExtractFields);
-                $subWrongFields = $this->getWrongFields();
-                if (!empty($subWrongFields)) {
-                    $wrongFields[$name] = $subWrongFields;
+                $subInvalidFields = $this->getInvalidFields();
+                if (!empty($subInvalidFields)) {
+                    $invalidFields[$name] = $subInvalidFields;
                 }
             }
         }
 
-        $this->wrongFields = $wrongFields;
+        $this->invalidFields = $invalidFields;
 
         return $data;
     }
 
     /**
-     * Get wrong fields
+     * Get invalid fields
      *
      * @return array
      */
-    public function getWrongFields()
+    public function getInvalidFields()
     {
-        return $this->wrongFields;
+        return $this->invalidFields;
     }
 }

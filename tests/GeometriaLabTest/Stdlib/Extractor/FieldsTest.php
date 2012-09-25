@@ -52,9 +52,9 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
     {
         $fields = array('id' => true, 'foo' => true);
         self::$extractorService->extract(self::$order, $fields);
-        $wrongFields = self::$extractorService->getWrongFields();
+        $invalidFields = self::$extractorService->getInvalidFields();
 
-        $this->assertEquals(array('foo'), $wrongFields);
+        $this->assertEquals(array('foo'), $invalidFields);
     }
 
     public function testExtractAllFields()
@@ -112,8 +112,8 @@ class FieldsTest extends \PHPUnit_Framework_TestCase
             ),
         );
         self::$extractorService->extract(self::$user, $fields);
-        $wrongFields = self::$extractorService->getWrongFields();
+        $invalidFields = self::$extractorService->getInvalidFields();
 
-        $this->assertEquals(array('foo', 'order' => array('foo')), $wrongFields);
+        $this->assertEquals(array('foo', 'order' => array('foo')), $invalidFields);
     }
 }
