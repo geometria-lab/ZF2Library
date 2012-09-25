@@ -22,7 +22,6 @@
         }
     },
     "require" : {
-        "zendframework/zendframework" : "2.*",
-        "geometria-lab/shiterator": "dev-master"
+        "zendframework/zendframework" : "2.*"
     }
 }
