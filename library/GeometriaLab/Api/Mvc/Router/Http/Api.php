@@ -40,11 +40,6 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     protected $assembledParams = array();
 
     /**
-     * @var string
-     */
-    protected $subResource;
-
-    /**
      * Create a new regex route.
      *
      * @param  array  $constraints
@@ -98,20 +93,37 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
             return null;
         }
 
-        $pathParts = $this->getPathParts($request);
+        $id = null;
+        $subResource = null;
         $routeMatch = new ZendRouteMatch(array());
+        $method = $request->getMethod();
+        $pathParts = $this->getPathParts($request);
 
+        if (isset($pathParts[3])) {
+            if ($this->isValidId($pathParts[2])) {
+                $id = $pathParts[2];
+                $subResource = $pathParts[3];
+            } else {
+                return null;
+            }
+        } elseif (isset($pathParts[2])) {
+            if ($this->isValidId($pathParts[2])) {
+                $id = $pathParts[2];
+            } else {
+                $subResource = $pathParts[2];
+            }
+        }
+        
         $namespace = $this->getNamespace($pathParts);
         $routeMatch->setParam('__NAMESPACE__', $namespace);
 
         $controller = $this->getController($pathParts);
         $routeMatch->setParam('controller', $controller);
 
-        $id = $this->getId($pathParts);
-        $routeMatch->setParam('id', $id);
-
-        $action = $this->getAction($routeMatch, $request);
+        $action = $this->getAction($id, $method, $subResource);
         $routeMatch->setParam('action', $action);
+
+        $routeMatch->setParam('id', $id);
 
         return $routeMatch;
     }
@@ -164,6 +176,15 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     }
 
     /**
+     * @param $value
+     * @return bool
+     */
+    protected function isValidId($value)
+    {
+        return is_numeric($value) || preg_match('/^[a-hA-H0-9]{24}$/', $value);
+    }
+
+    /**
      * @param array $pathParts
      * @return null|string
      */
@@ -190,88 +211,54 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     }
 
     /**
-     * @param array $pathParts
-     * @return null|string
-     */
-    protected function getId($pathParts)
-    {
-        $id = null;
-
-        if (isset($pathParts[3])) {
-            if ($this->isValidId($pathParts[2])) {
-                $id = $pathParts[2];
-                $this->subResource = $pathParts[3];
-            } else {
-                return null;
-            }
-        } else if (isset($pathParts[2])) {
-            if ($this->isValidId($pathParts[2])) {
-                $id = $pathParts[2];
-            } else {
-                $this->subResource = $pathParts[2];
-            }
-        }
-
-        return $id;
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    protected function isValidId($value)
-    {
-        return is_numeric($value) || preg_match('/^[a-hA-H0-9]{24}$/', $value);
-    }
-
-    /**
-     * @param ZendRouteMatch $routeMatch
-     * @param ZendRequestInterface $request
-     * @return null|string
+     * @param $id
+     * @param $method
+     * @param $subResource
+     * @return string
      * @throws ZendDomainException
      */
-    protected function getAction(ZendRouteMatch $routeMatch, ZendRequestInterface $request)
+    protected function getAction($id, $method, $subResource)
     {
-        switch (strtolower($request->getMethod())) {
+        switch (strtolower($method)) {
             case 'get':
-                if (null !== $routeMatch->getParam('id')) {
-                    if (null !== $this->subResource) {
-                        $action = 'get' . ucfirst($this->subResource);
+                if (null !== $id) {
+                    if (null !== $subResource) {
+                        $action = 'get' . ucfirst($subResource);
                     } else {
                         $action = 'get';
                     }
                 } else {
-                    if (null !== $this->subResource) {
-                        $action = 'get' . ucfirst($this->subResource) . 'List';
+                    if (null !== $subResource) {
+                        $action = 'get' . ucfirst($subResource) . 'List';
                     } else {
                         $action = 'getList';
                     }
                 }
                 break;
             case 'post':
-                if (null !== $routeMatch->getParam('id')) {
+                if (null !== $id) {
                     throw new ZendDomainException('Post is allowed on resources only');
                 }
-                if (null !== $this->subResource) {
-                    $action = 'create' . ucfirst($this->subResource);
+                if (null !== $subResource) {
+                    $action = 'create' . ucfirst($subResource);
                 } else {
                     $action = 'create';
                 }
                 break;
             case 'put':
-                if (null === $routeMatch->getParam('id')) {
+                if (null === $id) {
                     throw new ZendDomainException('Missing identifier');
                 }
-                if (null !== $this->subResource) {
+                if (null !== $subResource) {
                     throw new ZendDomainException('Put is allowed on root resource object only');
                 }
                 $action = 'update';
                 break;
             case 'delete':
-                if (null === $routeMatch->getParam('id')) {
+                if (null === $id) {
                     throw new ZendDomainException('Missing identifier');
                 }
-                if (null !== $this->subResource) {
+                if (null !== $subResource) {
                     throw new ZendDomainException('Delete is allowed on root resource object only');
                 }
                 $action = 'delete';
@@ -279,7 +266,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
             default:
                 throw new ZendDomainException('Invalid HTTP method!');
         }
-
+        
         return $action;
     }
 }
