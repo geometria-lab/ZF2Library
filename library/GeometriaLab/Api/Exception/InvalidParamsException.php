@@ -16,7 +16,7 @@ class InvalidParamsException extends AbstractException
     /**
      * @var string
      */
-    protected $message = 'Validation error';
+    protected $message = 'Invalid params';
     /**
      * @var int
      */
