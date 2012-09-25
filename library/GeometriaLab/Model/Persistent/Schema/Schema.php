@@ -5,14 +5,11 @@ namespace GeometriaLab\Model\Persistent\Schema;
 class Schema extends \GeometriaLab\Model\Schema\Schema
 {
     /**
-     * Expected properties namespaces
+     * Expected properties interface
      *
      * @var array
      */
-    static protected $propertyNamespaces = array(
-        'GeometriaLab\Model\Persistent\Schema\Property',
-        'GeometriaLab\Model\Persistent\Schema\Property\Relation',
-    );
+    static protected $propertyInterface = 'GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface';
 
     /**
      * Mapper class

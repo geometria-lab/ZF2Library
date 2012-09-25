@@ -15,11 +15,11 @@ class SchemaTest extends \PHPUnit_Framework_TestCase
 
     public function testAddBadProperty()
     {
-        $this->setExpectedException('RuntimeException', 'Property \'integerProperty\' must be in \'GeometriaLab\Model\Schema\Property\' namespaces, but GeometriaLab\Model\Persistent\Schema\Property is given');
+        $this->setExpectedException('RuntimeException', 'Property \'integerProperty\' must implement \'GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface\' interface, but \'GeometriaLab\Model\Schema\Property\PropertyInterface\' is given');
 
-        $modelSchema = new \GeometriaLab\Model\Schema\Schema();
-        $persistentModelProperty = new \GeometriaLab\Model\Persistent\Schema\Property\IntegerProperty(array('name' => 'integerProperty'));
-        $modelSchema->addProperty($persistentModelProperty);
+        $persistentModelSchema = new \GeometriaLab\Model\Persistent\Schema\Schema();
+        $modelProperty = new \GeometriaLab\Model\Schema\Property\IntegerProperty(array('name' => 'integerProperty'));
+        $persistentModelSchema->addProperty($modelProperty);
     }
 }
 

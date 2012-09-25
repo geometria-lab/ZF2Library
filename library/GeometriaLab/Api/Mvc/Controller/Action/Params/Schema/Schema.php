@@ -7,13 +7,11 @@ use GeometriaLab\Model\Schema\Property\PropertyInterface;
 class Schema extends \GeometriaLab\Model\Schema\Schema
 {
     /**
-     * Expected properties namespaces
+     * Expected properties interface
      *
      * @var array
      */
-    static protected $propertyNamespaces = array(
-        'GeometriaLab\Model\Persistent\Schema\Property',
-    );
+    static protected $propertyInterface = 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\PropertyInterface';
 
     /**
      * Validate property
@@ -23,17 +21,14 @@ class Schema extends \GeometriaLab\Model\Schema\Schema
      */
     protected function validateProperty(PropertyInterface $property)
     {
-        if (is_a($property, '\GeometriaLab\Model\Schema\Property\ModelProperty')) {
-            throw new \RuntimeException("Property '{$property->getName()}' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
-        }
+        parent::validateProperty($property);
 
-        if (is_a($property, '\GeometriaLab\Model\Schema\Property\ArrayProperty')) {
+        if (is_a($property, '\GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty')) {
             $itemProperty = $property->getItemProperty();
             if (is_a($itemProperty, '\GeometriaLab\Model\Schema\Property\ModelProperty')) {
                 throw new \RuntimeException("Item of array property '{$property->getName()}' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
             }
         }
 
-        parent::validateProperty($property);
     }
 }

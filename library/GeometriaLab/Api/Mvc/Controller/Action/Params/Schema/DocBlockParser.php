@@ -9,11 +9,11 @@ class DocBlockParser extends \GeometriaLab\Model\Schema\DocBlockParser
      * @var array
      */
     static protected $regularPropertiesClassMap = array(
-        'string'  => 'GeometriaLab\Model\Persistent\Schema\Property\StringProperty',
-        'array'   => 'GeometriaLab\Model\Persistent\Schema\Property\ArrayProperty',
-        'boolean' => 'GeometriaLab\Model\Persistent\Schema\Property\BooleanProperty',
-        'float'   => 'GeometriaLab\Model\Persistent\Schema\Property\FloatProperty',
-        'integer' => 'GeometriaLab\Model\Persistent\Schema\Property\IntegerProperty',
+        'string'  => 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\StringProperty',
+        'array'   => 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty',
+        'boolean' => 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\BooleanProperty',
+        'float'   => 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\FloatProperty',
+        'integer' => 'GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\IntegerProperty',
     );
 
     /**

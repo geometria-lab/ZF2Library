@@ -7,13 +7,11 @@ use GeometriaLab\Model\Schema\Property\PropertyInterface;
 class Schema implements SchemaInterface
 {
     /**
-     * Expected properties namespaces
+     * Expected properties interface
      *
      * @var array
      */
-    static protected $propertyNamespaces = array(
-        'GeometriaLab\Model\Schema\Property',
-    );
+    static protected $propertyInterface = 'GeometriaLab\Model\Schema\Property\PropertyInterface';
 
     /**
      * Class name
@@ -138,11 +136,10 @@ class Schema implements SchemaInterface
             throw new \InvalidArgumentException("Property '$name' already exist in model '$this->className'");
         }
 
-        $propertyReflection = new \ReflectionClass($property);
-        $propertyNamespace = $propertyReflection->getNamespaceName();
+        $propertyInterfaces = class_implements($property);
 
-        if (!in_array($propertyNamespace, static::$propertyNamespaces)) {
-            throw new \RuntimeException("Property '$name' must be in '" . implode(', ', static::$propertyNamespaces) . "' namespaces, but $propertyNamespace is given");
+        if (!isset($propertyInterfaces[static::$propertyInterface])) {
+            throw new \RuntimeException("Property '$name' must implement '" . static::$propertyInterface . "' interface, but '" . implode(', ', $propertyInterfaces) . "' is given");
         }
     }
 }

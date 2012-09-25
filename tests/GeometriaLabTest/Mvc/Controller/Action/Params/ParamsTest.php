@@ -5,7 +5,7 @@ namespace GeometriaLabTest\Mvc\Controller\Action\Params;
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Params as ControllerParams,
     GeometriaLab\Api\Mvc\Controller\Listener as ControllerListener,
     GeometriaLab\Model\Schema\Property\ModelProperty,
-    GeometriaLab\Model\Schema\Property\ArrayProperty;
+    GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty as ParamsArrayProperty;
 
 use Zend\Config\Config as ZendConfig,
     Zend\Http\Request as ZendRequest,
@@ -207,7 +207,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testModelPropertySet()
     {
-        $this->setExpectedException('\RuntimeException', "Property 'modelProperty' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
+        $this->setExpectedException('\RuntimeException', "Property 'modelProperty' must implement 'GeometriaLab\\Api\\Mvc\\Controller\\Action\\Params\\Schema\\Property\\PropertyInterface' interface, but 'GeometriaLab\\Model\\Schema\\Property\\PropertyInterface");
 
         $params = new ControllerParams();
         $model = new ModelProperty(array('name' => 'modelProperty'));
@@ -220,7 +220,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\RuntimeException', "Item of array property 'arrayProperty' mustn't be an instance of \\GeometriaLab\\Model\\Schema\\Property\\ModelProperty");
 
         $params = new ControllerParams();
-        $arrayProperty = new ArrayProperty(array(
+        $arrayProperty = new ParamsArrayProperty(array(
             'name'         => 'arrayProperty',
             'itemProperty' => new ModelProperty(),
         ));
