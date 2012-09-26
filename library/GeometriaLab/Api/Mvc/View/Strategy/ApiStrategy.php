@@ -257,7 +257,7 @@ class ApiStrategy implements ZendListenerAggregateInterface
             $contentType = $this->getContentType($format);
 
             if (is_string($contentType)) {
-                $headers->addHeaderLine('content-type', 'application/xml');
+                $headers->addHeaderLine($contentType);
             } elseif (is_callable($contentType)) {
                 call_user_func($contentType, $e);
             }
