@@ -2,16 +2,12 @@
 
 namespace GeometriaLab\Api\Mvc\Router\Http;
 
-use GeometriaLab\Api\Exception\InvalidFormatException;
-
 use Zend\Stdlib\ArrayUtils as ZendArrayUtils,
     Zend\Stdlib\RequestInterface as ZendRequestInterface,
     Zend\Mvc\Router\Exception as ZendRouterException,
     Zend\Mvc\Router\Http\RouteMatch as ZendRouteMatch,
     Zend\Mvc\Router\Exception\RuntimeException as ZendRuntimeException,
     Zend\Mvc\Exception\DomainException as ZendDomainException;
-
-use GeometriaLab\Api\Mvc\View\Strategy\ApiStrategy;
 
 /**
  *
@@ -87,7 +83,6 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      * @param  ZendRequestInterface $request
      * @param  string|null $pathOffset
      * @return ZendRouteMatch
-     * @throws ZendDomainException
      */
     public function match(ZendRequestInterface $request, $pathOffset = null)
     {
@@ -105,12 +100,10 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
 
         // 1. Get format
         $lastPart = end($pathParts);
-        $dotPosition = strpos('.', $lastPart);
-        if ($dotPosition !== false) {
-            $format = substr($lastPart, $dotPosition + 1);
-            if (!ApiStrategy::isValidFormat($format)) {
-                throw new InvalidFormatException("Format '$format' is not supported");
-            }
+        $formatPart = explode('.', $lastPart, 2);
+        if (count($formatPart) == 2) {
+            $pathParts[count($pathParts) - 1] = $formatPart[0];
+            $format = $formatPart[1];
             $request->setMetadata('format', $format);
         }
 

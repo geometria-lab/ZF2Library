@@ -2,70 +2,36 @@
 
 namespace GeometriaLab\Api\Mvc\View\Strategy;
 
-use GeometriaLab\Api\Mvc\View\Renderer\XmlRenderer;
+use GeometriaLab\Api\Exception\InvalidFormatException;
 
 use Zend\View\ViewEvent as ZendViewEvent,
-    Zend\View\Renderer\JsonRenderer as ZendJsonRenderer;
+    Zend\View\Renderer\RendererInterface as ZendRendererInterface,
+    Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
+    Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
+    Zend\ServiceManager\ServiceManager as ZendServiceManager;
 
-use Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
-    Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
-
-/**
- *
- */
 class ApiStrategy implements ZendListenerAggregateInterface
 {
-    /**
-     *
-     */
-    const FORMAT_JSON = 'json';
-
-    /**
-     *
-     */
-    const FORMAT_XML = 'xml';
-
     /**
      * @var \Zend\Stdlib\CallbackHandler[]
      */
     protected $listeners = array();
-
+    /**
+     * @var array
+     */
     protected $renderers = array();
-
-    protected $contentTypes = array(
-        self::FORMAT_JSON => 'application/json',
-        self::FORMAT_XML  => 'application/xml'
-    );
-
     /**
-     * @var \Zend\View\Renderer\JsonRenderer
+     * @var array
      */
-    protected $jsonRenderer;
-
+    protected $contentTypes = array();
     /**
-     * @var XmlRenderer
+     * @var string
      */
-    protected $xmlRenderer;
-
-    protected $defaultFormat = self::FORMAT_JSON;
-
-    static protected $formats = array(
-        self::FORMAT_JSON, self::FORMAT_XML
-    );
-
-    /**
-     * @param \Zend\View\Renderer\JsonRenderer            $jsonRenderer
-     * @param XmlRenderer $xmlRenderer
-     */
-    public function __construct(ZendJsonRenderer $jsonRenderer, XmlRenderer $xmlRenderer)
-    {
-        $this->jsonRenderer = $jsonRenderer;
-        $this->xmlRenderer = $xmlRenderer;
-    }
+    protected $defaultRenderer;
 
     /**
      * @param \Zend\EventManager\EventManagerInterface $events
-     * @param int                                      $priority
+     * @param int $priority
      */
     public function attach(ZendEventManagerInterface $events, $priority = 1)
     {
@@ -85,70 +51,218 @@ class ApiStrategy implements ZendListenerAggregateInterface
         }
     }
 
-    public function setDefaultFormat($format)
+    /**
+     * Set configs
+     *
+     * @param array $config
+     * @return ApiStrategy
+     * @throws \InvalidArgumentException
+     */
+    public function setConfig($config)
     {
-        if (!self::isValidFormat($format)) {
-            throw new \InvalidArgumentException("Format '$format' not supported");
+        if (!isset($config['view_strategy'])) {
+            throw new \InvalidArgumentException('Need "view_strategy" param in config');
+        }
+        if (!$config['view_strategy']['renderers']){
+            throw new \InvalidArgumentException('Need "view_strategy.renderers" param in config');
+        }
+        if (!$config['view_strategy']['default_renderer']){
+            throw new \InvalidArgumentException('Need "view_strategy.default_renderer" param in config');
         }
 
-        $this->defaultFormat = $format;
+        $this->createRenderers($config['view_strategy']['renderers']);
+        $this->setDefaultRenderer($config['view_strategy']['default_renderer']);
 
         return $this;
     }
 
-    public function getDefaultFormat()
+    /**
+     * Create renderers
+     *
+     * @param array $renderers
+     * @throws \InvalidArgumentException
+     */
+    protected function createRenderers(array $renderers)
     {
-        return $this->defaultFormat;
+        foreach ($renderers as $format => $params) {
+            if (!isset($params['class_name'])) {
+                throw new \InvalidArgumentException('Need "class_name" param in "' . $format .'"');
+            }
+
+            $renderer = new $params['class_name'];
+            $this->setRenderer($format, $renderer);
+
+            if (isset($params['content_type'])) {
+                $this->setContentType($format, $params['content_type']);
+            }
+        }
     }
 
     /**
-     * @param \Zend\View\ViewEvent $e
-     * @return \GeometriaLab\Api\Mvc\View\Renderer\XmlRenderer|\Zend\View\Renderer\JsonRenderer
+     * Get renderers
+     *
+     * @return array
+     */
+    public function getRenderers()
+    {
+        return $this->renderers;
+    }
+
+    /**
+     * Does it have renderer for format $format?
+     *
+     * @param string $format
+     * @return bool
+     */
+    public function hasRenderer($format)
+    {
+        return isset($this->renderers[$format]);
+    }
+
+    /**
+     * Set renderer
+     *
+     * @param string $format
+     * @param ZendRendererInterface $renderer
+     * @throws \InvalidArgumentException
+     */
+    public function setRenderer($format, ZendRendererInterface $renderer)
+    {
+        if ($this->hasRenderer($format)) {
+            throw new \InvalidArgumentException("Renderer for format '$format' already exist");
+        }
+
+        $this->renderers[$format] = $renderer;
+    }
+
+    /**
+     * Get renderer for format $format
+     *
+     * @param string $format
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
+    public function getRenderer($format)
+    {
+        if (!$this->hasRenderer($format)) {
+            throw new \InvalidArgumentException("Renderer for format '$format' doesn't present");
+        }
+
+        return $this->renderers[$format];
+    }
+
+    /**
+     * Set default renderer
+     *
+     * @param string $format
+     * @return ApiStrategy
+     */
+    public function setDefaultRenderer($format)
+    {
+        $this->defaultRenderer = $this->getRenderer($format);
+        return $this;
+    }
+
+    /**
+     * Get default renderer
+     *
+     * @return string
+     */
+    public function getDefaultRenderer()
+    {
+        return $this->defaultRenderer;
+    }
+
+    /**
+     * Does it have content type for format $format?
+     *
+     * @param string $format
+     * @return bool
+     */
+    public function hasContentType($format)
+    {
+        return isset($this->contentTypes[$format]);
+    }
+
+    /**
+     * Set content type for format $format
+     *
+     * @param string $format
+     * @param string|callable $contentType
+     * @return ApiStrategy
+     * @throws \InvalidArgumentException
+     */
+    public function setContentType($format, $contentType)
+    {
+        if (!$this->hasRenderer($format)) {
+            throw new \InvalidArgumentException("Renderer for format '$format' doesn't present");
+        }
+
+        $this->contentTypes[$format] = $contentType;
+
+        return $this;
+    }
+
+    /**
+     * Get content type for format $format
+     *
+     * @param string $format
+     * @return string|callable
+     * @throws \InvalidArgumentException
+     */
+    public function getContentType($format)
+    {
+        if (!$this->hasContentType($format)) {
+            throw new \InvalidArgumentException("Content type for format '$format' doesn't present");
+        }
+
+        return $this->contentTypes[$format];
+    }
+
+    /**
+     * Select renderer
+     *
+     * @param ZendViewEvent $e
+     * @return ZendRendererInterface
      */
     public function selectRenderer(ZendViewEvent $e)
     {
         $format = $e->getRequest()->getMetadata('format');
 
-        if ($format == 'xml') {
-            return $this->xmlRenderer;
-        } else {
-            return $this->jsonRenderer;
+        if ($this->hasRenderer($format)) {
+            return $this->getRenderer($format);
         }
+
+        return $this->getDefaultRenderer();
     }
 
     /**
-     * @param \Zend\View\ViewEvent $e
+     * Inject content to response
+     *
+     * @param ZendViewEvent $e
+     * @throws InvalidFormatException
      */
     public function injectResponse(ZendViewEvent $e)
     {
-        $renderer = $e->getRenderer();
-
         $response = $e->getResponse();
-        $result   = $e->getResult();
+        $result = $e->getResult();
         $headers = $response->getHeaders();
+        $format = $e->getRequest()->getMetadata('format');
 
-        if ($renderer == $this->jsonRenderer) {
-            if (!is_string($result)) {
-                // We don't have a string, and thus, no JSON
-                return;
-            }
+        if (!$this->hasRenderer($format)) {
+            throw new InvalidFormatException("Format '$format' is not supported");
+        }
 
-            if ($this->jsonRenderer->hasJsonpCallback()) {
-                $headers->addHeaderLine('content-type', 'application/javascript');
-            } else {
-                $headers->addHeaderLine('content-type', 'application/json');
+        if ($this->hasContentType($format)) {
+            $contentType = $this->getContentType($format);
+
+            if (is_string($contentType)) {
+                $headers->addHeaderLine('content-type', 'application/xml');
+            } elseif (is_callable($contentType)) {
+                call_user_func($contentType, $e);
             }
-        } else if ($renderer == $this->xmlRenderer) {
-            $headers->addHeaderLine('content-type', 'application/xml');
-        } else {
-            return;
         }
 
         $response->setContent($result);
-    }
-
-    static public function isValidFormat($format)
-    {
-        return in_array($format, self::$formats);
     }
 }
