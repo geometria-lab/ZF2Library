@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Api\Mvc\Router\Http;
 
+use GeometriaLab\Api\Exception\InvalidFormatException;
+
 use Zend\Stdlib\ArrayUtils as ZendArrayUtils,
     Zend\Stdlib\RequestInterface as ZendRequestInterface,
     Zend\Mvc\Router\Exception as ZendRouterException,
@@ -99,18 +101,20 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $method = $request->getMethod();
         $uri  = $request->getUri();
         $path = trim($uri->getPath(), '/');
-
-        foreach (array(ApiStrategy::FORMAT_JSON, ApiStrategy::FORMAT_XML) as $format) {
-            $needle = '.' . $format;
-            if (strpos($path, $needle) === strlen($path) - strlen($needle)) {
-                $request->setMetadata('format', $format);
-                $path = substr($path, 0, -strlen($needle));
-                break;
-            }
-        }
-
         $pathParts = explode('/', $path);
 
+        // 1. Get format
+        $lastPart = end($pathParts);
+        $dotPosition = strpos('.', $lastPart);
+        if ($dotPosition !== false) {
+            $format = substr($lastPart, $dotPosition + 1);
+            if (!ApiStrategy::isValidFormat($format)) {
+                throw new InvalidFormatException("Format '$format' is not supported");
+            }
+            $request->setMetadata('format', $format);
+        }
+
+        // 2. Get id and sub resource
         if (isset($pathParts[3])) {
             if ($this->isValidId($pathParts[2])) {
                 $id = $pathParts[2];
@@ -125,15 +129,17 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
                 $subResource = $pathParts[2];
             }
         }
-
         $routeMatch->setParam('id', $id);
-        
+
+        // 3. Get namespace
         $namespace = $this->getNamespace($pathParts);
         $routeMatch->setParam('__NAMESPACE__', $namespace);
 
+        // 4. Get controller
         $controller = $this->getController($pathParts);
         $routeMatch->setParam('controller', $controller);
 
+        // 5. Get action
         $action = $this->getAction($id, $method, $subResource);
         $routeMatch->setParam('action', $action);
 
@@ -206,6 +212,8 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      * @param $subResource
      * @return string
      * @throws ZendDomainException
+     *
+     * @todo Must throws bad request
      */
     protected function getAction($id, $method, $subResource)
     {

@@ -30,6 +30,13 @@ class ApiStrategy implements ZendListenerAggregateInterface
      */
     protected $listeners = array();
 
+    protected $renderers = array();
+
+    protected $contentTypes = array(
+        self::FORMAT_JSON => 'application/json',
+        self::FORMAT_XML  => 'application/xml'
+    );
+
     /**
      * @var \Zend\View\Renderer\JsonRenderer
      */
@@ -40,6 +47,12 @@ class ApiStrategy implements ZendListenerAggregateInterface
      */
     protected $xmlRenderer;
 
+    protected $defaultFormat = self::FORMAT_JSON;
+
+    static protected $formats = array(
+        self::FORMAT_JSON, self::FORMAT_XML
+    );
+
     /**
      * @param \Zend\View\Renderer\JsonRenderer            $jsonRenderer
      * @param XmlRenderer $xmlRenderer
@@ -48,17 +61,6 @@ class ApiStrategy implements ZendListenerAggregateInterface
     {
         $this->jsonRenderer = $jsonRenderer;
         $this->xmlRenderer = $xmlRenderer;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFormats()
-    {
-        return array(
-            self::FORMAT_JSON,
-            self::FORMAT_XML
-        );
     }
 
     /**
@@ -81,6 +83,22 @@ class ApiStrategy implements ZendListenerAggregateInterface
                 unset($this->listeners[$index]);
             }
         }
+    }
+
+    public function setDefaultFormat($format)
+    {
+        if (!self::isValidFormat($format)) {
+            throw new \InvalidArgumentException("Format '$format' not supported");
+        }
+
+        $this->defaultFormat = $format;
+
+        return $this;
+    }
+
+    public function getDefaultFormat()
+    {
+        return $this->defaultFormat;
     }
 
     /**
@@ -127,5 +145,10 @@ class ApiStrategy implements ZendListenerAggregateInterface
         }
 
         $response->setContent($result);
+    }
+
+    static public function isValidFormat($format)
+    {
+        return in_array($format, self::$formats);
     }
 }
