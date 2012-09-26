@@ -86,7 +86,7 @@ class Listener implements ZendListenerAggregateInterface
      * @param ZendRequestInterface $request
      * @return mixed
      */
-    static public function getParamsFromRequest(ZendRequestInterface $request)
+    static protected function getParamsFromRequest(ZendRequestInterface $request)
     {
         $queryParams = $request->getQuery()->toArray();
 
