@@ -6,6 +6,7 @@ use GeometriaLab\Api\Exception\InvalidFormatException;
 
 use Zend\View\ViewEvent as ZendViewEvent,
     Zend\View\Renderer\RendererInterface as ZendRendererInterface,
+    Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
     Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\ServiceManager\ServiceManager as ZendServiceManager;
@@ -27,7 +28,7 @@ class ApiStrategy implements ZendListenerAggregateInterface
     /**
      * @var string
      */
-    protected $defaultRenderer;
+    protected $defaultFormat;
 
     /**
      * @param \Zend\EventManager\EventManagerInterface $events
@@ -35,6 +36,7 @@ class ApiStrategy implements ZendListenerAggregateInterface
      */
     public function attach(ZendEventManagerInterface $events, $priority = 1)
     {
+        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'validateFormat'), -1);
         $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RENDERER, array($this, 'selectRenderer'), $priority);
         $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RESPONSE, array($this, 'injectResponse'), $priority);
     }
@@ -54,12 +56,14 @@ class ApiStrategy implements ZendListenerAggregateInterface
     /**
      * Set configs
      *
-     * @param array $config
+     * @param ZendMvcEvent $e
      * @return ApiStrategy
      * @throws \InvalidArgumentException
      */
-    public function setConfig($config)
+    public function validateFormat(ZendMvcEvent $e)
     {
+        $config = $e->getApplication()->getServiceManager()->get('Config');
+
         if (!isset($config['view_strategy'])) {
             throw new \InvalidArgumentException('Need "view_strategy" param in config');
         }
@@ -71,31 +75,9 @@ class ApiStrategy implements ZendListenerAggregateInterface
         }
 
         $this->createRenderers($config['view_strategy']['renderers']);
-        $this->setDefaultRenderer($config['view_strategy']['default_renderer']);
+        $this->setDefaultFormat($config['view_strategy']['default_renderer']);
 
         return $this;
-    }
-
-    /**
-     * Create renderers
-     *
-     * @param array $renderers
-     * @throws \InvalidArgumentException
-     */
-    protected function createRenderers(array $renderers)
-    {
-        foreach ($renderers as $format => $params) {
-            if (!isset($params['class_name'])) {
-                throw new \InvalidArgumentException('Need "class_name" param in "' . $format .'"');
-            }
-            if (!isset($params['content_type'])) {
-                throw new \InvalidArgumentException('Need "content_type" param in "' . $format .'"');
-            }
-
-            $renderer = new $params['class_name'];
-            $this->setRenderer($format, $renderer);
-            $this->setContentType($format, $params['content_type']);
-        }
     }
 
     /**
@@ -120,19 +102,19 @@ class ApiStrategy implements ZendListenerAggregateInterface
     }
 
     /**
-     * Set renderer
-     *
      * @param string $format
      * @param ZendRendererInterface $renderer
+     * @param $contentType
      * @throws \InvalidArgumentException
      */
-    public function setRenderer($format, ZendRendererInterface $renderer)
+    public function setRenderer($format, ZendRendererInterface $renderer, $contentType)
     {
         if ($this->hasRenderer($format)) {
             throw new \InvalidArgumentException("Renderer for format '$format' already exist");
         }
 
         $this->renderers[$format] = $renderer;
+        $this->contentTypes[$format] = $contentType;
     }
 
     /**
@@ -156,51 +138,27 @@ class ApiStrategy implements ZendListenerAggregateInterface
      *
      * @param string $format
      * @return ApiStrategy
-     */
-    public function setDefaultRenderer($format)
-    {
-        $this->defaultRenderer = $this->getRenderer($format);
-        return $this;
-    }
-
-    /**
-     * Get default renderer
-     *
-     * @return string
-     */
-    public function getDefaultRenderer()
-    {
-        return $this->defaultRenderer;
-    }
-
-    /**
-     * Does it have content type for format $format?
-     *
-     * @param string $format
-     * @return bool
-     */
-    public function hasContentType($format)
-    {
-        return isset($this->contentTypes[$format]);
-    }
-
-    /**
-     * Set content type for format $format
-     *
-     * @param string $format
-     * @param string|callable $contentType
-     * @return ApiStrategy
      * @throws \InvalidArgumentException
      */
-    public function setContentType($format, $contentType)
+    public function setDefaultFormat($format)
     {
         if (!$this->hasRenderer($format)) {
             throw new \InvalidArgumentException("Renderer for format '$format' doesn't present");
         }
 
-        $this->contentTypes[$format] = $contentType;
+        $this->defaultFormat = $format;
 
         return $this;
+    }
+
+    /**
+     * Get default format
+     *
+     * @return string
+     */
+    public function getDefaultFormat()
+    {
+        return $this->defaultFormat;
     }
 
     /**
@@ -208,14 +166,9 @@ class ApiStrategy implements ZendListenerAggregateInterface
      *
      * @param string $format
      * @return string|callable
-     * @throws \InvalidArgumentException
      */
     public function getContentType($format)
     {
-        if (!$this->hasContentType($format)) {
-            throw new \InvalidArgumentException("Content type for format '$format' doesn't present");
-        }
-
         return $this->contentTypes[$format];
     }
 
@@ -229,11 +182,11 @@ class ApiStrategy implements ZendListenerAggregateInterface
     {
         $format = $e->getRequest()->getMetadata('format');
 
-        if ($this->hasRenderer($format)) {
-            return $this->getRenderer($format);
+        if (!$this->hasRenderer($format)) {
+            $format = $this->getDefaultFormat();
         }
 
-        return $this->getDefaultRenderer();
+        return $this->getRenderer($format);
     }
 
     /**
@@ -241,6 +194,7 @@ class ApiStrategy implements ZendListenerAggregateInterface
      *
      * @param ZendViewEvent $e
      * @throws InvalidFormatException
+     * @throws \RuntimeException
      */
     public function injectResponse(ZendViewEvent $e)
     {
@@ -249,6 +203,10 @@ class ApiStrategy implements ZendListenerAggregateInterface
         /* @var \Zend\Http\Headers $headers */
         $headers = $response->getHeaders();
         $format = $e->getRequest()->getMetadata('format');
+
+        if ($format === null) {
+            $format = $this->getDefaultFormat();
+        }
 
         if (!$this->hasRenderer($format)) {
             throw new InvalidFormatException("Format '$format' is not supported");
@@ -265,5 +223,26 @@ class ApiStrategy implements ZendListenerAggregateInterface
         }
 
         $response->setContent($result);
+    }
+
+    /**
+     * Create renderers
+     *
+     * @param array $renderers
+     * @throws \InvalidArgumentException
+     */
+    protected function createRenderers(array $renderers)
+    {
+        foreach ($renderers as $format => $params) {
+            if (!isset($params['class_name'])) {
+                throw new \InvalidArgumentException('Need "class_name" param in "' . $format .'"');
+            }
+            if (!isset($params['content_type'])) {
+                throw new \InvalidArgumentException('Need "content_type" param in "' . $format .'"');
+            }
+
+            $renderer = new $params['class_name'];
+            $this->setRenderer($format, $renderer, $params['content_type']);
+        }
     }
 }
