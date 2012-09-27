@@ -25,7 +25,7 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
      */
     public function attach(ZendEventManagerInterface $events)
     {
-        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_DISPATCH_ERROR, array($this, 'detectNotFoundError'));
+        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_DISPATCH_ERROR, array($this, 'detectException'));
     }
 
     /**
@@ -53,13 +53,6 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
         $exception = $e->getParam('exception');
         if (!$exception instanceof \Exception) {
             return;
-        }
-
-        // @todo Remove shiterator from library and use via events
-        if (APPLICATION_ENV === 'production') {
-            $error = new \Shiterator\Error\Exception($exception);
-            $shiterator = \Shiterator\ErrorHandler::getInstance();
-            $shiterator->getClient()->addError($error);
         }
 
         $config = $e->getApplication()->getServiceManager()->get('Config');

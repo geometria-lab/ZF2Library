@@ -2,19 +2,17 @@
 
 namespace GeometriaLab\Api\Mvc\View\Http;
 
-use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
-use Zend\EventManager\EventManagerInterface as ZendEvents;
-use Zend\Mvc\MvcEvent as ZendMvcEvent;
-
 use GeometriaLab\Model,
     GeometriaLab\Model\ModelInterface;
 
 use GeometriaLab\Api\Mvc\View\Model\ApiModel,
     GeometriaLab\Api\Exception\InvalidFieldsException;
 
-/**
- *
- */
+use Zend\Mvc\MvcEvent as ZendMvcEvent,
+    Zend\Mvc\View\Http\InjectViewModelListener as ZendInjectViewModelListener,
+    Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
+    Zend\EventManager\EventManagerInterface as ZendEvents;
+
 class CreateApiModelListener implements ZendListenerAggregateInterface
 {
     /**
@@ -32,8 +30,12 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
      */
     public function attach(ZendEvents $events)
     {
-        $this->listeners[] = $events->attach('dispatch', array($this, 'createApiModel'),  -99);
-        $this->listeners[] = $events->attach('dispatch', array($this, 'hydrateData'),  1);
+        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_DISPATCH_ERROR, array($this, 'createApiModel'), -99);
+
+        $sharedEvents = $events->getSharedManager();
+        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'hydrateData'), 0);
+        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'createApiModel'), -99);
+        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array(new ZendInjectViewModelListener(), 'injectViewModel'), -100);
     }
 
     /**
@@ -184,7 +186,6 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
                     }
                     unset($stack[$level--]);
                     if ($level < 0) {
-                        // @TODO Need all messages with name
                         throw new InvalidFieldsException('Bad _fields syntax');
                     }
                     $field = '';

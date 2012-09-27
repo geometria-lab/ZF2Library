@@ -1,14 +1,13 @@
 <?php
 
-namespace GeometriaLab\Api\Mvc\Controller;
+namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEvents,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Stdlib\RequestInterface as ZendRequestInterface;
 
-use GeometriaLab\Api\Mvc\Controller\Action\Params\Params,
-    GeometriaLab\Api\Exception\InvalidParamsException;
+use GeometriaLab\Api\Exception\InvalidParamsException;
 
 class Listener implements ZendListenerAggregateInterface
 {
@@ -27,7 +26,7 @@ class Listener implements ZendListenerAggregateInterface
      */
     public function attach(ZendEvents $events)
     {
-        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array('\GeometriaLab\Api\Mvc\Controller\Listener', 'createParams'),  -30);
+        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'createParams'),  -30);
     }
 
     /**
@@ -49,11 +48,11 @@ class Listener implements ZendListenerAggregateInterface
      * @param ZendMvcEvent $e
      * @throws InvalidParamsException
      */
-    static public function createParams(ZendMvcEvent $e)
+    public function createParams(ZendMvcEvent $e)
     {
         $routeMatch = $e->getRouteMatch();
         $request = $e->getRequest();
-        $queryParams = self::getParamsFromRequest($request);
+        $queryParams = $this->getParamsFromRequest($request);
 
         // @TODO Stub
         $id = $routeMatch->getParam('id');
@@ -86,7 +85,7 @@ class Listener implements ZendListenerAggregateInterface
      * @param ZendRequestInterface $request
      * @return mixed
      */
-    static public function getParamsFromRequest(ZendRequestInterface $request)
+    protected function getParamsFromRequest(ZendRequestInterface $request)
     {
         $queryParams = $request->getQuery()->toArray();
 
