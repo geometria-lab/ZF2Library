@@ -1,15 +1,9 @@
 {
-    "hash": "47bc0a68ab3fd6cf853e35663fa12244",
+    "hash": "8d209e57f8b4fbc06940143799d2b4ce",
     "packages": [
         {
-            "package": "geometria-lab/shiterator",
-            "version": "dev-master",
-            "source-reference": "5afd93f1887045e5a07c77d26e70b571e41027ff",
-            "commit-date": "1340037114"
-        },
-        {
             "package": "zendframework/zendframework",
-            "version": "2.0.0"
+            "version": "2.0.2"
         }
     ],
     "packages-dev": null,
@@ -17,7 +11,7 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "geometria-lab/shiterator": 20
-    }
+    "stability-flags": [
+
+    ]
 }

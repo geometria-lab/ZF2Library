@@ -9,9 +9,10 @@ use Zend\View\ViewEvent as ZendViewEvent,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
     Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
-    Zend\ServiceManager\ServiceManager as ZendServiceManager;
+    Zend\ServiceManager\ServiceManager as ZendServiceManager,
+    Zend\ServiceManager\ServiceManagerAwareInterface as ZendServiceManagerAwareInterface;
 
-class ApiStrategy implements ZendListenerAggregateInterface
+class RenderStrategy implements ZendListenerAggregateInterface, ZendServiceManagerAwareInterface
 {
     /**
      * @var \Zend\Stdlib\CallbackHandler[]
@@ -29,6 +30,20 @@ class ApiStrategy implements ZendListenerAggregateInterface
      * @var string
      */
     protected $defaultFormat;
+    /**
+     * Service Manager
+     *
+     * @var ZendServiceManager
+     */
+    protected $serviceManager;
+
+    /**
+     * @param ZendServiceManager $serviceManager
+     */
+    public function __construct(ZendServiceManager $serviceManager)
+    {
+        $this->setServiceManager($serviceManager);
+    }
 
     /**
      * @param \Zend\EventManager\EventManagerInterface $events
@@ -37,8 +52,12 @@ class ApiStrategy implements ZendListenerAggregateInterface
     public function attach(ZendEventManagerInterface $events, $priority = 1)
     {
         $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'validateFormat'), -1);
-        $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RENDERER, array($this, 'selectRenderer'), $priority);
-        $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RESPONSE, array($this, 'injectResponse'), $priority);
+
+        $view = $this->serviceManager->get('Zend\View\View');
+        $events = $view->getEventManager();
+
+        $listeners[] = $events->attach(ZendViewEvent::EVENT_RENDERER, array($this, 'selectRenderer'), 100);
+        $listeners[] = $events->attach(ZendViewEvent::EVENT_RESPONSE, array($this, 'injectResponse'), 100);
     }
 
     /**
@@ -54,28 +73,38 @@ class ApiStrategy implements ZendListenerAggregateInterface
     }
 
     /**
+     * Set serviceManager
+     *
+     * @param \Zend\ServiceManager\ServiceManager $serviceManager
+     */
+    public function setServiceManager(ZendServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+    }
+
+    /**
      * Set configs
      *
      * @param ZendMvcEvent $e
-     * @return ApiStrategy
+     * @return RenderStrategy
      * @throws \InvalidArgumentException
      */
     public function validateFormat(ZendMvcEvent $e)
     {
-        $config = $e->getApplication()->getServiceManager()->get('Config');
+        $config = $this->serviceManager->get('Config');
 
-        if (!isset($config['view_strategy'])) {
-            throw new \InvalidArgumentException('Need "view_strategy" param in config');
+        if (!isset($config['view_render_strategy'])) {
+            throw new \InvalidArgumentException('Need "view_render_strategy" param in config');
         }
-        if (!$config['view_strategy']['renderers']){
-            throw new \InvalidArgumentException('Need "view_strategy.renderers" param in config');
+        if (!$config['view_render_strategy']['renderers']){
+            throw new \InvalidArgumentException('Need "view_render_strategy.renderers" param in config');
         }
-        if (!$config['view_strategy']['default_renderer']){
-            throw new \InvalidArgumentException('Need "view_strategy.default_renderer" param in config');
+        if (!$config['view_render_strategy']['default_format']){
+            throw new \InvalidArgumentException('Need "view_render_strategy.default_format" param in config');
         }
 
-        $this->createRenderers($config['view_strategy']['renderers']);
-        $this->setDefaultFormat($config['view_strategy']['default_renderer']);
+        $this->createRenderers($config['view_render_strategy']['renderers']);
+        $this->setDefaultFormat($config['view_render_strategy']['default_format']);
 
         return $this;
     }
@@ -137,7 +166,7 @@ class ApiStrategy implements ZendListenerAggregateInterface
      * Set default renderer
      *
      * @param string $format
-     * @return ApiStrategy
+     * @return RenderStrategy
      * @throws \InvalidArgumentException
      */
     public function setDefaultFormat($format)
