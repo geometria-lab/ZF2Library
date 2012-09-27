@@ -88,13 +88,13 @@ class ApiStrategy implements ZendListenerAggregateInterface
             if (!isset($params['class_name'])) {
                 throw new \InvalidArgumentException('Need "class_name" param in "' . $format .'"');
             }
+            if (!isset($params['content_type'])) {
+                throw new \InvalidArgumentException('Need "content_type" param in "' . $format .'"');
+            }
 
             $renderer = new $params['class_name'];
             $this->setRenderer($format, $renderer);
-
-            if (isset($params['content_type'])) {
-                $this->setContentType($format, $params['content_type']);
-            }
+            $this->setContentType($format, $params['content_type']);
         }
     }
 
@@ -246,6 +246,7 @@ class ApiStrategy implements ZendListenerAggregateInterface
     {
         $response = $e->getResponse();
         $result = $e->getResult();
+        /* @var \Zend\Http\Headers $headers */
         $headers = $response->getHeaders();
         $format = $e->getRequest()->getMetadata('format');
 
@@ -253,14 +254,14 @@ class ApiStrategy implements ZendListenerAggregateInterface
             throw new InvalidFormatException("Format '$format' is not supported");
         }
 
-        if ($this->hasContentType($format)) {
-            $contentType = $this->getContentType($format);
+        $contentType = $this->getContentType($format);
 
-            if (is_string($contentType)) {
-                $headers->addHeaderLine($contentType);
-            } elseif (is_callable($contentType)) {
-                call_user_func($contentType, $e);
-            }
+        if (is_string($contentType)) {
+            $headers->addHeaderLine($contentType);
+        } elseif (is_callable($contentType)) {
+            call_user_func($contentType, $e);
+        } else {
+            throw new \RuntimeException('Content type must be string or callable');
         }
 
         $response->setContent($result);
