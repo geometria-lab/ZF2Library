@@ -86,4 +86,19 @@ interface QueryInterface
     public function hasOffset();
 
     public function resetOffset();
+
+    /**
+     * Get mapper
+     *
+     * @return MapperInterface
+     */
+    public function getMapper();
+
+    /**
+     * Set mapper
+     *
+     * @param MapperInterface $mapper
+     * @return QueryInterface
+     */
+    public function setMapper(MapperInterface $mapper);
 }

@@ -6,6 +6,7 @@ use GeometriaLab\Model,
     GeometriaLab\Model\ModelInterface;
 
 use GeometriaLab\Api\Mvc\View\Model\ApiModel,
+    GeometriaLab\Api\Paginator\ModelPaginator,
     GeometriaLab\Api\Exception\InvalidFieldsException;
 
 use Zend\Mvc\MvcEvent as ZendMvcEvent,
@@ -33,7 +34,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_DISPATCH_ERROR, array($this, 'createApiModel'), -99);
 
         $sharedEvents = $events->getSharedManager();
-        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'hydrateData'), 0);
+        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'extractData'), 0);
         $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'createApiModel'), -99);
         $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array(new ZendInjectViewModelListener(), 'injectViewModel'), -100);
     }
@@ -54,7 +55,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
     }
 
     /**
-     * @param \Zend\Mvc\MvcEvent $e
+     * @param ZendMvcEvent $e
      */
     public function createApiModel(ZendMvcEvent $e)
     {
@@ -110,40 +111,47 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
     }
 
     /**
+     * Extract data
+     *
      * @param ZendMvcEvent $e
-     * @throws InvalidFieldsException
+     * @throws \RuntimeException
      */
-    public function hydrateData(ZendMvcEvent $e)
+    public function extractData(ZendMvcEvent $e)
     {
         $result = $e->getResult();
 
-        if ($result instanceof ApiModel) {
-            $data = $result->getVariable(ApiModel::FIELD_DATA);
-        } else {
-            $data = $result;
+        if (!$result instanceof ApiModel) {
+            throw new \RuntimeException('Result must be ApiModel');
         }
 
-        if ($data instanceof Model\ModelInterface || $data instanceof Model\CollectionInterface) {
-            $fields = $e->getRequest()->getQuery()->get('_fields');
-            $fieldsData = self::createFieldsFromString($fields);
-            /* @var \GeometriaLab\Api\Stdlib\Extractor\Service $extractor */
-            $extractor = $e->getApplication()->getServiceManager()->get('Extractor');
-            $extractedData = $extractor->extract($data, $fieldsData);
-            $wrongProperties = $extractor->getInvalidFields();
+        $data = $result->getVariable(ApiModel::FIELD_DATA);
 
-            if (!empty($wrongProperties)) {
-                $exception = new InvalidFieldsException('Invalid fields');
-                $exception->setFields($wrongProperties);
-                throw $exception;
+        if ($data instanceof ModelPaginator) {
+            $params = $e->getRouteMatch()->getParam('params');
+
+            if (!isset($params->limit)) {
+                throw new \RuntimeException('Limit not present in params');
             }
 
-            if ($result instanceof ApiModel) {
-                $result->setVariable(ApiModel::FIELD_DATA, $extractedData);
-            } else {
-                $result = $extractedData;
+            if (!isset($params->offset)) {
+                throw new \RuntimeException('Offset not present in params');
             }
 
-            $e->setResult($result);
+            $collection = $data->getItems($params->limit, $params->offset);
+            $extractedData = $this->extractDataFromModel($e, $collection);
+
+            $collectionData = array(
+                'items'      => $extractedData,
+                'limit'      => $params->limit,
+                'offset'     => $params->offset,
+                'totalCount' => $data->count(),
+            );
+
+            $result->setVariable(ApiModel::FIELD_DATA, $collectionData);
+        } elseif ($data instanceof Model\ModelInterface || ($data instanceof Model\CollectionInterface && !$data->isEmpty())) {
+            $extractedData = $this->extractDataFromModel($e, $data);
+
+            $result->setVariable(ApiModel::FIELD_DATA, $extractedData);
         }
     }
 
@@ -203,5 +211,23 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         }
 
         return $fields;
+    }
+
+    protected function extractDataFromModel(ZendMvcEvent $e, $model)
+    {
+        $fields = $e->getRequest()->getQuery()->get('_fields');
+        $fieldsData = self::createFieldsFromString($fields);
+        /* @var \GeometriaLab\Api\Stdlib\Extractor\Service $extractor */
+        $extractor = $e->getApplication()->getServiceManager()->get('Extractor');
+        $extractedData = $extractor->extract($model, $fieldsData);
+        $wrongProperties = $extractor->getInvalidFields();
+
+        if (!empty($wrongProperties)) {
+            $exception = new InvalidFieldsException('Invalid fields');
+            $exception->setFields($wrongProperties);
+            throw $exception;
+        }
+
+        return $extractedData;
     }
 }
