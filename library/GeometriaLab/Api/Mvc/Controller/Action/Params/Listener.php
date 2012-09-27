@@ -26,7 +26,8 @@ class Listener implements ZendListenerAggregateInterface
      */
     public function attach(ZendEventManagerInterface $events)
     {
-        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'createParams'),  -30);
+        $sharedEvents = $events->getSharedManager();
+        $this->listeners[] = $sharedEvents->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'createParams'),  -30);
     }
 
     /**

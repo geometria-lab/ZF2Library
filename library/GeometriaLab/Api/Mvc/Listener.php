@@ -57,8 +57,7 @@ class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwar
         $viewManager = $this->serviceManager->get('ViewManager');
         $viewManager->getRouteNotFoundStrategy()->detach($eventManager);
         $viewManager->getExceptionStrategy()->detach($eventManager);
-        // @todo Try to detach 'renderer' event, but $eventManager doesn't have it
-        $viewManager->getRendererStrategy()->detach($eventManager);
+        $viewManager->getRendererStrategy()->detach($viewManager->getView()->getEventManager());
 
         /* @var \Zend\EventManager\SharedEventManager $sharedEvents */
         $sharedEvents = $eventManager->getSharedManager();
@@ -102,7 +101,7 @@ class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwar
         $viewManager = $this->serviceManager->get('ViewManager');
         $viewManager->getRouteNotFoundStrategy()->attach($eventManager);
         $viewManager->getExceptionStrategy()->attach($eventManager);
-        $viewManager->getRendererStrategy()->attach($eventManager);
+        $viewManager->getRendererStrategy()->attach($viewManager->getView()->getEventManager());
         /* @var \Zend\EventManager\SharedEventManager $sharedEvents */
         $sharedEvents = $eventManager->getSharedManager();
 
