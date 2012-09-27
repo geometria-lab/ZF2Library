@@ -12,7 +12,7 @@ namespace GeometriaLab\Api\Exception;
 /**
  *
  */
-class WrongFormatException extends AbstractException
+class InvalidFormatException extends AbstractException
 {
     /**
      * @var int
@@ -21,7 +21,7 @@ class WrongFormatException extends AbstractException
     /**
      * @var string
      */
-    protected $message = 'Wrong format';
+    protected $message = 'Invalid format';
     /**
      * @var int
      */

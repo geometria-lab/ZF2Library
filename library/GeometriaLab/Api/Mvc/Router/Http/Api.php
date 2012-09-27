@@ -9,8 +9,6 @@ use Zend\Stdlib\ArrayUtils as ZendArrayUtils,
     Zend\Mvc\Router\Exception\RuntimeException as ZendRuntimeException,
     Zend\Mvc\Exception\DomainException as ZendDomainException;
 
-use GeometriaLab\Api\Mvc\View\Strategy\ApiStrategy;
-
 /**
  *
  */
@@ -85,7 +83,6 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      * @param  ZendRequestInterface $request
      * @param  string|null $pathOffset
      * @return ZendRouteMatch
-     * @throws ZendDomainException
      */
     public function match(ZendRequestInterface $request, $pathOffset = null)
     {
@@ -99,18 +96,18 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $method = $request->getMethod();
         $uri  = $request->getUri();
         $path = trim($uri->getPath(), '/');
-
-        foreach (array(ApiStrategy::FORMAT_JSON, ApiStrategy::FORMAT_XML) as $format) {
-            $needle = '.' . $format;
-            if (strpos($path, $needle) === strlen($path) - strlen($needle)) {
-                $request->setMetadata('format', $format);
-                $path = substr($path, 0, -strlen($needle));
-                break;
-            }
-        }
-
         $pathParts = explode('/', $path);
 
+        // 1. Get format
+        $lastPart = end($pathParts);
+        $formatPart = explode('.', $lastPart, 2);
+        if (count($formatPart) == 2) {
+            $pathParts[count($pathParts) - 1] = $formatPart[0];
+            $format = $formatPart[1];
+            $request->setMetadata('format', $format);
+        }
+
+        // 2. Get id and sub resource
         if (isset($pathParts[3])) {
             if ($this->isValidId($pathParts[2])) {
                 $id = $pathParts[2];
@@ -125,15 +122,17 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
                 $subResource = $pathParts[2];
             }
         }
-
         $routeMatch->setParam('id', $id);
-        
+
+        // 3. Get namespace
         $namespace = $this->getNamespace($pathParts);
         $routeMatch->setParam('__NAMESPACE__', $namespace);
 
+        // 4. Get controller
         $controller = $this->getController($pathParts);
         $routeMatch->setParam('controller', $controller);
 
+        // 5. Get action
         $action = $this->getAction($id, $method, $subResource);
         $routeMatch->setParam('action', $action);
 
@@ -206,6 +205,8 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      * @param $subResource
      * @return string
      * @throws ZendDomainException
+     *
+     * @todo Must throws bad request
      */
     protected function getAction($id, $method, $subResource)
     {

@@ -3,9 +3,9 @@
 namespace GeometriaLabTest\Mvc\Controller\Action\Params;
 
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Params as ControllerParams,
-    GeometriaLab\Api\Mvc\Controller\Listener as ControllerListener,
     GeometriaLab\Model\Schema\Property\ModelProperty,
-    GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty as ParamsArrayProperty;
+    GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty as ParamsArrayProperty,
+    GeometriaLab\Api\Mvc\Controller\Action\Params\Listener as ParamsListener;
 
 use Zend\Config\Config as ZendConfig,
     Zend\Http\Request as ZendRequest,
@@ -89,7 +89,9 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => true
         )));
 
-        ControllerListener::createParams(static::$event);
+        
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
 
         /* @var \GeometriaLab\Api\Mvc\Controller\Action\Params\Params $params */
         $params = static::$event->getrouteMatch()->getParam('params');
@@ -119,7 +121,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => true,
         )));
 
-        ControllerListener::createParams(static::$event);
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
 
         /* @var \GeometriaLab\Api\Mvc\Controller\Action\Params\Params $params */
         $params = static::$event->getrouteMatch()->getParam('params');
@@ -147,7 +150,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => 'foo',
         )));
 
-        ControllerListener::createParams(static::$event);
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
 
         $this->assertNotEmpty(static::$event->getError());
         $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));
@@ -165,7 +169,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'invalid' => 'foo'
         )));
 
-        ControllerListener::createParams(static::$event);
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
 
         $this->assertNotEmpty(static::$event->getError());
         $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));
@@ -182,7 +187,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'invalid' => 'foo'
         )));
 
-        ControllerListener::createParams(static::$event);
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
 
         $this->assertNotEmpty(static::$event->getError());
         $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));
@@ -199,7 +205,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
             'bool' => true,
         )));
 
-        ControllerListener::createParams(static::$event);
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
 
         $this->assertNotEmpty(static::$event->getError());
         $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));

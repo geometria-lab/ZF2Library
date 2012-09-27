@@ -3,7 +3,7 @@
 namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
-    Zend\EventManager\EventManagerInterface as ZendEvents,
+    Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Stdlib\RequestInterface as ZendRequestInterface;
 
@@ -21,21 +21,22 @@ class Listener implements ZendListenerAggregateInterface
     /**
      * Attach listeners
      *
-     * @param  ZendEvents $events
+     * @param ZendEventManagerInterface $events
      * @return void
      */
-    public function attach(ZendEvents $events)
+    public function attach(ZendEventManagerInterface $events)
     {
-        $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'createParams'),  -30);
+        $sharedEvents = $events->getSharedManager();
+        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'createParams'), 100);
     }
 
     /**
      * Detach listeners
      *
-     * @param  ZendEvents $events
+     * @param ZendEventManagerInterface $events
      * @return void
      */
-    public function detach(ZendEvents $events)
+    public function detach(ZendEventManagerInterface $events)
     {
         foreach ($this->listeners as $index => $listener) {
             if ($events->detach($listener)) {
