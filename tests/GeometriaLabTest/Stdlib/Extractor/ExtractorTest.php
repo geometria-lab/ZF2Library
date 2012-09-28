@@ -2,7 +2,9 @@
 
 namespace GeometriaLabTest\Stdlib\Extractor;
 
-use GeometriaLab\Api\Stdlib\Extractor\Service,
+use GeometriaLab\Model\Collection,
+    GeometriaLab\Api\Paginator\ModelPaginator,
+    GeometriaLab\Api\Stdlib\Extractor\Service,
     GeometriaLabTest\Stdlib\Extractor\TestExtractors\User as UserExtractor,
     GeometriaLabTest\Stdlib\Extractor\TestExtractors\Order as OrderExtractor,
     GeometriaLabTest\Stdlib\Extractor\TestModels\User,
@@ -25,10 +27,21 @@ class ExtractorTest extends \PHPUnit_Framework_TestCase
         self::$user->order = self::$order;
     }
 
-    public function testExtract()
+    public function testExtractModel()
     {
         $extractor = new OrderExtractor();
         $data = $extractor->extract(self::$order);
+
+        $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
+    }
+
+    public function testExtractCollection()
+    {
+        $collection = new Collection();
+        $collection->push(self::$order);
+
+        $extractor = new OrderExtractor();
+        $data = $extractor->extract($collection);
 
         $this->assertEquals($data, array('id' => 2, 'transactionId' => 123));
     }

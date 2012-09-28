@@ -111,6 +111,7 @@ class Service implements ZendFactoryInterface
                 $invalidFields = $extractor->getInvalidFields();
 
                 foreach ($fieldsData as $name => $field) {
+                    // @todo Fetch all available relations
                     if ($field instanceof ModelInterface || $fields instanceof CollectionInterface) {
                         $parentExtractFields = isset($fields[$name]) ? $fields[$name] : array();
                         $fieldsData[$name] = $this->extract($field, $parentExtractFields);
