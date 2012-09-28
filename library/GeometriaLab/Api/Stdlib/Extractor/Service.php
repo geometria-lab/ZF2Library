@@ -4,10 +4,11 @@ namespace GeometriaLab\Api\Stdlib\Extractor;
 
 use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\ServiceManager\ServiceLocatorInterface as ZendServiceLocatorInterface,
-    Zend\ServiceManager\Exception\ServiceNotCreatedException as ZendServiceNotCreatedException,
     Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Model\ModelInterface,
+    GeometriaLab\Model\CollectionInterface,
+    GeometriaLab\Api\Paginator\ModelPaginator,
     GeometriaLab\Api\Stdlib\Extractor\Extractor,
     GeometriaLab\Api\Exception\InvalidFieldsException;
 
@@ -53,21 +54,21 @@ class Service implements ZendFactoryInterface
      * @param string $nameSpace
      * @return Service
      */
-    public function setNamespace($nameSpace)
+    public function setNamespace($namespace)
     {
-        $this->extractorsNamespace = $nameSpace;
+        $this->extractorsNamespace = $namespace;
         return $this;
     }
 
     /**
-     * @param ModelInterface $model
+     * @param ModelInterface|CollectionInterface|ModelPaginator $data
      * @param array $fields
      * @return array
      * @throws InvalidFieldsException
      * @throws ZendBadMethodCallException
      * @throws \InvalidArgumentException
      */
-    public function extract(ModelInterface $model, $fields = array())
+    public function extract($data, $fields = array())
     {
         if ($this->extractorsNamespace === null) {
             throw new \InvalidArgumentException('Need setup Namespace');
@@ -78,34 +79,70 @@ class Service implements ZendFactoryInterface
             $extractFields = array();
         }
 
-        $parts = explode('\\', get_class($model));
-        $extractorName = $this->extractorsNamespace . '\\' . array_pop($parts);
-
-        if (!isset(static::$extractorInstances[$extractorName])) {
-            if (!is_subclass_of($extractorName, '\GeometriaLab\Api\Stdlib\Extractor\Extractor')) {
-                throw new ZendBadMethodCallException("Invalid extractor for model '" . get_class($model) . "'");
-            }
-            static::$extractorInstances[$extractorName] = new $extractorName;
+        if ($data instanceof ModelPaginator) {
+            $collection = $data->getItems();
+        } else if ($data instanceof CollectionInterface) {
+            $collection = $data;
+        } else if ($data instanceof ModelInterface) {
+            $collection = new \GeometriaLab\Model\Collection();
+            $collection->push($data);
+        } else {
+            throw new \InvalidArgumentException('Data must be CollectionInterface, ModelInterface or ModelPaginator');
         }
 
-        $extractor = static::$extractorInstances[$extractorName];
-        $data = $extractor->extract($model, $extractFields);
-        $invalidFields = $extractor->getInvalidFields();
+        if (!$collection->isEmpty()) {
+            $firstModel = $collection->getFirst();
 
-        foreach ($data as $name => $field) {
-            if ($field instanceof \GeometriaLab\Model\ModelInterface) {
-                $parentExtractFields = isset($fields[$name]) ? $fields[$name] : array();
-                $data[$name] = $this->extract($field, $parentExtractFields);
-                $subInvalidFields = $this->getInvalidFields();
-                if (!empty($subInvalidFields)) {
-                    $invalidFields[$name] = $subInvalidFields;
+            $parts = explode('\\', get_class($firstModel));
+            $extractorName = $this->extractorsNamespace . '\\' . array_pop($parts);
+
+            if (!isset(static::$extractorInstances[$extractorName])) {
+                if (!is_subclass_of($extractorName, '\GeometriaLab\Api\Stdlib\Extractor\Extractor')) {
+                    throw new ZendBadMethodCallException("Invalid extractor for model '" . get_class($firstModel) . "'");
                 }
+                static::$extractorInstances[$extractorName] = new $extractorName;
             }
+
+            $extractor = static::$extractorInstances[$extractorName];
+
+            $dataCollection = array();
+            foreach($collection as $model) {
+                $fieldsData = $extractor->extract($model, $extractFields);
+                $invalidFields = $extractor->getInvalidFields();
+
+                foreach ($fieldsData as $name => $field) {
+                    if ($field instanceof ModelInterface || $fields instanceof CollectionInterface) {
+                        $parentExtractFields = isset($fields[$name]) ? $fields[$name] : array();
+                        $fieldsData[$name] = $this->extract($field, $parentExtractFields);
+                        $subInvalidFields = $this->getInvalidFields();
+                        if (!empty($subInvalidFields)) {
+                            $invalidFields[$name] = $subInvalidFields;
+                        }
+                    }
+                }
+                $dataCollection[] = $fieldsData;
+            }
+        } else {
+            $dataCollection = array();
         }
 
         $this->invalidFields = $invalidFields;
 
-        return $data;
+        $extractedData = array();
+
+        if ($data instanceof ModelPaginator) {
+            $extractedData['items'] = $dataCollection;
+            $extractedData['totalCount'] = empty($dataCollection) ? 0 : count($data);
+            $extractedData['limit']  = $data->getLimit();
+            $extractedData['offset'] = $data->getOffset();
+        } else if ($data instanceof CollectionInterface) {
+            $extractedData['items'] = $dataCollection;
+            $extractedData['totalCount'] = count($dataCollection);
+        } else if ($data instanceof ModelInterface) {
+            $extractedData['item'] = $dataCollection[0];
+        }
+
+        return $extractedData;
     }
 
     /**

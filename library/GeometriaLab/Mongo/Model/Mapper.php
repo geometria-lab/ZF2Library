@@ -290,7 +290,7 @@ class Mapper extends AbstractMapper
         $data = $this->transformModelDataForStorage($data);
 
         if (!isset($data['_id']) && $this->getPrimaryKeyGenerator()) {
-            $data['_id'] = new \MongoId($this->getPrimaryKeyGenerator()->generate());
+            $data['_id'] = $this->getPrimaryKeyGenerator()->generate();
         }
 
         $result = $this->getMongoCollection()->insert($data, array('safe' => true));

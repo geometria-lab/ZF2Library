@@ -13,9 +13,18 @@ class ModelPaginator implements \Countable
     protected $query;
 
     /**
-     * @var Collection
+     * Limit
+     *
+     * @var integer
      */
-    protected $collection;
+    protected $limit;
+
+    /**
+     * Offset
+     *
+     * @var integer
+     */
+    protected $offset;
 
     /**
      * Constructor
@@ -25,23 +34,6 @@ class ModelPaginator implements \Countable
     public function __construct(QueryInterface $query)
     {
         $this->setQuery($query);
-    }
-
-    /**
-     * Get items by limit and offset
-     *
-     * @param integer $limit
-     * @param integer $offset
-     * @return Collection
-     */
-    public function getItems($limit, $offset)
-    {
-        $this->getQuery()->limit($limit);
-        $this->getQuery()->offset($offset);
-
-        $mapper = $this->getQuery()->getMapper();
-
-        return $mapper->getAll($this->getQuery());
     }
 
     /**
@@ -62,6 +54,68 @@ class ModelPaginator implements \Countable
     public function setQuery(QueryInterface $query)
     {
         $this->query = $query;
+
+        return $this;
+    }
+
+    /**
+     * @param integer $limit
+     */
+    public function setLimit($limit)
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @param integer $offset
+     * @return ModelPaginator
+     */
+    public function setOffset($offset)
+    {
+        $this->offset = $offset;
+
+        return $this;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getOffset()
+    {
+        return $this->offset;
+    }
+
+    /**
+     * Get items by limit and offset
+     *
+     * @return Collection
+     * @throws \RuntimeException
+     */
+    public function getItems()
+    {
+        $limit = $this->getLimit();
+        $offset = $this->getOffset();
+
+        if ($limit === null) {
+            throw new \RuntimeException('Limit must be positive integer');
+        }
+
+        $this->getQuery()->limit($limit)
+                         ->offset($offset);
+
+        $mapper = $this->getQuery()->getMapper();
+
+        return $mapper->getAll($this->getQuery());
     }
 
     /**

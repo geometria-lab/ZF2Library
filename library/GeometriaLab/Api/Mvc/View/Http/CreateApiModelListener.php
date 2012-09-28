@@ -2,12 +2,13 @@
 
 namespace GeometriaLab\Api\Mvc\View\Http;
 
-use GeometriaLab\Model,
-    GeometriaLab\Model\ModelInterface;
-
-use GeometriaLab\Api\Mvc\View\Model\ApiModel,
+use GeometriaLab\Model\ModelInterface,
+    GeometriaLab\Model\CollectionInterface,
+    GeometriaLab\Api\Mvc\View\Model\ApiModel,
     GeometriaLab\Api\Paginator\ModelPaginator,
-    GeometriaLab\Api\Exception\InvalidFieldsException;
+    GeometriaLab\Api\Exception\InvalidFieldsException,
+    GeometriaLab\Api\Mvc\Controller\Action\Params\Params,
+    GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\IntegerProperty as ParamsIntegerProperty;
 
 use Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Mvc\View\Http\InjectViewModelListener as ZendInjectViewModelListener,
@@ -126,30 +127,27 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
         $data = $result->getVariable(ApiModel::FIELD_DATA);
 
-        if ($data instanceof ModelPaginator) {
-            $params = $e->getRouteMatch()->getParam('params');
-
-            if (!isset($params->limit)) {
-                throw new \RuntimeException('Limit not present in params');
+        if ($this->isDataPaginatorOrModelOrCollection($data)) {
+            // Set params to paginator
+            if ($data instanceof ModelPaginator) {
+                $params = $e->getRouteMatch()->getParam('params');
+                $this->populatePaginatorFromParams($data, $params);
             }
 
-            if (!isset($params->offset)) {
-                throw new \RuntimeException('Offset not present in params');
+            $fields = $e->getRequest()->getQuery()->get('_fields');
+            $fieldsData = self::createFieldsFromString($fields);
+
+            /* @var \GeometriaLab\Api\Stdlib\Extractor\Service $extractor */
+            $extractor = $e->getApplication()->getServiceManager()->get('Extractor');
+            $extractedData = $extractor->extract($data, $fieldsData);
+
+            $wrongProperties = $extractor->getInvalidFields();
+
+            if (!empty($wrongProperties)) {
+                $exception = new InvalidFieldsException('Invalid fields');
+                $exception->setFields($wrongProperties);
+                throw $exception;
             }
-
-            $collection = $data->getItems($params->limit, $params->offset);
-            $extractedData = $this->extractDataFromModel($e, $collection);
-
-            $collectionData = array(
-                'items'      => $extractedData,
-                'limit'      => $params->limit,
-                'offset'     => $params->offset,
-                'totalCount' => $data->count(),
-            );
-
-            $result->setVariable(ApiModel::FIELD_DATA, $collectionData);
-        } elseif ($data instanceof Model\ModelInterface || ($data instanceof Model\CollectionInterface && !$data->isEmpty())) {
-            $extractedData = $this->extractDataFromModel($e, $data);
 
             $result->setVariable(ApiModel::FIELD_DATA, $extractedData);
         }
@@ -213,21 +211,55 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         return $fields;
     }
 
-    protected function extractDataFromModel(ZendMvcEvent $e, $model)
+    /**
+     * @param mixed $data
+     * @return bool
+     */
+    protected function isDataPaginatorOrModelOrCollection($data)
     {
-        $fields = $e->getRequest()->getQuery()->get('_fields');
-        $fieldsData = self::createFieldsFromString($fields);
-        /* @var \GeometriaLab\Api\Stdlib\Extractor\Service $extractor */
-        $extractor = $e->getApplication()->getServiceManager()->get('Extractor');
-        $extractedData = $extractor->extract($model, $fieldsData);
-        $wrongProperties = $extractor->getInvalidFields();
+        return $data instanceof ModelPaginator ||
+               $data instanceof ModelInterface ||
+               $data instanceof CollectionInterface;
+    }
 
-        if (!empty($wrongProperties)) {
-            $exception = new InvalidFieldsException('Invalid fields');
-            $exception->setFields($wrongProperties);
-            throw $exception;
+    /**
+     * @param ModelPaginator $paginator
+     * @param Params $params
+     * @throws \RuntimeException
+     */
+    protected function populatePaginatorFromParams(ModelPaginator $paginator, Params $params)
+    {
+        $paramsSchema = $params::getSchema();
+
+        // Validate limit
+        if ($paramsSchema->hasProperty('limit')) {
+            throw new \RuntimeException('Limit must be present in params');
         }
 
-        return $extractedData;
+        $property = $paramsSchema->getProperty('limit');
+
+        if ($property instanceof ParamsIntegerProperty) {
+            throw new \RuntimeException('Limit must be integer');
+        }
+
+        if ($property->getDefaultValue() === null) {
+            throw new \RuntimeException('Limit must have default value');
+        }
+
+        // Validate offset
+        if ($paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
+            throw new \RuntimeException('Offset must be integer');
+        }
+
+        if ($paramsSchema->hasProperty('offset')) {
+            throw new \RuntimeException('Offset must be present in params');
+        }
+
+        if ($paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
+            throw new \RuntimeException('Offset must be integer');
+        }
+
+        $paginator->setLimit($params->get('limit'));
+        $paginator->setOffset($params->get('offset'));
     }
 }
