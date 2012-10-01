@@ -46,6 +46,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 'id' => 2,
                 'transactionId' => 123,
             ),
+            'type' => 'Order',
         );
 
         $this->assertEquals($data, $actual);
@@ -66,6 +67,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             'totalCount' => 1,
+            'type' => 'Order',
         );
         $this->assertEquals($data, $actual);
     }
@@ -90,6 +92,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 'id' => 2,
                 'transactionId' => 123,
             ),
+            'type' => 'Order',
         );
 
         $this->assertEquals($data['item']['order'], $actual);
@@ -105,6 +108,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 'id' => 2,
                 'transactionId' => 123,
             ),
+            'type' => 'Order',
         );
 
         $this->assertEquals($data, $actual);
@@ -127,8 +131,10 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                     'item' => array(
                         'transactionId' => 123,
                     ),
+                    'type' => 'Order',
                 ),
             ),
+            'type' => 'User',
         );
 
         $this->assertEquals($data, $actual);
@@ -148,8 +154,10 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                         'id' => 2,
                         'transactionId' => 123,
                     ),
+                    'type' => 'Order',
                 ),
             ),
+            'type' => 'User',
         );
 
         $this->assertEquals($data, $actual);

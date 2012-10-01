@@ -94,7 +94,8 @@ class Service implements ZendFactoryInterface
             $firstModel = $collection->getFirst();
 
             $parts = explode('\\', get_class($firstModel));
-            $extractorName = $this->extractorsNamespace . '\\' . array_pop($parts);
+            $type = array_pop($parts);
+            $extractorName = $this->extractorsNamespace . '\\' . $type;
 
             if (!isset(static::$extractorInstances[$extractorName])) {
                 if (!is_subclass_of($extractorName, '\GeometriaLab\Api\Stdlib\Extractor\Extractor')) {
@@ -106,7 +107,7 @@ class Service implements ZendFactoryInterface
             $extractor = static::$extractorInstances[$extractorName];
 
             $dataCollection = array();
-            foreach($collection as $model) {
+            foreach ($collection as $model) {
                 $fieldsData = $extractor->extract($model, $extractFields);
                 $invalidFields = $extractor->getInvalidFields();
 
@@ -125,6 +126,7 @@ class Service implements ZendFactoryInterface
             }
         } else {
             $dataCollection = array();
+            $type = false;
         }
 
         $this->invalidFields = $invalidFields;
@@ -141,6 +143,10 @@ class Service implements ZendFactoryInterface
             $extractedData['totalCount'] = count($dataCollection);
         } else if ($data instanceof ModelInterface) {
             $extractedData['item'] = $dataCollection[0];
+        }
+
+        if ($type !== false) {
+            $extractedData['type'] = $type;
         }
 
         return $extractedData;
