@@ -126,7 +126,7 @@ class Service implements ZendFactoryInterface
             }
         } else {
             $dataCollection = array();
-            $type = false;
+            $type = null;
         }
 
         $this->invalidFields = $invalidFields;
@@ -140,12 +140,11 @@ class Service implements ZendFactoryInterface
             $extractedData['offset'] = $data->getOffset();
         } else if ($data instanceof CollectionInterface) {
             $extractedData['items'] = $dataCollection;
-            $extractedData['totalCount'] = count($dataCollection);
         } else if ($data instanceof ModelInterface) {
             $extractedData['item'] = $dataCollection[0];
         }
 
-        if ($type !== false) {
+        if ($type !== null) {
             $extractedData['type'] = $type;
         }
 
