@@ -58,6 +58,7 @@ class ServiceFactory implements ZendFactoryInterface
      * @param ZendRouteMatch $routeMatch
      * @return Params
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getByRouteMatch(ZendRouteMatch $routeMatch)
     {
@@ -66,6 +67,10 @@ class ServiceFactory implements ZendFactoryInterface
         }
 
         $paramClassName = $this->paramsNamespace . '\\' . $routeMatch->getParam('__CONTROLLER__') . '\\' . ucfirst($routeMatch->getParam('action'));
+
+        if (!class_exists($paramClassName)) {
+            throw new \RuntimeException("Class '$paramClassName' doesn't exist");
+        }
 
         return new $paramClassName();
     }

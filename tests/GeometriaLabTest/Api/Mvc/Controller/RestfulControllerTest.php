@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace GeometriaLabTest\Mvc\Controller;
+namespace GeometriaLabTest\Api\Mvc\Controller;
 
 class RestfulControllerTest extends \PHPUnit_Framework_TestCase
 {

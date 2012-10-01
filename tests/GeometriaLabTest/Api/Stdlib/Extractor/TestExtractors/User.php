@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\Extractor\TestExtractors;
+namespace GeometriaLabTest\Api\Stdlib\Extractor\TestExtractors;
 
 use GeometriaLab\Api\Stdlib\Extractor\Schema,
     GeometriaLab\Api\Stdlib\Extractor\Extractor;

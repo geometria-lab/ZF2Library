@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Mvc\Controller\Action\Params\Sample;
+namespace GeometriaLabTest\Api\Mvc\Controller\Action\Params\Sample;
 
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Params;
 

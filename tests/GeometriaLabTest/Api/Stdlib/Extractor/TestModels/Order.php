@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Stdlib\Extractor\TestModels;
+namespace GeometriaLabTest\Api\Stdlib\Extractor\TestModels;
 
 use GeometriaLab\Model\AbstractModel;
 

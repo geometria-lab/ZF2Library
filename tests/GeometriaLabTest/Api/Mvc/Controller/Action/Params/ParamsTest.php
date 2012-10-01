@@ -1,11 +1,11 @@
 <?php
 
-namespace GeometriaLabTest\Mvc\Controller\Action\Params;
+namespace GeometriaLabTest\Api\Mvc\Controller\Action\Params;
 
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Params as ControllerParams,
-    GeometriaLab\Model\Schema\Property\ModelProperty,
     GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty as ParamsArrayProperty,
-    GeometriaLab\Api\Mvc\Controller\Action\Params\Listener as ParamsListener;
+    GeometriaLab\Api\Mvc\Controller\Action\Params\Listener as ParamsListener,
+    GeometriaLab\Model\Schema\Property\ModelProperty;
 
 use Zend\Config\Config as ZendConfig,
     Zend\Http\Request as ZendRequest,
@@ -47,7 +47,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
                     'Config'                  => function($sm) {
                         return new ZendConfig(array(
                             'params' => array(
-                                '__NAMESPACE__' => '\GeometriaLabTest\Mvc\Controller\Action\Params',
+                                '__NAMESPACE__' => '\GeometriaLabTest\Api\Mvc\Controller\Action\Params',
                             ),
                         ));
                     },

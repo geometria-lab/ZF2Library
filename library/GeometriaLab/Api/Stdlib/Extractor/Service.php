@@ -51,7 +51,7 @@ class Service implements ZendFactoryInterface
     }
 
     /**
-     * @param string $nameSpace
+     * @param string $namespace
      * @return Service
      */
     public function setNamespace($namespace)
