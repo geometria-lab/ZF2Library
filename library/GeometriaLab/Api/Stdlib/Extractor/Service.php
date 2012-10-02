@@ -105,8 +105,9 @@ class Service implements ZendFactoryInterface
             }
 
             $extractor = static::$extractorInstances[$extractorName];
-
             $dataCollection = array();
+            $invalidFields = array();
+
             foreach ($collection as $model) {
                 $fieldsData = $extractor->extract($model, $extractFields);
                 $invalidFields = $extractor->getInvalidFields();
@@ -124,12 +125,13 @@ class Service implements ZendFactoryInterface
                 }
                 $dataCollection[] = $fieldsData;
             }
+
+            $this->invalidFields = $invalidFields;
+
         } else {
             $dataCollection = array();
             $type = null;
         }
-
-        $this->invalidFields = $invalidFields;
 
         $extractedData = array();
 
