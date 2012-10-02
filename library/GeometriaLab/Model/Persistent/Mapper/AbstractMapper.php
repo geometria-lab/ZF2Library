@@ -2,7 +2,8 @@
 
 namespace GeometriaLab\Model\Persistent\Mapper;
 
-use \GeometriaLab\Model\ModelInterface;
+use \GeometriaLab\Model\ModelInterface,
+    \GeometriaLab\Api\Paginator\ModelPaginator;
 
 abstract class AbstractMapper implements MapperInterface
 {
@@ -142,5 +143,25 @@ abstract class AbstractMapper implements MapperInterface
     public function createQuery()
     {
         return new Query($this);
+    }
+
+    /**
+     * Get paginator instance
+     *
+     * @param QueryInterface $query
+     * @return ModelPaginator
+     * @throws \InvalidArgumentException
+     */
+    public function getPaginator(QueryInterface $query = null)
+    {
+        if ($query === null) {
+            $query = $this->createQuery();
+        }
+
+        if (!$query instanceof Query) {
+            throw new \InvalidArgumentException('Query must be GeometriaLab\Model\Persistent\Mapper\Query');
+        }
+
+        return new ModelPaginator($query);
     }
 }

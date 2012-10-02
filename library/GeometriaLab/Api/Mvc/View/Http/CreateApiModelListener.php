@@ -232,13 +232,13 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         $paramsSchema = $params::getSchema();
 
         // Validate limit
-        if ($paramsSchema->hasProperty('limit')) {
+        if (!$paramsSchema->hasProperty('limit')) {
             throw new \RuntimeException('Limit must be present in params');
         }
 
         $property = $paramsSchema->getProperty('limit');
 
-        if ($property instanceof ParamsIntegerProperty) {
+        if (!$property instanceof ParamsIntegerProperty) {
             throw new \RuntimeException('Limit must be integer');
         }
 
@@ -247,15 +247,15 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         }
 
         // Validate offset
-        if ($paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
+        if (!$paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
             throw new \RuntimeException('Offset must be integer');
         }
 
-        if ($paramsSchema->hasProperty('offset')) {
+        if (!$paramsSchema->hasProperty('offset')) {
             throw new \RuntimeException('Offset must be present in params');
         }
 
-        if ($paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
+        if (!$paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
             throw new \RuntimeException('Offset must be integer');
         }
 
