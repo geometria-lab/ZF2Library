@@ -93,10 +93,12 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         $params = new ParamsListener();
         $params->createParams(static::$event);
 
-        /* @var \GeometriaLab\Api\Mvc\Controller\Action\Params\AbstractParams $params */
+        /* @var Sample\Test $params */
         $params = static::$event->getrouteMatch()->getParam('params');
 
         $this->assertInstanceOf('\GeometriaLab\Api\Mvc\Controller\Action\Params\AbstractParams', $params);
+
+        $this->assertInstanceOf('\GeometriaLabTest\Api\Mvc\Controller\Action\Params\Sample\Test', $params);
 
         $this->assertEquals(array(
                 'id' => 1,
@@ -124,7 +126,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         $params = new ParamsListener();
         $params->createParams(static::$event);
 
-        /* @var \GeometriaLab\Api\Mvc\Controller\Action\Params\Params $params */
+        /* @var Sample\Test $params */
         $params = static::$event->getrouteMatch()->getParam('params');
 
         $this->assertEquals(array(
@@ -214,30 +216,52 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testModelPropertySet()
     {
-        $this->markTestIncomplete();
-        /*
         $this->setExpectedException('\RuntimeException', "Property 'modelProperty' must implement 'GeometriaLab\\Api\\Mvc\\Controller\\Action\\Params\\Schema\\Property\\PropertyInterface' interface, but 'GeometriaLab\\Model\\Schema\\Property\\PropertyInterface");
 
-        $params = new ControllerParams();
-        $model = new ModelProperty(array('name' => 'modelProperty'));
+        static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
+            'id' => 1,
+            'name' => ' Phillip ',
+            'email' => 'Fry@Example.com',
+            'float' => '12.3',
+            'array' => array('foo', '123'),
+            'bool' => true,
+        )));
 
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
+
+        /* @var Sample\Test $params */
+        $params = static::$event->getrouteMatch()->getParam('params');
+
+        $model = new ModelProperty(array('name' => 'modelProperty'));
         $params->getSchema()->addProperty($model);
-        */
     }
 
     public function testArrayOfModelsPropertySet()
     {
-        $this->markTestIncomplete();
-        /*
         $this->setExpectedException('\RuntimeException', "Item of array property must be an instance of \\GeometriaLab\\Api\\Mvc\\Controller\\Action\\Params\\Schema\\Property\\PropertyInterface");
 
-        $params = new ControllerParams();
+        static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
+            'id' => 1,
+            'name' => ' Phillip ',
+            'email' => 'Fry@Example.com',
+            'float' => '12.3',
+            'array' => array('foo', '123'),
+            'bool' => true,
+        )));
+
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
+
+        /* @var Sample\Test $params */
+        $params = static::$event->getrouteMatch()->getParam('params');
+
         $arrayProperty = new ParamsArrayProperty(array(
             'name'         => 'arrayProperty',
             'itemProperty' => new ModelProperty(),
         ));
 
         $params->getSchema()->addProperty($arrayProperty);
-        */
+
     }
 }
