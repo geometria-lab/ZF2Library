@@ -4,10 +4,7 @@ namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 use \GeometriaLab\Model\AbstractModel;
 
-/**
- *
- */
-class Params extends AbstractModel
+abstract class AbstractParams extends AbstractModel
 {
     /**
      * Parser class name

@@ -236,21 +236,19 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             throw new \RuntimeException('Limit must be present in params');
         }
 
-        $property = $paramsSchema->getProperty('limit');
+        $limitProperty = $paramsSchema->getProperty('limit');
 
-        if ($property instanceof ParamsIntegerProperty) {
-            throw new \RuntimeException('Limit must be integer');
+        if ($limitProperty instanceof ParamsIntegerProperty) {
+            throw new \RuntimeException('Limit property must be integer');
         }
 
-        if ($property->getDefaultValue() === null) {
-            throw new \RuntimeException('Limit must have default value');
+        if ($limitProperty->getDefaultValue() === null) {
+            throw new \RuntimeException('Limit property must have default value');
         }
+
+        // @todo Check validator 1 >= n >= 100
 
         // Validate offset
-        if ($paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
-            throw new \RuntimeException('Offset must be integer');
-        }
-
         if ($paramsSchema->hasProperty('offset')) {
             throw new \RuntimeException('Offset must be present in params');
         }
