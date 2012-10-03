@@ -6,7 +6,9 @@ class FloatProperty extends AbstractProperty
 {
     protected function setup()
     {
-        $this->addTypeValidator('float');
+        $type = 'float';
+        $this->addTypeValidator($type);
+        $this->addNotEmptyValidator($type);
 
         $this->getFilterChain()->attach(function ($value) {
             $filteredValue = (float)$value;

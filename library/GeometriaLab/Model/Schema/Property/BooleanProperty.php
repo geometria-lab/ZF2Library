@@ -6,7 +6,9 @@ class BooleanProperty extends AbstractProperty
 {
     protected function setup()
     {
-        $this->addTypeValidator('boolean');
+        $type = 'boolean';
+        $this->addTypeValidator($type);
+        $this->addNotEmptyValidator($type);
 
         $this->getFilterChain()->attach(function($value) {
             switch (gettype($value)) {

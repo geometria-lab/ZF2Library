@@ -16,6 +16,9 @@ interface PropertyInterface
     public function setRequired($required);
     public function isRequired();
 
+    public function setAllowEmpty($allowEmpty);
+    public function isAllowEmpty();
+
     /**
      * @abstract
      * @param ZendFilterChain $filterChain

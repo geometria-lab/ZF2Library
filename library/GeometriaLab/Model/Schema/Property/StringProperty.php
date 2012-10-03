@@ -6,6 +6,8 @@ class StringProperty extends AbstractProperty
 {
     protected function setup()
     {
-        $this->addTypeValidator('string');
+        $type = 'string';
+        $this->addTypeValidator($type);
+        $this->addNotEmptyValidator($type);
     }
 }
