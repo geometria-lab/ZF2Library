@@ -7,7 +7,7 @@ use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Api\Mvc\View\Model\ApiModel,
     GeometriaLab\Api\Paginator\ModelPaginator,
     GeometriaLab\Api\Exception\InvalidFieldsException,
-    GeometriaLab\Api\Mvc\Controller\Action\Params\Params,
+    GeometriaLab\Api\Mvc\Controller\Action\Params\AbstractParams,
     GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\IntegerProperty as ParamsIntegerProperty;
 
 use Zend\Mvc\MvcEvent as ZendMvcEvent,
@@ -116,6 +116,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
      *
      * @param ZendMvcEvent $e
      * @throws \RuntimeException
+     * @throws InvalidFieldsException
      */
     public function extractData(ZendMvcEvent $e)
     {
@@ -224,10 +225,10 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
     /**
      * @param ModelPaginator $paginator
-     * @param Params $params
+     * @param AbstractParams $params
      * @throws \RuntimeException
      */
-    protected function populatePaginatorFromParams(ModelPaginator $paginator, Params $params)
+    protected function populatePaginatorFromParams(ModelPaginator $paginator, AbstractParams $params)
     {
         $paramsSchema = $params::getSchema();
 
@@ -236,21 +237,19 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             throw new \RuntimeException('Limit must be present in params');
         }
 
-        $property = $paramsSchema->getProperty('limit');
+        $limitProperty = $paramsSchema->getProperty('limit');
 
-        if (!$property instanceof ParamsIntegerProperty) {
-            throw new \RuntimeException('Limit must be integer');
+        if (!$limitProperty instanceof ParamsIntegerProperty) {
+            throw new \RuntimeException('Limit property must be integer');
         }
 
-        if ($property->getDefaultValue() === null) {
-            throw new \RuntimeException('Limit must have default value');
+        if ($limitProperty->getDefaultValue() === null) {
+            throw new \RuntimeException('Limit property must have default value');
         }
+
+        // @todo Check validator 1 >= n >= 100
 
         // Validate offset
-        if (!$paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
-            throw new \RuntimeException('Offset must be integer');
-        }
-
         if (!$paramsSchema->hasProperty('offset')) {
             throw new \RuntimeException('Offset must be present in params');
         }

@@ -61,7 +61,7 @@ class Listener implements ZendListenerAggregateInterface
             $queryParams['id'] = $id;
         }
 
-        /* @var Params $params */
+        /* @var AbstractParams $params */
         $params = $e->getApplication()->getServiceManager()->get('Params');
         $params->populate($queryParams);
 
