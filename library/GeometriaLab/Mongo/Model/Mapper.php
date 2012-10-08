@@ -265,6 +265,7 @@ class Mapper extends AbstractMapper
                 $value = $model->get($name);
 
                 if ($value !== null) {
+                    // @todo Wrap originProperty and targetProperty to mongoId
                     if ($property instanceof ModelProperty) {
                         $value = $value->toArray(-1);
                     } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
@@ -343,6 +344,7 @@ class Mapper extends AbstractMapper
                     if ($value === null) {
                         $unsetData[$name] = 1;
                     } else {
+                        // @todo Wrap originProperty and targetProperty to mongoId
                         if ($property instanceof ModelProperty) {
                             $value = $value->toArray(-1);
                         } else if ($property instanceof ArrayProperty && $property->getItemProperty() instanceof ModelProperty) {
