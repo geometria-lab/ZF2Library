@@ -65,7 +65,7 @@ class Service implements ZendFactoryInterface
             if (!method_exists($this, $method)) {
                 throw new \InvalidArgumentException("Undefined param '$name'");
             }
-            call_user_func(array($this, $method), $value);
+            $this->$method($value);
         }
 
         return $this;
