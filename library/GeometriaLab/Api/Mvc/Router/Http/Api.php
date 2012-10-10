@@ -253,16 +253,13 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
                 }
                 break;
             case 'post':
-                if (null !== $subResource) {
-                    if (null === $id) {
-                        throw new ZendDomainException('Missing identifier');
-                    }
-                    $action = lcfirst($subResource);
-                } else {
+                if (null === $subResource) {
                     if (null !== $id) {
                         throw new ZendDomainException('Post is allowed on resources only');
                     }
                     $action = 'create';
+                } else {
+                    $action = lcfirst($subResource);
                 }
                 break;
             case 'put':
