@@ -128,7 +128,9 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
             }
         }
 
-        $subResource = $this->prepareSubResource($subResource);
+        if ($subResource !== null) {
+            $subResource = $this->prepareSubResource($subResource);
+        }
 
         $routeMatch->setParam('id', $id);
 
