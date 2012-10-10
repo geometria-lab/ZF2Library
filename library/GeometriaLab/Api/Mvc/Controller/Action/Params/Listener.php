@@ -5,7 +5,7 @@ namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
-    Zend\Http\PhpEnvironment\Request as ZendRequest;
+    Zend\Http\Request as ZendRequest;
 
 use GeometriaLab\Api\Exception\InvalidParamsException;
 
