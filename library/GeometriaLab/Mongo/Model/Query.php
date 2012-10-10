@@ -4,7 +4,6 @@ namespace GeometriaLab\Mongo\Model;
 
 use GeometriaLab\Model\Persistent\Mapper\Query as AbstractQuery,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
-    GeometriaLab\Model\Persistent\Mapper\MapperInterface,
     GeometriaLab\Model\Schema\Schema as ModelSchema,
     GeometriaLab\Model\Schema\Manager as SchemaManager,
     GeometriaLab\Model\Schema\Property\ArrayProperty,
