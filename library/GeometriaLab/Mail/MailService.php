@@ -7,7 +7,7 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\Mail\Message as ZendMessage,
     Zend\Mail\Transport\Sendmail as ZendSendmail;
 
-class Service implements ZendFactoryInterface
+class MailService implements ZendFactoryInterface
 {
     /**
      * @var array
@@ -36,7 +36,7 @@ class Service implements ZendFactoryInterface
 
     /**
      * @param ZendServiceLocatorInterface $serviceLocator
-     * @return Service
+     * @return MailService
      * @throws \InvalidArgumentException
      */
     public function createService(ZendServiceLocatorInterface $serviceLocator)
@@ -53,7 +53,7 @@ class Service implements ZendFactoryInterface
 
     /**
      * @param $config
-     * @return Service
+     * @return MailService
      * @throws \InvalidArgumentException
      */
     public function setConfig($config)
@@ -89,7 +89,7 @@ class Service implements ZendFactoryInterface
 
     /**
      * @param string|\Zend\Mail\Address\AddressInterface|array|\Zend\Mail\AddressList|\Traversable $from
-     * @return Service
+     * @return MailService
      */
     public function setFrom($from)
     {
