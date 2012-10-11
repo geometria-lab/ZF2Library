@@ -2,8 +2,7 @@
 
 namespace GeometriaLabTest\Api\Mvc\Controller\Action\Params;
 
-use GeometriaLab\Api\Mvc\Controller\Action\Params\AbstractParams as ControllerParams,
-    GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty as ParamsArrayProperty,
+use GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty as ParamsArrayProperty,
     GeometriaLab\Api\Mvc\Controller\Action\Params\Listener as ParamsListener,
     GeometriaLab\Model\Schema\Property\ModelProperty;
 
@@ -28,7 +27,7 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        static::$sm = $this->serviceManager = new ZendServiceManager(
+        static::$sm = new ZendServiceManager(
             new ZendServiceManagerConfig(array(
                 'invokables' => array(
                     'DispatchListener' => 'Zend\Mvc\DispatchListener',
