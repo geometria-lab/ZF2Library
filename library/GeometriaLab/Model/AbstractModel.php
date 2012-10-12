@@ -78,7 +78,6 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
                     }
                 }
 
-
                 throw new \InvalidArgumentException("Invalid property '$name':" . $errorMessage);
             }
         }
