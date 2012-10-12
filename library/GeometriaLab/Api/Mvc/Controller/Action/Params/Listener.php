@@ -7,7 +7,8 @@ use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterfa
     Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Http\Request as ZendRequest;
 
-use GeometriaLab\Api\Exception\InvalidParamsException;
+use GeometriaLab\Api\Exception\InvalidParamsException,
+    \GeometriaLab\Api\Exception\ObjectNotFoundException;
 
 class Listener implements ZendListenerAggregateInterface
 {
@@ -28,6 +29,7 @@ class Listener implements ZendListenerAggregateInterface
     {
         $sharedEvents = $events->getSharedManager();
         $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'createParams'), 100);
+        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'validateParams'), 99);
     }
 
     /**
@@ -46,6 +48,8 @@ class Listener implements ZendListenerAggregateInterface
     }
 
     /**
+     * Create Params object and inject it to RouteMatch
+     *
      * @param ZendMvcEvent $e
      * @throws InvalidParamsException
      */
@@ -82,6 +86,8 @@ class Listener implements ZendListenerAggregateInterface
     }
 
     /**
+     * Get params from request
+     *
      * @param ZendRequest $request
      * @return mixed
      */
@@ -100,5 +106,43 @@ class Listener implements ZendListenerAggregateInterface
         $postParams = $request->getPost()->toArray();
 
         return array_merge($postParams, $queryParams);
+    }
+
+    /**
+     * Validate Params object
+     *
+     * @param ZendMvcEvent $e
+     * @throws \RuntimeException
+     * @throws ObjectNotFoundException
+     */
+    public function validateParams(ZendMvcEvent $e)
+    {
+        $routeMatch = $e->getRouteMatch();
+        /* @var AbstractParams $params */
+        $params = $routeMatch->getParam('params');
+
+        if ($routeMatch->getParam('id') !== null) {
+            if (!$params->has('id')) {
+                throw new \RuntimeException("Need 'id' property");
+            }
+
+            $hasRelationObject = false;
+
+            foreach ($params->getRelations() as $relation) {
+                /* @var \GeometriaLab\Model\Persistent\Relation\BelongsTo $relation */
+                if ($relation->getProperty()->getOriginProperty() == 'id') {
+                    $relationName = $relation->getProperty()->getName();
+                    if ($params->$relationName === null) {
+                        throw new ObjectNotFoundException();
+                    }
+                    $hasRelationObject = true;
+                    break;
+                }
+            }
+
+            if (!$hasRelationObject) {
+                throw new \RuntimeException('Need belongsTo relation with originProperty = id');
+            }
+        }
     }
 }

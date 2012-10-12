@@ -65,7 +65,7 @@ abstract class AbstractRelation extends AbstractProperty implements PropertyInte
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getOriginProperty()
     {

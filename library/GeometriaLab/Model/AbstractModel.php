@@ -60,15 +60,8 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      */
     public function set($name, $value)
     {
-        $schema = static::getSchema();
-        $property = $schema->getProperty($name);
-
         if ($value !== null) {
-            $value = $property->filterAndValidate($value);
-        } else {
-            if ($property->isRequired()) {
-                $this->errorMessages[$name]['isRequired'] = "Value is required";
-            }
+            $value = static::getSchema()->getProperty($name)->filterAndValidate($value);
         }
 
         return parent::set($name, $value);
