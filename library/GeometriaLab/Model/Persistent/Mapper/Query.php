@@ -4,7 +4,8 @@ namespace GeometriaLab\Model\Persistent\Mapper;
 
 use GeometriaLab\Model\Persistent\Mapper\MapperInterface,
     GeometriaLab\Model\Schema\Schema,
-    GeometriaLab\Model\Schema\Manager as SchemaManager;
+    GeometriaLab\Model\Schema\Manager as SchemaManager,
+    GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException;
 
 class Query implements QueryInterface
 {
@@ -349,13 +350,12 @@ class Query implements QueryInterface
     protected function prepareFieldValue($field, $value)
     {
         $property = $this->getModelSchema()->getProperty($field);
-        $value = $property->getFilterChain()->filter($value);
 
-        if (!$property->getValidatorChain()->isValid($value)) {
-            throw new \InvalidArgumentException("Invalid property '$field' value: " . implode("\r\n", $property->getValidatorChain()->getMessages()));
+        try {
+            return $property->filterAndValidate($value);
+        } catch (InvalidValueException $e) {
+            throw new \InvalidArgumentException("Invalid value for field '$field': " . $e->getMessage());
         }
-
-        return $value;
     }
 
     /**

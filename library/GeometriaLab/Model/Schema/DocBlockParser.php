@@ -1,7 +1,8 @@
 <?php
 namespace GeometriaLab\Model\Schema;
 
-use GeometriaLab\Model\Schema\Property\PropertyInterface;
+use GeometriaLab\Model\Schema\Property\PropertyInterface,
+    GeometriaLab\Validator\ValidatorChain;
 
 use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ZendTagInterface,
     Zend\Code\Reflection\DocBlock\Tag\PropertyTag as ZendPropertyTag,
@@ -9,8 +10,7 @@ use Zend\Code\Reflection\DocBlock\Tag\TagInterface as ZendTagInterface,
     Zend\Code\Reflection\Exception\InvalidArgumentException as ZendInvalidArgumentException,
     Zend\Code\Reflection\DocBlockReflection as ZendDocBlockReflection;
 
-use Zend\Validator\ValidatorChain as ZendValidatorChain,
-    Zend\Filter\FilterChain as ZendFilterChain,
+use Zend\Filter\FilterChain as ZendFilterChain,
     Zend\Filter\Exception\RuntimeException as ZendRuntimeException;
 
 use Zend\Serializer\Serializer as ZendSerializer;
@@ -232,12 +232,12 @@ class DocBlockParser
 
     /**
      * @param array $validators
-     * @return ZendValidatorChain(
+     * @return ValidatorChain
      * @throws ZendRuntimeException
      */
     public function createValidatorChain(array $validators)
     {
-        $validatorChain = new ZendValidatorChain();
+        $validatorChain = new ValidatorChain();
 
         foreach ($validators as $validator) {
             if (is_string($validator)) {

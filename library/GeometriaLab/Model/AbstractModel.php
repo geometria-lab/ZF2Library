@@ -61,24 +61,13 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     public function set($name, $value)
     {
         $schema = static::getSchema();
+        $property = $schema->getProperty($name);
 
         if ($value !== null) {
-            $property = $schema->getProperty($name);
-
-            $value = $property->getFilterChain()->filter($value);
-
-            if (!$property->getValidatorChain()->isValid($value)) {
-                $errorMessage = '';
-                $validationErrorMessages = $property->getValidatorChain()->getMessages();
-                foreach ($validationErrorMessages as $message) {
-                    if (is_array($message)) {
-                        $errorMessage .= implode("\r\n", $message);
-                    } else {
-                        $errorMessage .= "\r\n$message";
-                    }
-                }
-
-                throw new \InvalidArgumentException("Invalid property '$name':" . $errorMessage);
+            $value = $property->filterAndValidate($value);
+        } else {
+            if ($property->isRequired()) {
+                $this->errorMessages[$name]['isRequired'] = "Value is required";
             }
         }
 
@@ -103,22 +92,15 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      */
     public function isValid()
     {
-        $this->errorMessages = array();
+        foreach ($this->getProperties() as $property) {
+            if ($property->isRequired()) {
+                $name = $property->getName();
+                $value = $this->get($name);
 
-        foreach ($this->getPropertiesForValidation() as $property) {
-            $name = $property->getName();
-            $value = $this->get($name);
-
-            $messages = $property->getValidatorChain()->getMessages();
-            if (!empty($messages)) {
-                $this->errorMessages[$name] = $messages;
-            }
-
-            if ($value === null && $property->isRequired() && !isset($this->errorMessages[$name])) {
-                if (!isset($this->errorMessages[$name])) {
+                if ($value === null) {
                     $this->errorMessages[$name] = array();
+                    $this->errorMessages[$name]['isRequired'] = "Value is required";
                 }
-                $this->errorMessages[$name]['isRequired'] = "Value is required";
             }
         }
 
@@ -179,15 +161,5 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     protected function getProperties()
     {
         return static::getSchema()->getProperties();
-    }
-
-    /**
-     * Get properties for validation
-     *
-     * @return PropertyInterface[]
-     */
-    public function getPropertiesForValidation()
-    {
-        return $this->getProperties();
     }
 }

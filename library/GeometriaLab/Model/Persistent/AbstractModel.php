@@ -336,21 +336,4 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
             }
         }
     }
-
-    /**
-     * Get properties for validation
-     *
-     * @return \GeometriaLab\Model\Schema\Property\PropertyInterface[]
-     */
-    public function getPropertiesForValidation()
-    {
-        $properties = array();
-        foreach(self::getSchema()->getProperties() as $property) {
-            if (!$property instanceof AbstractRelationProperty) {
-                $properties[] = $property;
-            }
-        }
-
-        return $properties;
-    }
 }

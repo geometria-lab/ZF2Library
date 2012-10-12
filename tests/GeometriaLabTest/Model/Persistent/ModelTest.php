@@ -43,7 +43,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetInvalidProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'id':\r\nValue must be a integer, string is present");
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
         $model = new TestModels\Model();
         $model->set('id', 'foo');
     }

@@ -37,7 +37,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testPopulateInvalidProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'booleanProperty':\r\nValue must be a boolean, string is present");
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
 
         $data = $this->getData();
         $data['booleanProperty'] = 'foo';
@@ -155,7 +155,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetInvalidValidationProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'emailProperty':\r\nThe input is not a valid email address. Use the basic format local-part@hostname");
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
         $this->model->emailProperty = 'invalid email';
     }
 
@@ -175,7 +175,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testNotEmptyProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'requiredProperty':\r\nValue is required and can't be empty");
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
 
         $this->model->requiredProperty = '';
     }

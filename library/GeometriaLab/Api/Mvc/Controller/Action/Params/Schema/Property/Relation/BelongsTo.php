@@ -6,13 +6,5 @@ use GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\PropertyInterf
 
 class BelongsTo extends \GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo implements PropertyInterface
 {
-    /**
-     * @param bool $required
-     * @return BelongsTo
-     */
-    public function setRequired($required)
-    {
-        $this->isRequired = $required;
-        return $this;
-    }
+
 }

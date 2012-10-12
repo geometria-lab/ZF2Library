@@ -4,6 +4,7 @@ namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 use GeometriaLab\Model\AbstractModel,
     GeometriaLab\Model\Persistent\Relation\BelongsTo,
+    GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException,
     GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\Relation\BelongsTo as BelongsToProperty;
 
 /**
@@ -52,6 +53,8 @@ abstract class AbstractParams extends AbstractModel
             }
             try {
                 $this->set($key, $value);
+            } catch (InvalidValueException $e) {
+                $this->errorMessages[$key] = $e->getValidationErrorMessages();
             } catch (\InvalidArgumentException $e) {
                 // Do nothing, keep silent...
             }
@@ -161,7 +164,7 @@ abstract class AbstractParams extends AbstractModel
         $result = parent::isValid();
 
         foreach ($this->notPresentProperties as $name => $value) {
-            $this->errorMessages[$name]['notPresent'] = "Property does not exists";
+            $this->errorMessages[$name] = array('notPresent' => "Property does not exists");
             $result = false;
         }
 

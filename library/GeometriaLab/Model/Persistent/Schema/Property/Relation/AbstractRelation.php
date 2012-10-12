@@ -81,16 +81,6 @@ abstract class AbstractRelation extends AbstractProperty implements PropertyInte
     }
 
     /**
-     * @param bool $required
-     * @return \GeometriaLab\Model\Schema\Property\PropertyInterface|void
-     * @throws \RuntimeException
-     */
-    public function setRequired($required)
-    {
-        throw new \RuntimeException('Required is not supported for relations');
-    }
-
-    /**
      * @param bool $persistent
      * @return \GeometriaLab\Model\Persistent\Schema\Property\PropertyInterface|void
      * @throws \RuntimeException

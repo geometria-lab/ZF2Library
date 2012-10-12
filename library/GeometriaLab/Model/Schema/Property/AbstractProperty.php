@@ -2,10 +2,11 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
-use GeometriaLab\Validator\IsType;
+use GeometriaLab\Validator\IsType,
+    GeometriaLab\Validator\ValidatorChain,
+    GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException;
 
 use Zend\Filter\FilterChain as ZendFilterChain,
-    Zend\Validator\ValidatorChain as ZendValidatorChain,
     Zend\Validator\NotEmpty as ZendNotEmptyValidator;
 
 abstract class AbstractProperty implements PropertyInterface
@@ -39,7 +40,7 @@ abstract class AbstractProperty implements PropertyInterface
      */
     protected $filterChain;
     /**
-     * @var ZendValidatorChain
+     * @var ValidatorChain
      */
     protected $validatorChain;
     /**
@@ -204,10 +205,10 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
-     * @param ZendValidatorChain $validatorChain
+     * @param ValidatorChain $validatorChain
      * @return AbstractProperty
      */
-    public function setValidatorChain(ZendValidatorChain $validatorChain)
+    public function setValidatorChain(ValidatorChain $validatorChain)
     {
         $this->validatorChain = $validatorChain;
 
@@ -215,15 +216,39 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
-     * @return ZendValidatorChain
+     * @return ValidatorChain
      */
     public function getValidatorChain()
     {
         if ($this->validatorChain === null) {
-            $this->validatorChain = new ZendValidatorChain();
+            $this->validatorChain = new ValidatorChain();
         }
 
         return $this->validatorChain;
+    }
+
+    /**
+     * Filter and validate value
+     *
+     * @param mixed $value
+     * @return mixed
+     * @throws InvalidValueException
+     */
+    public function filterAndValidate($value)
+    {
+        $value = $this->getFilterChain()->filter($value);
+
+        if (!$this->getValidatorChain()->isValid($value)) {
+            $errorMessages = $this->getValidatorChain()->getMessages();
+            $this->getValidatorChain()->cleanupMessages();
+
+            $exception = new InvalidValueException("Invalid value for property '{$this->getName()}'");
+            $exception->setValidationErrorMessages($errorMessages);
+
+            throw $exception;
+        }
+
+        return $value;
     }
 
     /**
