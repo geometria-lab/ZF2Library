@@ -44,10 +44,6 @@ abstract class AbstractProperty implements PropertyInterface
      */
     protected $validatorChain;
     /**
-     * @var boolean
-     */
-    protected $notEmptyValidator = false;
-    /**
      * Type validators
      *
      * @var array
@@ -138,12 +134,12 @@ abstract class AbstractProperty implements PropertyInterface
      */
     public function setAllowEmpty($allowEmpty)
     {
-        if ($this->notEmptyValidator && $allowEmpty) {
-            throw new \RuntimeException("Can't change 'allow empty' from false to true");
+        if ($allowEmpty) {
+            $this->addNotEmptyValidator();
+        } else {
+            $this->removeNotEmptyValidator();
         }
-
         $this->allowEmpty = $allowEmpty;
-        $this->addNotEmptyValidator();
 
         return $this;
     }
@@ -272,24 +268,36 @@ abstract class AbstractProperty implements PropertyInterface
      */
     protected function addNotEmptyValidator($type = ZendNotEmptyValidator::ALL)
     {
-        if (!($this->isRequired() && !$this->isAllowEmpty()) || $this->notEmptyValidator) {
+        if (!($this->isRequired() && !$this->isAllowEmpty())) {
             return;
         }
 
         $chain = $this->getValidatorChain();
-        $validators = $chain->getValidators();
 
-        if (isset($validators[0]['instance']) && $validators[0]['instance'] instanceof ZendNotEmptyValidator) {
-            $this->notEmptyValidator = true;
-            return;
+        foreach ($chain->getValidators() as $validatorData) {
+            if (isset($validatorData['instance']) && $validatorData['instance'] instanceof ZendNotEmptyValidator) {
+                return;
+            }
         }
-
-        $this->notEmptyValidator = true;
 
         $validator = new ZendNotEmptyValidator();
         $validator->setType($type);
 
         $chain->prependValidator($validator, true);
+    }
+
+    /**
+     * Remove not empty validator
+     */
+    protected function removeNotEmptyValidator()
+    {
+        $chain = $this->getValidatorChain();
+
+        foreach ($chain->getValidators() as $index => $validatorData) {
+            if (isset($validatorData['instance']) && $validatorData['instance'] instanceof ZendNotEmptyValidator) {
+                $chain->removeValidatorByIndex($index);
+            }
+        }
     }
 
     /**
