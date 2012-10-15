@@ -39,7 +39,11 @@ class ValidatorChain extends ZendValidatorChain
             'breakChainOnFailure' => (boolean)$breakChainOnFailure,
         );
 
-        array_splice($this->validators, $index, 0, $validatorData);
+        $this->validators = array_merge(
+            array_slice($this->validators, 0, $index),
+            array($validatorData),
+            array_slice($this->validators, $index)
+        );
 
         return $this;
     }
