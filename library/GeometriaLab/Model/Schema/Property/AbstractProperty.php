@@ -135,9 +135,9 @@ abstract class AbstractProperty implements PropertyInterface
     public function setAllowEmpty($allowEmpty)
     {
         if ($allowEmpty) {
-            $this->addNotEmptyValidator();
-        } else {
             $this->removeNotEmptyValidator();
+        } else {
+            $this->addNotEmptyValidator();
         }
         $this->allowEmpty = $allowEmpty;
 
