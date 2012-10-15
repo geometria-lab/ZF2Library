@@ -30,7 +30,7 @@ class ValidatorChain extends ZendValidatorChain
             throw new \InvalidArgumentException("Index too small");
         }
 
-        if ($index > $this->count() - 1) {
+        if ($index > $this->count()) {
             throw new \InvalidArgumentException("Index too large");
         }
 

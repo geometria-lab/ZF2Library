@@ -78,17 +78,27 @@ class Unique extends ZendAbstractValidator
             throw new ZendRuntimeException("Field not configured");
         }
 
-        // @TODO Remove Unique validator from Validator Chain, then match count, then add Unique validator to chain
-
+        $uniqueValidator = null;
         /* @var AbstractModel $model */
-        /*$model = new $this->class;
+        $model = new $this->class;
+        $validatorChain = $model->getSchema()->getProperty($this->field)->getValidatorChain();
+
+        foreach ($validatorChain->getValidators() as $index => $validatorData) {
+            if ($validatorData['instance'] instanceof Unique) {
+                $uniqueValidator = $validatorData;
+                $uniqueValidator['index'] = $index;
+                $validatorChain->removeValidatorByIndex($index);
+            }
+        }
+
         $matchedCount = $model->getMapper()->count(array($this->field => $value));
+
+        $validatorChain->addValidatorByIndex($uniqueValidator['index'], $uniqueValidator['instance'], $uniqueValidator['breakChainOnFailure']);
 
         if ($matchedCount) {
             $this->error(self::EXISTS, $value);
             return false;
         }
-        */
 
         return true;
     }
