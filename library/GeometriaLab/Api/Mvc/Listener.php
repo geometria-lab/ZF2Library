@@ -9,7 +9,6 @@ use GeometriaLab\Api\Mvc\Controller\Action\Params\Listener as ParamsListener,
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
-    Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Mvc\ModuleRouteListener as ZendModuleRouteListener,
     Zend\ServiceManager\ServiceManager as ZendServiceManager,
     Zend\ServiceManager\ServiceManagerAwareInterface as ZendServiceManagerAwareInterface;
