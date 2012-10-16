@@ -69,9 +69,9 @@ class Listener implements ZendListenerAggregateInterface
         $params = $e->getApplication()->getServiceManager()->get('Params');
         $params->populate($requestParams);
 
-        $routeMatch->setParam('params', $params);
-
         $this->validateParams($params, $routeMatch);
+
+        $routeMatch->setParam('params', $params);
     }
 
     /**
