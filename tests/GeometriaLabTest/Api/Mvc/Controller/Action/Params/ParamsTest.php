@@ -142,6 +142,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidProperty()
     {
+        $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
+
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,
             'name' => 'Phillip',
@@ -153,13 +155,12 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
         $params = new ParamsListener();
         $params->createParams(static::$event);
-
-        $this->assertNotEmpty(static::$event->getError());
-        $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));
     }
 
     public function testNotPresentProperty()
     {
+        $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
+
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,
             'name' => 'Phillip',
@@ -172,13 +173,12 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
         $params = new ParamsListener();
         $params->createParams(static::$event);
-
-        $this->assertNotEmpty(static::$event->getError());
-        $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));
     }
 
     public function testRequiredProperty()
     {
+        $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
+
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,
             'name' => 'Phillip',
@@ -190,13 +190,12 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
         $params = new ParamsListener();
         $params->createParams(static::$event);
-
-        $this->assertNotEmpty(static::$event->getError());
-        $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));
     }
 
     public function testNotValidProperty()
     {
+        $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
+
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
             'id' => 1,
             'name' => 'Phillip',
@@ -208,9 +207,6 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
         $params = new ParamsListener();
         $params->createParams(static::$event);
-
-        $this->assertNotEmpty(static::$event->getError());
-        $this->assertInstanceOf('\GeometriaLab\Api\Exception\InvalidParamsException', static::$event->getParam('exception'));
     }
 
     public function testModelPropertySet()
