@@ -144,24 +144,4 @@ abstract class AbstractMapper implements MapperInterface
     {
         return new Query($this);
     }
-
-    /**
-     * Get paginator instance
-     *
-     * @param QueryInterface $query
-     * @return ModelPaginator
-     * @throws \InvalidArgumentException
-     */
-    public function getPaginator(QueryInterface $query = null)
-    {
-        if ($query === null) {
-            $query = $this->createQuery();
-        }
-
-        if (!$query instanceof Query) {
-            throw new \InvalidArgumentException('Query must be GeometriaLab\Model\Persistent\Mapper\Query');
-        }
-
-        return new ModelPaginator($query);
-    }
 }

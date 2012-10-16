@@ -79,9 +79,9 @@ class Unique extends ZendAbstractValidator
         }
 
         $uniqueValidator = null;
-        /* @var AbstractModel $model */
-        $model = new $this->class;
-        $validatorChain = $model->getSchema()->getProperty($this->field)->getValidatorChain();
+        /* @var AbstractModel $modelClass */
+        $modelClass = $this->class;
+        $validatorChain = $modelClass::getSchema()->getProperty($this->field)->getValidatorChain();
 
         foreach ($validatorChain->getValidators() as $index => $validatorData) {
             if ($validatorData['instance'] instanceof Unique) {
@@ -91,7 +91,7 @@ class Unique extends ZendAbstractValidator
             }
         }
 
-        $matchedCount = $model->getMapper()->count(array($this->field => $value));
+        $matchedCount = $modelClass::getMapper()->count(array($this->field => $value));
 
         $validatorChain->addValidatorByIndex($uniqueValidator['index'], $uniqueValidator['instance'], $uniqueValidator['breakChainOnFailure']);
 

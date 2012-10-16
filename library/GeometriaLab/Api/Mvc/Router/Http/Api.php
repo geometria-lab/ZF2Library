@@ -93,11 +93,8 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $id = null;
         $subResource = null;
         $routeMatch = new ZendRouteMatch(array());
-        $method = $request->getMethod();
 
-        if (APPLICATION_ENV == 'development') {
-            $method = $request->getQuery('_method', $method);
-        }
+        $method = $request->getQuery('_method', $request->getMethod());
 
         $uri  = $request->getUri();
         $path = trim($uri->getPath(), '/');

@@ -4,11 +4,12 @@ namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
+    Zend\Mvc\Router\RouteMatch as ZendRouteMatch,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Http\Request as ZendRequest;
 
 use GeometriaLab\Api\Exception\InvalidParamsException,
-    \GeometriaLab\Api\Exception\ObjectNotFoundException;
+    GeometriaLab\Api\Exception\ObjectNotFoundException;
 
 class Listener implements ZendListenerAggregateInterface
 {
@@ -29,7 +30,6 @@ class Listener implements ZendListenerAggregateInterface
     {
         $sharedEvents = $events->getSharedManager();
         $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'createParams'), 100);
-        $this->listeners[] = $sharedEvents->attach('Zend\Stdlib\DispatchableInterface', ZendMvcEvent::EVENT_DISPATCH, array($this, 'validateParams'), 99);
     }
 
     /**
@@ -71,18 +71,7 @@ class Listener implements ZendListenerAggregateInterface
 
         $routeMatch->setParam('params', $params);
 
-        if (!$params->isValid()) {
-            $exception = new InvalidParamsException();
-            $exception->setParams($params);
-
-            $e->setParam('exception', $exception);
-            $e->setError($exception->getMessage());
-
-            $e->getApplication()->getEventManager()->trigger(ZendMvcEvent::EVENT_DISPATCH_ERROR, $e);
-            $e->stopPropagation();
-
-            return;
-        }
+        $this->validateParams($params, $routeMatch);
     }
 
     /**
@@ -111,16 +100,14 @@ class Listener implements ZendListenerAggregateInterface
     /**
      * Validate Params object
      *
-     * @param ZendMvcEvent $e
+     * @param AbstractParams $params
+     * @param ZendRouteMatch $routeMatch
      * @throws \RuntimeException
      * @throws ObjectNotFoundException
+     * @throws InvalidParamsException
      */
-    public function validateParams(ZendMvcEvent $e)
+    public function validateParams(AbstractParams $params, ZendRouteMatch $routeMatch)
     {
-        $routeMatch = $e->getRouteMatch();
-        /* @var AbstractParams $params */
-        $params = $routeMatch->getParam('params');
-
         if ($routeMatch->getParam('id') !== null) {
             if (!$params->has('id')) {
                 throw new \RuntimeException("Need 'id' property");
@@ -143,6 +130,13 @@ class Listener implements ZendListenerAggregateInterface
             if (!$hasRelationObject) {
                 throw new \RuntimeException('Need belongsTo relation with originProperty = id');
             }
+        }
+
+        if (!$params->isValid()) {
+            $exception = new InvalidParamsException();
+            $exception->setParams($params);
+
+            throw $exception;
         }
     }
 }
