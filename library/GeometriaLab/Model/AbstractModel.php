@@ -6,14 +6,8 @@ use GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Model\Schema\Property\PropertyInterface,
     GeometriaLab\Model\Schema\Manager as SchemaManager;
 
-abstract class AbstractModel implements ModelInterface
+abstract class AbstractModel extends Schemaless\Model implements ModelInterface
 {
-    /**
-     * Property values
-     *
-     * @var array
-     */
-    protected $propertyValues = array();
     /**
      * Parser class name
      *
@@ -36,30 +30,7 @@ abstract class AbstractModel implements ModelInterface
     {
         $this->setup();
 
-        if ($data !== null) {
-            $this->populate($data);
-        }
-    }
-
-    /**
-     * Populate model from array or iterable object
-     *
-     * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
-     * @param bool $notValidate
-     * @return AbstractModel
-     * @throws \InvalidArgumentException
-     */
-    public function populate($data, $notValidate = false)
-    {
-        if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
-            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
-        }
-
-        foreach ($data as $key => $value) {
-            $this->set($key, $value, $notValidate);
-        }
-
-        return $this;
+        parent::__construct($data);
     }
 
     /**
@@ -75,27 +46,27 @@ abstract class AbstractModel implements ModelInterface
             throw new \InvalidArgumentException("Property '$name' does not exists");
         }
 
-        $method = "get{$name}";
-        if (method_exists($this, $method)) {
-            return call_user_func(array($this, $method));
-        }
-
-        if (isset($this->propertyValues[$name])) {
-            return $this->propertyValues[$name];
-        } else {
-            return null;
-        }
+        return parent::get($name);
     }
 
     /**
-     * Magic get property value
+     * Populate model from array or iterable object and doesn't validate it
      *
-     * @param string $name
-     * @return mixed
+     * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
+     * @return AbstractModel
+     * @throws \InvalidArgumentException
      */
-    public function __get($name)
+    public function populateWithNoValidation($data)
     {
-        return $this->get($name);
+        if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
+            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
+        }
+
+        foreach ($data as $key => $value) {
+            $this->setWithNoValidation($key, $value);
+        }
+
+        return $this;
     }
 
     /**
@@ -103,45 +74,36 @@ abstract class AbstractModel implements ModelInterface
      *
      * @param string $name
      * @param mixed $value
-     * @param bool $notValidate
-     * @return AbstractModel|ModelInterface
+     * @return AbstractModel
      * @throws \InvalidArgumentException
      */
-    public function set($name, $value, $notValidate = false)
+    public function set($name, $value)
     {
         if ($value !== null) {
-            $property = static::getSchema()->getProperty($name);
-
             if ($this->$name === $value) {
                 return $this;
             }
-            if ($notValidate) {
-                $value = $property->getFilterChain()->filter($value);
-            } else {
-                $value = $property->filterAndValidate($value);
-            }
+            $value = static::getSchema()->getProperty($name)->filterAndValidate($value);
         }
 
-        $method = "set{$name}";
-        if (method_exists($this, $method)) {
-            call_user_func(array($this, $method), $value);
-        } else {
-            $this->propertyValues[$name] = $value;
-        }
-
-        return $this;
+        return parent::set($name, $value);
     }
 
     /**
-     * Magic for set property
+     * Set property value
      *
      * @param string $name
      * @param mixed $value
-     * @return AbstractModel
+     * @return AbstractModel|ModelInterface
+     * @throws \InvalidArgumentException
      */
-    public function __set($name, $value)
+    public function setWithNoValidation($name, $value)
     {
-        return $this->set($name, $value);
+        if ($value !== null) {
+            $value = static::getSchema()->getProperty($name)->getFilterChain()->filter($value);
+        }
+
+        return parent::set($name, $value);
     }
 
     /**
@@ -164,34 +126,6 @@ abstract class AbstractModel implements ModelInterface
     public function __isset($name)
     {
         return $this->has($name);
-    }
-
-    /**
-     * Convert model to array
-     *
-     * @param integer $depth
-     * @return array
-     */
-    public function toArray($depth = 0)
-    {
-        $array = array();
-        foreach ($this->getProperties() as $name => $property) {
-            $array[$name] = $this->get($name);
-
-            if ($depth !== 0 && $array[$name] instanceof ModelInterface) {
-                $array[$name] = $array[$name]->toArray($depth === -1 ? -1 : $depth - 1);
-            }
-        }
-
-        return $array;
-    }
-
-    /**
-     * IteratorAggregate implementation
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->toArray());
     }
 
     /**

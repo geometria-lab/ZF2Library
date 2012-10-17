@@ -71,11 +71,10 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
      *
      * @param string $name
      * @param mixed $value
-     * @param bool $notValidate
      * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
-    public function set($name, $value, $notValidate = false)
+    public function set($name, $value)
     {
         if ($this->hasRelation($name)) {
             $relation = $this->getRelation($name);
@@ -86,7 +85,42 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
                 $relation->setTargetModels($value);
             }
         } else {
-            parent::set($name, $value, $notValidate);
+            parent::set($name, $value);
+
+            foreach ($this->getRelations() as $relation) {
+                // @todo If changed referenced key?
+                /**
+                 * @var BelongsTo $relation
+                 */
+                if ($relation instanceof BelongsTo && $relation->getProperty()->getOriginProperty() === $name) {
+                    $relation->resetTargetModel();
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set property value and doesn't validate it
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return AbstractModel|ModelInterface
+     * @throws \InvalidArgumentException
+     */
+    public function setWithNoValidation($name, $value)
+    {
+        if ($this->hasRelation($name)) {
+            $relation = $this->getRelation($name);
+
+            if ($relation instanceof BelongsTo || $relation instanceof HasOne) {
+                $relation->setTargetModel($value);
+            } elseif ($relation instanceof HasMany) {
+                $relation->setTargetModels($value);
+            }
+        } else {
+            parent::setWithNoValidation($name, $value);
 
             foreach ($this->getRelations() as $relation) {
                 // @todo If changed referenced key?

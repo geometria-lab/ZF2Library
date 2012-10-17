@@ -185,7 +185,13 @@ class Mapper extends AbstractMapper
              * @var ModelInterface $model
              */
             $model = new $modelClass();
-            $model->populate($data, !$this->getValidateOnFetch());
+
+            if ($this->getValidateOnFetch()) {
+                $model->populate($data);
+            } else {
+                $model->populateWithNoValidation($data);
+            }
+
             $model->markClean();
 
             $collection->push($model);

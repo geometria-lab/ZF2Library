@@ -21,11 +21,11 @@ class ModelProperty extends AbstractProperty
     public function setModelClass($modelClass)
     {
         $reflect = new \ReflectionClass($modelClass);
-        $implementsModel = $reflect->implementsInterface('\GeometriaLab\Model\ModelInterface');
+        $implementsSchemaless = $reflect->implementsInterface('\GeometriaLab\Model\Schemaless\ModelInterface');
         $implementsPersistent = $reflect->implementsInterface('\GeometriaLab\Model\Persistent\ModelInterface');
 
-        if (!$implementsModel || $implementsPersistent) {
-            throw new \InvalidArgumentException('Invalid model class, must be implements GeometriaLab\Model\ModelInterface');
+        if (!$implementsSchemaless || $implementsPersistent) {
+            throw new \InvalidArgumentException('Invalid model class, must be implements GeometriaLab\Model\Schemaless\ModelInterface');
         }
 
         $this->modelClass = $modelClass;
