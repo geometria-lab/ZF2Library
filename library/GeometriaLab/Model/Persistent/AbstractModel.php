@@ -71,10 +71,11 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
      *
      * @param string $name
      * @param mixed $value
+     * @param bool $notValidate
      * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
-    public function set($name, $value)
+    public function set($name, $value, $notValidate = false)
     {
         if ($this->hasRelation($name)) {
             $relation = $this->getRelation($name);
@@ -85,7 +86,7 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
                 $relation->setTargetModels($value);
             }
         } else {
-            parent::set($name, $value);
+            parent::set($name, $value, $notValidate);
 
             foreach ($this->getRelations() as $relation) {
                 // @todo If changed referenced key?

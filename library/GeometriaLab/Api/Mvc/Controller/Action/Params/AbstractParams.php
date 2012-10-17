@@ -37,10 +37,11 @@ abstract class AbstractParams extends AbstractModel
      * Populate model from array or iterable object
      *
      * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
-     * @return AbstractModel
+     * @param bool $notValidate
+     * @return AbstractParams
      * @throws \InvalidArgumentException
      */
-    public function populate($data)
+    public function populate($data, $notValidate = false)
     {
         if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
             throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
@@ -52,6 +53,7 @@ abstract class AbstractParams extends AbstractModel
                 continue;
             }
             try {
+                // We always need validation hear!
                 $this->set($key, $value);
             } catch (InvalidValueException $e) {
                 $this->errorMessages[$key] = $e->getValidationErrorMessages();
@@ -85,14 +87,15 @@ abstract class AbstractParams extends AbstractModel
      *
      * @param string $name
      * @param mixed $value
+     * @param bool $notValidate
      * @return AbstractParams
-     * @throws \InvalidArgumentException
      */
-    public function set($name, $value)
+    public function set($name, $value, $notValidate = false)
     {
         if ($this->hasRelation($name)) {
             $this->getRelation($name)->setTargetModel($value);
         } else {
+            // We always need validation hear!
             parent::set($name, $value);
 
             foreach ($this->getRelations() as $relation) {

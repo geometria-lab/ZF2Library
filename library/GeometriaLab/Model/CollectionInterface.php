@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\Schemaless\ModelInterface as SchemalessModelInterface;
+use GeometriaLab\Model\ModelInterface;
 
 interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
 {
@@ -10,7 +10,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Add model or models to the end of a collection
      *
-     * @param SchemalessModelInterface|\Traversable|array $data
+     * @param ModelInterface|\Traversable|array $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
@@ -19,14 +19,14 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Remove and return last model
      *
-     * @return SchemalessModelInterface|null
+     * @return ModelInterface|null
      */
     public function pop();
 
     /**
      * Add model or models at the beginning of a collection
      *
-     * @param SchemalessModelInterface|\Traversable|array $data
+     * @param ModelInterface|\Traversable|array $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
@@ -35,7 +35,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Remove and return first model
      *
-     * @return SchemalessModelInterface|null
+     * @return ModelInterface|null
      */
     public function shift();
 
@@ -43,30 +43,30 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
      * Set model to collection by offset
      *
      * @param integer $offset
-     * @param SchemalessModelInterface $model
+     * @param ModelInterface $model
      * @return CollectionInterface|Collection
      */
-    public function set($offset, SchemalessModelInterface $model);
+    public function set($offset, ModelInterface $model);
 
     /**
      * Get model from collection by offset
      *
      * @param integer $offset
-     * @return SchemalessModelInterface|null
+     * @return ModelInterface|null
      */
     public function get($offset);
 
     /**
      * Get first model
      *
-     * @return SchemalessModelInterface|null
+     * @return ModelInterface|null
      */
     public function getFirst();
 
     /**
      * Get last model
      *
-     * @return SchemalessModelInterface|null
+     * @return ModelInterface|null
      */
     public function getLast();
 
@@ -115,10 +115,10 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Remove model from collection
      *
-     * @param SchemalessModelInterface $model
+     * @param ModelInterface $model
      * @return CollectionInterface|Collection
      */
-    public function remove(SchemalessModelInterface $model);
+    public function remove(ModelInterface $model);
 
     /**
      * Remove models by callback

@@ -61,7 +61,7 @@ class BelongsTo extends AbstractRelation
         $originPropertyName = $this->getProperty()->getOriginProperty();
 
         if ($this->getOriginModel()->get($originPropertyName) !== $targetPropertyValue) {
-            $this->getOriginModel()->set($originPropertyName, $targetPropertyValue);
+            $this->getOriginModel()->set($originPropertyName, $targetPropertyValue, true);
         }
 
         return $this;

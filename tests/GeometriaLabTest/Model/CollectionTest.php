@@ -2,8 +2,9 @@
 
 namespace GeometriaLabTest\Model;
 
-use GeometriaLab\Model\Collection,
-    GeometriaLab\Model\Schemaless\Model;
+use GeometriaLabTest\Model\TestModels\Model;
+
+use GeometriaLab\Model\Collection;
 
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {

@@ -13,8 +13,8 @@ class HasOne extends AbstractRelation
     protected $targetModel = false;
 
     /**
+     * @param bool $refresh
      * @return ModelInterface|null
-     * @throws \RuntimeException
      */
     public function getTargetModel($refresh = false)
     {

@@ -2,11 +2,11 @@
 
 namespace GeometriaLab\Api\Mvc\View\Http;
 
-use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
-use Zend\EventManager\EventManagerInterface as ZendEventManagerInterface;
-use Zend\Mvc\MvcEvent as ZendMvcEvent;
-use Zend\Mvc\Application as ZendApplication;
-use Zend\Http\Response as ZendHttpResponse;
+use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
+    Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
+    Zend\Mvc\MvcEvent as ZendMvcEvent,
+    Zend\Mvc\Application as ZendApplication,
+    Zend\Http\Response as ZendHttpResponse;
 
 use GeometriaLab\Api\Exception as ApiException;
 
@@ -21,7 +21,7 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
     protected $listeners = array();
 
     /**
-     * @param \Zend\EventManager\EventManagerInterface $events
+     * @param ZendEventManagerInterface $events
      */
     public function attach(ZendEventManagerInterface $events)
     {
@@ -29,7 +29,7 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
     }
 
     /**
-     * @param \Zend\EventManager\EventManagerInterface $events
+     * @param ZendEventManagerInterface $events
      */
     public function detach(ZendEventManagerInterface $events)
     {
@@ -41,7 +41,8 @@ class HandleExceptionStrategy implements ZendListenerAggregateInterface
     }
 
     /**
-     * @param \Zend\Mvc\MvcEvent $e
+     * @param ZendMvcEvent $e
+     * @throws \Exception
      */
     public function detectException(ZendMvcEvent $e)
     {

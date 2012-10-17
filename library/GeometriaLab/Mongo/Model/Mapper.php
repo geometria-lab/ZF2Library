@@ -22,20 +22,24 @@ class Mapper extends AbstractMapper
      * @var string
      */
     protected $mongoInstanceName;
-
     /**
      * Mongo collection name
      *
      * @var string
      */
     protected $collectionName;
-
     /**
      * Flag for validate model primary keys only once
      *
      * @var bool
      */
     protected $isPrimaryKeysValidated = false;
+    /**
+     * Flag for validate properties when fetch
+     *
+     * @var bool
+     */
+    protected $validateOnFetch = false;
 
     /**
      * @var ZendServiceManager
@@ -86,6 +90,26 @@ class Mapper extends AbstractMapper
     public function getMongoInstanceName()
     {
         return $this->mongoInstanceName;
+    }
+
+    /**
+     * Set validate on fetch
+     *
+     * @param bool $validateOnFetch
+     */
+    public function setValidateOnFetch($validateOnFetch)
+    {
+        $this->validateOnFetch = (bool)$validateOnFetch;
+    }
+
+    /**
+     * Get validate on fetch
+     *
+     * @return bool
+     */
+    public function getValidateOnFetch()
+    {
+        return $this->validateOnFetch;
     }
 
     /**
@@ -161,7 +185,7 @@ class Mapper extends AbstractMapper
              * @var ModelInterface $model
              */
             $model = new $modelClass();
-            $model->populate($data);
+            $model->populate($data, !$this->getValidateOnFetch());
             $model->markClean();
 
             $collection->push($model);
@@ -173,7 +197,7 @@ class Mapper extends AbstractMapper
     }
 
     /**
-     * Find monogo documents by query
+     * Find mongo documents by query
      *
      * @param Query $query
      * @return \MongoCursor

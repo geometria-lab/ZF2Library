@@ -2,11 +2,6 @@
 
 namespace GeometriaLab\Model\Persistent;
 
-use GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\BelongsTo,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany;
-
 class Collection extends \GeometriaLab\Model\Collection implements CollectionInterface
 {
     /**

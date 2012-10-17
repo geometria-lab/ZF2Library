@@ -2,6 +2,9 @@
 
 namespace GeometriaLab\Model\Schemaless;
 
+/**
+ *
+ */
 class Model implements ModelInterface
 {
     /**

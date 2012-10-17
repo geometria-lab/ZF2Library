@@ -14,7 +14,7 @@ class ModelPropertyTest extends \PHPUnit_Framework_TestCase
 
     public function testSetModelClass()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Invalid model class, must be implements GeometriaLab\Model\Schemaless\ModelInterface');
+        $this->setExpectedException('\InvalidArgumentException', 'Invalid model class, must be implements GeometriaLab\Model\ModelInterface');
         $m = new ModelProperty();
         $m->setModelClass('stdClass');
     }

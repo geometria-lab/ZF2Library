@@ -68,7 +68,7 @@ class HasMany extends AbstractRelation
         foreach($targetModels as $targetModel) {
             if ($onDelete === HasManyProperty::DELETE_CASCADE) {
                 $targetModel->delete();
-            } else if ($onDelete === HasManyProperty::DELETE_SET_NULL) {
+            } elseif ($onDelete === HasManyProperty::DELETE_SET_NULL) {
                 $targetModel->set($this->getProperty()->getTargetProperty(), null);
                 $targetModel->save();
             }

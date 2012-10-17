@@ -176,11 +176,15 @@ class Query extends AbstractQuery
             $property = $property->getItemProperty();
         }
 
+        // @todo Validate or not?
+        /*
         try {
-            $value = $property->filterAndValidate($value);
+            $value = $property->getFilterChain()->filter($value);
+            $value = $property->validate($value);
         } catch (InvalidValueException $e) {
             throw new \InvalidArgumentException("Invalid value for field '$field': " . $e->getMessage());
         }
+        */
 
         return $value;
     }
