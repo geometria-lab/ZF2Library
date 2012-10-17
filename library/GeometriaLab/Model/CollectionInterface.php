@@ -2,7 +2,8 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\ModelInterface;
+use GeometriaLab\Model\ModelInterface,
+    GeometriaLab\Model\Schemaless\ModelInterface as SchemalessModelInterface;
 
 interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
 {
@@ -10,7 +11,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Add model or models to the end of a collection
      *
-     * @param ModelInterface|\Traversable|array $data
+     * @param ModelInterface|SchemalessModelInterface|\Traversable|array $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
@@ -43,16 +44,16 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
      * Set model to collection by offset
      *
      * @param integer $offset
-     * @param ModelInterface $model
+     * @param ModelInterface|SchemalessModelInterface $model
      * @return CollectionInterface|Collection
      */
-    public function set($offset, ModelInterface $model);
+    public function set($offset, $model);
 
     /**
      * Get model from collection by offset
      *
      * @param integer $offset
-     * @return ModelInterface|null
+     * @return ModelInterface|SchemalessModelInterface|null
      */
     public function get($offset);
 
@@ -115,10 +116,10 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Remove model from collection
      *
-     * @param ModelInterface $model
+     * @param ModelInterface|SchemalessModelInterface $model
      * @return CollectionInterface|Collection
      */
-    public function remove(ModelInterface $model);
+    public function remove($model);
 
     /**
      * Remove models by callback

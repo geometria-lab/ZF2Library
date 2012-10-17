@@ -2,14 +2,15 @@
 
 namespace GeometriaLab\Model;
 
-use GeometriaLab\Model\ModelInterface;
+use GeometriaLab\Model\ModelInterface,
+    GeometriaLab\Model\Schemaless\ModelInterface as SchemalessModelInterface;
 
 class Collection implements CollectionInterface
 {
     /**
      * Models
      *
-     * @var ModelInterface[]
+     * @var ModelInterface[]|SchemalessModelInterface[]
      */
     protected $models = array();
 
@@ -35,17 +36,17 @@ class Collection implements CollectionInterface
     /**
      * Add model or models to the end of a collection
      *
-     * @param ModelInterface|\Traversable|array $data
+     * @param ModelInterface|SchemalessModelInterface|\Traversable|array $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
     public function push($data)
     {
-        if ($data instanceof ModelInterface) {
+        if ($data instanceof ModelInterface || $data instanceof SchemalessModelInterface) {
             array_push($this->models, $data);
         } elseif (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $model) {
-                if (!$model instanceof ModelInterface) {
+                if (!$model instanceof ModelInterface && !$model instanceof SchemalessModelInterface) {
                     throw new \InvalidArgumentException('Data must be model, array or iterated object with models.');
                 }
                 $this->push($model);
@@ -60,7 +61,7 @@ class Collection implements CollectionInterface
     /**
      * Remove and return last model
      *
-     * @return ModelInterface|null
+     * @return ModelInterface|SchemalessModelInterface|null
      */
     public function pop()
     {
@@ -70,17 +71,17 @@ class Collection implements CollectionInterface
     /**
      * Add model or models at the beginning of a collection
      *
-     * @param ModelInterface|\Traversable|array $data
+     * @param ModelInterface|SchemalessModelInterface|\Traversable|array $data
      * @return CollectionInterface|Collection
      * @throws \InvalidArgumentException
      */
     public function unshift($data)
     {
-        if ($data instanceof ModelInterface) {
+        if ($data instanceof ModelInterface || $data instanceof SchemalessModelInterface) {
             array_unshift($this->models, $data);
         } else if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $model) {
-                if (!$model instanceof ModelInterface) {
+                if (!$model instanceof ModelInterface && !$model instanceof SchemalessModelInterface) {
                     throw new \InvalidArgumentException('Data must be model, array or iterated object with models.');
                 }
                 $this->unshift($model);
@@ -106,11 +107,16 @@ class Collection implements CollectionInterface
      * Set model to collection by offset
      *
      * @param integer $offset
-     * @param ModelInterface $model
+     * @param ModelInterface|SchemalessModelInterface $model
      * @return CollectionInterface|Collection
+     * @throws \InvalidArgumentException
      */
-    public function set($offset, ModelInterface $model)
+    public function set($offset, $model)
     {
+        if (!$model instanceof ModelInterface && !$model instanceof SchemalessModelInterface) {
+            throw new \InvalidArgumentException('Model must be ModelInterface or SchemalessModelInterface');
+        }
+
         $this->models[$offset] = $model;
 
         return $this;
@@ -120,7 +126,7 @@ class Collection implements CollectionInterface
      * Get model from collection by offset
      *
      * @param integer $offset
-     * @return ModelInterface|null
+     * @return ModelInterface|SchemalessModelInterface|null
      */
     public function get($offset)
     {
@@ -148,7 +154,7 @@ class Collection implements CollectionInterface
     /**
      * Get last model
      *
-     * @return ModelInterface|null
+     * @return ModelInterface|SchemalessModelInterface|null
      */
     public function getLast()
     {
@@ -160,7 +166,7 @@ class Collection implements CollectionInterface
     /**
      * Get models by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function getByCallback($callback)
@@ -186,9 +192,9 @@ class Collection implements CollectionInterface
      */
     public function getByCondition($condition)
     {
-        $callback = function(ModelInterface $model) use ($condition) {
+        $callback = function($model) use ($condition) {
             /**
-             * @var ModelInterface $model
+             * @var ModelInterface|SchemalessModelInterface $model
              */
             foreach ($condition as $propertyName => $value) {
                 if ($model->get($propertyName) != $value) {
@@ -232,7 +238,7 @@ class Collection implements CollectionInterface
      */
     public function getProperty($name)
     {
-        $callback = function(ModelInterface $model) use ($name) {
+        $callback = function($model) use ($name) {
             return $model->get($name);
         };
 
@@ -251,7 +257,7 @@ class Collection implements CollectionInterface
         $result = array();
 
         /**
-         * @var ModelInterface $model
+         * @var ModelInterface|SchemalessModelInterface $model
          */
         foreach($this->models as $model) {
             $result[$model->get($keyPropertyName)] = $model->get($valuePropertyName);
@@ -263,11 +269,16 @@ class Collection implements CollectionInterface
     /**
      * Remove model from collection
      *
-     * @param ModelInterface $model
+     * @param ModelInterface|SchemalessModelInterface $model
      * @return CollectionInterface|Collection
+     * @throws \InvalidArgumentException
      */
-    public function remove(ModelInterface $model)
+    public function remove($model)
     {
+        if (!$model instanceof ModelInterface && !$model instanceof SchemalessModelInterface) {
+            throw new \InvalidArgumentException('Model must be ModelInterface or SchemalessModelInterface');
+        }
+
         $offset = array_search($model, $this->models, true);
 
         if ($offset) {
@@ -282,13 +293,13 @@ class Collection implements CollectionInterface
     /**
      * Remove models by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function removeByCallback($callback)
     {
         if (count($this)) {
-            $reversedCallback = function(ModelInterface $model) use ($callback) {
+            $reversedCallback = function($model) use ($callback) {
                 return !$callback($model);
             };
 
@@ -309,9 +320,9 @@ class Collection implements CollectionInterface
      */
     public function removeByCondition($condition)
     {
-        $callback = function(ModelInterface $model) use ($condition) {
+        $callback = function($model) use ($condition) {
             /**
-             * @var ModelInterface $model
+             * @var ModelInterface|SchemalessModelInterface $model
              */
             foreach ($condition as $propertyName => $value) {
                 if ($model->get($propertyName) != $value) {
@@ -389,7 +400,7 @@ class Collection implements CollectionInterface
         $array = array();
 
         /**
-         * @var ModelInterface $model
+         * @var ModelInterface|SchemalessModelInterface $model
          */
         foreach($this->models as $model) {
             if ($depth !== 0) {
@@ -405,7 +416,7 @@ class Collection implements CollectionInterface
     /**
      * Sort collection by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function sortByCallback($callback)
@@ -424,7 +435,7 @@ class Collection implements CollectionInterface
      */
     public function sort(array $propertyNames)
     {
-        $callback = function(ModelInterface $a, ModelInterface $b) use ($propertyNames) {
+        $callback = function($a, $b) use ($propertyNames) {
             foreach($propertyNames as $propertyName => $direction) {
                 $comparison = strcmp($a->get($propertyName), $b->get($propertyName));
                 if ($comparison !== 0) {
@@ -503,7 +514,7 @@ class Collection implements CollectionInterface
 
     /**
      * @param integer $offset
-     * @return ModelInterface|null
+     * @return ModelInterface|SchemalessModelInterface|null
      */
     public function offsetGet($offset)
     {
