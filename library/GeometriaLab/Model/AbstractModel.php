@@ -14,7 +14,6 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      * @var string
      */
     static protected $parserClassName = 'GeometriaLab\Model\Schema\DocBlockParser';
-
     /**
      * Validation error messages
      *
@@ -51,6 +50,46 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     }
 
     /**
+     * Populate model from array or iterable object and doesn't validate it
+     *
+     * @param array|\Traversable|\stdClass $data  Model data (must be array or iterable object)
+     * @return AbstractModel
+     * @throws \InvalidArgumentException
+     */
+    public function populateWithoutValidation($data)
+    {
+        if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
+            throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
+        }
+
+        foreach ($data as $key => $value) {
+            $this->setWithoutValidation($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set property value
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return AbstractModel
+     * @throws \InvalidArgumentException
+     */
+    public function set($name, $value)
+    {
+        if ($value !== null) {
+            if ($this->$name === $value) {
+                return $this;
+            }
+            $value = static::getSchema()->getProperty($name)->filterAndValidate($value);
+        }
+
+        return parent::set($name, $value);
+    }
+
+    /**
      * Set property value
      *
      * @param string $name
@@ -58,29 +97,10 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
-    public function set($name, $value)
+    public function setWithoutValidation($name, $value)
     {
-        $schema = static::getSchema();
-
         if ($value !== null) {
-            $property = $schema->getProperty($name);
-
-            $value = $property->getFilterChain()->filter($value);
-
-            if (!$property->getValidatorChain()->isValid($value)) {
-                $errorMessage = '';
-                $validationErrorMessages = $property->getValidatorChain()->getMessages();
-                foreach ($validationErrorMessages as $message) {
-                    if (is_array($message)) {
-                        $errorMessage .= implode("\r\n", $message);
-                    } else {
-                        $errorMessage .= "\r\n$message";
-                    }
-                }
-
-
-                throw new \InvalidArgumentException("Invalid property '$name':" . $errorMessage);
-            }
+            $value = static::getSchema()->getProperty($name)->getFilterChain()->filter($value);
         }
 
         return parent::set($name, $value);
@@ -98,28 +118,32 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     }
 
     /**
+     * Magic for get property
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return $this->has($name);
+    }
+
+    /**
      * Is Valid model data
      *
      * @return bool
      */
     public function isValid()
     {
-        $this->errorMessages = array();
+        foreach ($this->getProperties() as $property) {
+            if ($property->isRequired()) {
+                $name = $property->getName();
+                $value = $this->get($name);
 
-        foreach ($this->getPropertiesForValidation() as $property) {
-            $name = $property->getName();
-            $value = $this->get($name);
-
-            $messages = $property->getValidatorChain()->getMessages();
-            if (!empty($messages)) {
-                $this->errorMessages[$name] = $messages;
-            }
-
-            if ($value === null && $property->isRequired() && !isset($this->errorMessages[$name])) {
-                if (!isset($this->errorMessages[$name])) {
+                if ($value === null) {
                     $this->errorMessages[$name] = array();
+                    $this->errorMessages[$name]['isRequired'] = "Value is required";
                 }
-                $this->errorMessages[$name]['isRequired'] = "Value is required";
             }
         }
 
@@ -180,15 +204,5 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
     protected function getProperties()
     {
         return static::getSchema()->getProperties();
-    }
-
-    /**
-     * Get properties for validation
-     *
-     * @return PropertyInterface[]
-     */
-    public function getPropertiesForValidation()
-    {
-        return $this->getProperties();
     }
 }

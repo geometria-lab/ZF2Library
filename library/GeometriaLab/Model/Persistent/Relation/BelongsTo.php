@@ -12,6 +12,7 @@ class BelongsTo extends AbstractRelation
     protected $targetModel = false;
 
     /**
+     * @param bool $refresh
      * @return ModelInterface|null
      * @throws \RuntimeException
      */
@@ -21,19 +22,13 @@ class BelongsTo extends AbstractRelation
             $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
             if ($originPropertyValue !== null) {
-                /**
-                 * @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper
-                 */
+                /* @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper */
                 $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
 
                 $condition = array($this->getProperty()->getTargetProperty() => $originPropertyValue);
                 $query = $targetMapper->createQuery()->where($condition);
 
                 $this->targetModel = $targetMapper->getOne($query);
-
-                if ($this->targetModel === null) {
-                    throw new \RuntimeException('Invalid target model with: ' . json_encode($condition));
-                }
             } else {
                 $this->targetModel = null;
             }

@@ -4,10 +4,12 @@ namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
+    Zend\Mvc\Router\RouteMatch as ZendRouteMatch,
     Zend\Mvc\MvcEvent as ZendMvcEvent,
-    Zend\Stdlib\RequestInterface as ZendRequestInterface;
+    Zend\Http\Request as ZendRequest;
 
-use GeometriaLab\Api\Exception\InvalidParamsException;
+use GeometriaLab\Api\Exception\InvalidParamsException,
+    GeometriaLab\Api\Exception\ObjectNotFoundException;
 
 class Listener implements ZendListenerAggregateInterface
 {
@@ -46,6 +48,8 @@ class Listener implements ZendListenerAggregateInterface
     }
 
     /**
+     * Create Params object and inject it to RouteMatch
+     *
      * @param ZendMvcEvent $e
      * @throws InvalidParamsException
      */
@@ -53,40 +57,30 @@ class Listener implements ZendListenerAggregateInterface
     {
         $routeMatch = $e->getRouteMatch();
         $request = $e->getRequest();
-        $queryParams = $this->getParamsFromRequest($request);
+        $requestParams = $this->getParamsFromRequest($request);
 
         // @TODO Stub
         $id = $routeMatch->getParam('id');
         if ($id !== null) {
-            $queryParams['id'] = $id;
+            $requestParams['id'] = $id;
         }
 
-        /* @var Params $params */
+        /* @var AbstractParams $params */
         $params = $e->getApplication()->getServiceManager()->get('Params');
-        $params->populate($queryParams);
+        $params->populate($requestParams);
+
+        $this->validateParams($params, $routeMatch);
 
         $routeMatch->setParam('params', $params);
-
-        if (!$params->isValid()) {
-            $exception = new InvalidParamsException();
-            $exception->setParams($params);
-
-            $e->setParam('exception', $exception);
-            $e->setError($exception->getMessage());
-
-            $e->getApplication()->getEventManager()->trigger(ZendMvcEvent::EVENT_DISPATCH_ERROR, $e);
-            $e->stopPropagation();
-
-            return;
-        }
     }
 
     /**
-     * @static
-     * @param ZendRequestInterface $request
+     * Get params from request
+     *
+     * @param ZendRequest $request
      * @return mixed
      */
-    protected function getParamsFromRequest(ZendRequestInterface $request)
+    protected function getParamsFromRequest(ZendRequest $request)
     {
         $queryParams = $request->getQuery()->toArray();
 
@@ -98,6 +92,51 @@ class Listener implements ZendListenerAggregateInterface
             }
         }
 
-        return $queryParams;
+        $postParams = $request->getPost()->toArray();
+
+        return array_merge($postParams, $queryParams);
+    }
+
+    /**
+     * Validate Params object
+     *
+     * @param AbstractParams $params
+     * @param ZendRouteMatch $routeMatch
+     * @throws \RuntimeException
+     * @throws ObjectNotFoundException
+     * @throws InvalidParamsException
+     */
+    public function validateParams(AbstractParams $params, ZendRouteMatch $routeMatch)
+    {
+        if ($routeMatch->getParam('id') !== null) {
+            if (!$params->has('id')) {
+                throw new \RuntimeException("Need 'id' property");
+            }
+
+            $hasRelationObject = false;
+
+            foreach ($params->getRelations() as $relation) {
+                /* @var \GeometriaLab\Model\Persistent\Relation\BelongsTo $relation */
+                if ($relation->getProperty()->getOriginProperty() == 'id') {
+                    $relationName = $relation->getProperty()->getName();
+                    if ($params->$relationName === null) {
+                        throw new ObjectNotFoundException();
+                    }
+                    $hasRelationObject = true;
+                    break;
+                }
+            }
+
+            if (!$hasRelationObject) {
+                throw new \RuntimeException('Need belongsTo relation with originProperty = id');
+            }
+        }
+
+        if (!$params->isValid()) {
+            $exception = new InvalidParamsException();
+            $exception->setParams($params);
+
+            throw $exception;
+        }
     }
 }

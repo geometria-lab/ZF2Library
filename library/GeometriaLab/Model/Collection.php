@@ -160,7 +160,7 @@ class Collection implements CollectionInterface
     /**
      * Get models by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function getByCallback($callback)
@@ -282,7 +282,7 @@ class Collection implements CollectionInterface
     /**
      * Remove models by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function removeByCallback($callback)
@@ -405,7 +405,7 @@ class Collection implements CollectionInterface
     /**
      * Sort collection by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function sortByCallback($callback)

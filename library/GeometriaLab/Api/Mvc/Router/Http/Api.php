@@ -93,7 +93,9 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $id = null;
         $subResource = null;
         $routeMatch = new ZendRouteMatch(array());
-        $method = $request->getMethod();
+
+        $method = $request->getQuery('_method', $request->getMethod());
+
         $uri  = $request->getUri();
         $path = trim($uri->getPath(), '/');
         $pathParts = explode('/', $path);
@@ -122,6 +124,11 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
                 $subResource = $pathParts[2];
             }
         }
+
+        if ($subResource !== null) {
+            $subResource = $this->prepareSubResource($subResource);
+        }
+
         $routeMatch->setParam('id', $id);
 
         // 3. Get namespace
@@ -174,6 +181,22 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
     }
 
     /**
+     * Prepare sub resource
+     *
+     * @param $subResource
+     * @return string
+     * @throws ZendDomainException
+     */
+    protected function prepareSubResource($subResource)
+    {
+        if (!preg_match('/^[\w][\w-]+$/', $subResource)) {
+            throw new ZendDomainException('Invalid sub resource name');
+        }
+
+        return str_replace(' ' , '', ucwords(str_replace('-', ' ', $subResource)));
+    }
+
+    /**
      * @param array $pathParts
      * @return null|string
      */
@@ -214,26 +237,26 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
             case 'get':
                 if (null !== $id) {
                     if (null !== $subResource) {
-                        $action = 'get' . ucfirst($subResource);
+                        $action = 'get' . $subResource;
                     } else {
                         $action = 'get';
                     }
                 } else {
                     if (null !== $subResource) {
-                        $action = 'get' . ucfirst($subResource) . 'List';
+                        $action = 'get' . $subResource . 'List';
                     } else {
                         $action = 'getList';
                     }
                 }
                 break;
             case 'post':
-                if (null !== $id) {
-                    throw new ZendDomainException('Post is allowed on resources only');
-                }
-                if (null !== $subResource) {
-                    $action = 'create' . ucfirst($subResource);
-                } else {
+                if (null === $subResource) {
+                    if (null !== $id) {
+                        throw new ZendDomainException('Post is allowed on resources only');
+                    }
                     $action = 'create';
+                } else {
+                    $action = lcfirst($subResource);
                 }
                 break;
             case 'put':

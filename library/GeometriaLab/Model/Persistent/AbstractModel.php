@@ -102,6 +102,41 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
     }
 
     /**
+     * Set property value and doesn't validate it
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return AbstractModel|ModelInterface
+     * @throws \InvalidArgumentException
+     */
+    public function setWithoutValidation($name, $value)
+    {
+        if ($this->hasRelation($name)) {
+            $relation = $this->getRelation($name);
+
+            if ($relation instanceof BelongsTo || $relation instanceof HasOne) {
+                $relation->setTargetModel($value);
+            } elseif ($relation instanceof HasMany) {
+                $relation->setTargetModels($value);
+            }
+        } else {
+            parent::setWithoutValidation($name, $value);
+
+            foreach ($this->getRelations() as $relation) {
+                // @todo If changed referenced key?
+                /**
+                 * @var BelongsTo $relation
+                 */
+                if ($relation instanceof BelongsTo && $relation->getProperty()->getOriginProperty() === $name) {
+                    $relation->resetTargetModel();
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Get relation
      *
      * @param string $name
@@ -335,22 +370,5 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
                 $this->set($name, $property->getDefaultValue());
             }
         }
-    }
-
-    /**
-     * Get properties for validation
-     *
-     * @return \GeometriaLab\Model\Schema\Property\PropertyInterface[]
-     */
-    public function getPropertiesForValidation()
-    {
-        $properties = array();
-        foreach(self::getSchema()->getProperties() as $property) {
-            if (!$property instanceof AbstractRelationProperty) {
-                $properties[] = $property;
-            }
-        }
-
-        return $properties;
     }
 }

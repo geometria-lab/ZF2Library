@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Model\Persistent\Relation;
 
-use GeometriaLab\Model\Persistent\ModelInterface,
+use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty;
 
 abstract class AbstractRelation
@@ -58,7 +58,7 @@ abstract class AbstractRelation
     }
 
     /**
-     * @return string
+     * @return ModelInterface
      */
     public function getOriginModel()
     {

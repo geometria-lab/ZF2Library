@@ -2,10 +2,12 @@
 
 namespace GeometriaLab\Model\Schema\Property;
 
-use GeometriaLab\Validator\IsType;
+use GeometriaLab\Validator\IsType,
+    GeometriaLab\Validator\ValidatorChain,
+    GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException;
 
 use Zend\Filter\FilterChain as ZendFilterChain,
-    Zend\Validator\ValidatorChain as ZendValidatorChain;
+    Zend\Validator\NotEmpty as ZendNotEmptyValidator;
 
 abstract class AbstractProperty implements PropertyInterface
 {
@@ -15,31 +17,32 @@ abstract class AbstractProperty implements PropertyInterface
      * @var string
      */
     protected $name;
-
     /**
      * Default value
      *
      * @var mixed
      */
     protected $defaultValue;
-
     /**
      * Required property
      *
      * @var boolean
      */
     protected $isRequired = false;
-
+    /**
+     * Allow empty value
+     *
+     * @var bool
+     */
+    protected $allowEmpty = false;
     /**
      * @var ZendFilterChain
      */
     protected $filterChain;
-
     /**
-     * @var ZendValidatorChain
+     * @var ValidatorChain
      */
     protected $validatorChain;
-
     /**
      * Type validators
      *
@@ -54,8 +57,8 @@ abstract class AbstractProperty implements PropertyInterface
      */
     public function __construct(array $options = array())
     {
-        $this->setup();
         $this->setOptions($options);
+        $this->setup();
     }
 
     /**
@@ -123,6 +126,35 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
+     * Set allow empty
+     *
+     * @param boolean $allowEmpty
+     * @return PropertyInterface
+     * @throws \RuntimeException
+     */
+    public function setAllowEmpty($allowEmpty)
+    {
+        if ($allowEmpty) {
+            $this->removeNotEmptyValidator();
+        } else {
+            $this->addNotEmptyValidator();
+        }
+        $this->allowEmpty = $allowEmpty;
+
+        return $this;
+    }
+
+    /**
+     * Is allow empty
+     *
+     * @return boolean
+     */
+    public function isAllowEmpty()
+    {
+        return $this->allowEmpty;
+    }
+
+    /**
      * Get default value
      *
      * @return mixed
@@ -169,10 +201,10 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
-     * @param ZendValidatorChain $validatorChain
+     * @param ValidatorChain $validatorChain
      * @return AbstractProperty
      */
-    public function setValidatorChain(ZendValidatorChain $validatorChain)
+    public function setValidatorChain(ValidatorChain $validatorChain)
     {
         $this->validatorChain = $validatorChain;
 
@@ -180,18 +212,44 @@ abstract class AbstractProperty implements PropertyInterface
     }
 
     /**
-     * @return ZendValidatorChain
+     * @return ValidatorChain
      */
     public function getValidatorChain()
     {
         if ($this->validatorChain === null) {
-            $this->validatorChain = new ZendValidatorChain();
+            $this->validatorChain = new ValidatorChain();
         }
 
         return $this->validatorChain;
     }
 
     /**
+     * Filter and validate value
+     *
+     * @param mixed $value
+     * @return mixed
+     * @throws InvalidValueException
+     */
+    public function filterAndValidate($value)
+    {
+        $value = $this->getFilterChain()->filter($value);
+
+        if (!$this->getValidatorChain()->isValid($value)) {
+            $errorMessages = $this->getValidatorChain()->getMessages();
+            $this->getValidatorChain()->cleanupMessages();
+
+            $exception = new InvalidValueException("Invalid value for property '{$this->getName()}'");
+            $exception->setValidationErrorMessages($errorMessages);
+
+            throw $exception;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Add validator by type
+     *
      * @param $type
      */
     protected function addTypeValidator($type)
@@ -200,7 +258,46 @@ abstract class AbstractProperty implements PropertyInterface
             static::$typeValidators[$type] = new IsType($type);
         }
 
-        $this->getValidatorChain()->addValidator(static::$typeValidators[$type]);
+        $this->getValidatorChain()->prependValidator(static::$typeValidators[$type], true);
+    }
+
+    /**
+     * Add not empty validator
+     *
+     * @param string|int $type
+     */
+    protected function addNotEmptyValidator($type = ZendNotEmptyValidator::ALL)
+    {
+        if (!($this->isRequired() && !$this->isAllowEmpty())) {
+            return;
+        }
+
+        $chain = $this->getValidatorChain();
+
+        foreach ($chain->getValidators() as $validatorData) {
+            if (isset($validatorData['instance']) && $validatorData['instance'] instanceof ZendNotEmptyValidator) {
+                return;
+            }
+        }
+
+        $validator = new ZendNotEmptyValidator();
+        $validator->setType($type);
+
+        $chain->prependValidator($validator, true);
+    }
+
+    /**
+     * Remove not empty validator
+     */
+    protected function removeNotEmptyValidator()
+    {
+        $chain = $this->getValidatorChain();
+
+        foreach ($chain->getValidators() as $index => $validatorData) {
+            if (isset($validatorData['instance']) && $validatorData['instance'] instanceof ZendNotEmptyValidator) {
+                $chain->removeValidatorByIndex($index);
+            }
+        }
     }
 
     /**

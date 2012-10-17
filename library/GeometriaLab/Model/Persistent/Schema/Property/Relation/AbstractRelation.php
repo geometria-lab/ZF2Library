@@ -65,7 +65,7 @@ abstract class AbstractRelation extends AbstractProperty implements PropertyInte
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getOriginProperty()
     {
@@ -78,16 +78,6 @@ abstract class AbstractRelation extends AbstractProperty implements PropertyInte
     public function getRelationClass()
     {
         return $this->relationClass;
-    }
-
-    /**
-     * @param bool $required
-     * @return \GeometriaLab\Model\Schema\Property\PropertyInterface|void
-     * @throws \RuntimeException
-     */
-    public function setRequired($required)
-    {
-        throw new \RuntimeException('Required is not supported for relations');
     }
 
     /**

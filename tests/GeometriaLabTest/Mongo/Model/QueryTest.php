@@ -56,20 +56,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->query->where(array('floatProperty' => 0.1, 'undefinedProperty' => 1));
     }
 
-    public function testWhereWithInvalidValue()
-    {
-        $this->setExpectedException('\InvalidArgumentException');
-
-        $this->query->where(array('floatProperty' => 'string'));
-    }
-
-    public function testWhereWithInvalidValueInside()
-    {
-        $this->setExpectedException('\InvalidArgumentException');
-
-        $this->query->where(array('integerProperty' => array('$in' => array('string', 2, 3))));
-    }
-
     public function testWhereWithNotImplementedOperators()
     {
         $this->setExpectedException('\InvalidArgumentException', 'Operator $or not implemented yet');

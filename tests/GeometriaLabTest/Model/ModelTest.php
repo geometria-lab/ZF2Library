@@ -37,7 +37,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testPopulateInvalidProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'booleanProperty':\r\nValue must be a boolean, string is present");
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
 
         $data = $this->getData();
         $data['booleanProperty'] = 'foo';
@@ -155,21 +155,51 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetInvalidValidationProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'emailProperty':\r\nThe input is not a valid email address. Use the basic format local-part@hostname");
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
         $this->model->emailProperty = 'invalid email';
+    }
+
+    public function testRequiredProperty()
+    {
+        $data = $this->getData();
+        unset($data['requiredProperty']);
+
+        $this->model->populate($data);
+
+        $this->assertFalse($this->model->isValid());
+
+        $errorMessage = $this->model->getErrorMessages();
+
+        $this->assertEquals($errorMessage, array('requiredProperty' => array('isRequired' => 'Value is required')));
+    }
+
+    public function testNotEmptyProperty()
+    {
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
+
+        $this->model->requiredProperty = '';
+    }
+
+    public function testEmptyProperty()
+    {
+        $this->model->emptyProperty = '';
+
+        $this->assertEquals($this->model->emptyProperty, '');
     }
 
     protected function getData()
     {
         return array(
-            'booleanProperty' => true,
-            'floatProperty'   => 3.4,
-            'integerProperty' => 10,
-            'stringProperty'  => 'test',
-            'subTest'         => new SubModel(array('id' => 1, 'title' => 'Hello')),
-            'arrayOfInteger'  => array(9, 10, 11, 12, 13),
-            'arrayOfString'   => array('string1', 'string2'),
-            'arrayOfSubTest'  => array(new SubModel(array('id' => 1, 'title' => 'Hello')), new SubModel(array('id' => 2, 'title' => 'Hello2')))
+            'booleanProperty'  => true,
+            'floatProperty'    => 3.4,
+            'integerProperty'  => 10,
+            'stringProperty'   => 'test',
+            'subTest'          => new SubModel(array('id' => 1, 'title' => 'Hello')),
+            'arrayOfInteger'   => array(9, 10, 11, 12, 13),
+            'arrayOfString'    => array('string1', 'string2'),
+            'arrayOfSubTest'   => array(new SubModel(array('id' => 1, 'title' => 'Hello')), new SubModel(array('id' => 2, 'title' => 'Hello2'))),
+            'emailProperty'    => 'email@example.com',
+            'requiredProperty' => 'test',
         );
     }
 }

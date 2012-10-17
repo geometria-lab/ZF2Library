@@ -18,5 +18,33 @@ class ModelPropertyTest extends \PHPUnit_Framework_TestCase
         $m = new ModelProperty();
         $m->setModelClass('stdClass');
     }
+
+    public function testSetAllowEmpty()
+    {
+        $model = new ModelProperty();
+        $model->setRequired(true);
+        $model->setAllowEmpty(false);
+
+        $validators = $model->getValidatorChain()->getValidators();
+
+        $this->assertInstanceOf('\Zend\Validator\NotEmpty', $validators[0]['instance']);
+    }
+
+    public function testRemoveAllowEmpty()
+    {
+        $model = new ModelProperty();
+        $model->setRequired(true);
+        $model->setAllowEmpty(false);
+
+        $validators = $model->getValidatorChain()->getValidators();
+
+        $this->assertInstanceOf('\Zend\Validator\NotEmpty', $validators[0]['instance']);
+
+        $model->setAllowEmpty(true);
+
+        foreach ($model->getValidatorChain()->getValidators() as $validator) {
+            $this->assertNotInstanceOf('\Zend\Validator\NotEmpty', $validator['instance']);
+        }
+    }
 }
 

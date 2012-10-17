@@ -66,7 +66,6 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                     'transactionId' => 123,
                 ),
             ),
-            'totalCount' => 1,
             'type' => 'Order',
         );
         $this->assertEquals($data, $actual);

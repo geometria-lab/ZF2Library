@@ -6,7 +6,6 @@ use GeometriaLab\Model\Schemaless\ModelInterface as SchemalessModelInterface;
 
 interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
 {
-
     /**
      * Add model or models to the end of a collection
      *
@@ -73,7 +72,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Get models by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function getByCallback($callback);
@@ -123,7 +122,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Remove models by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function removeByCallback($callback);
@@ -176,7 +175,7 @@ interface CollectionInterface extends \Iterator, \Countable, \ArrayAccess
     /**
      * Sort collection by callback
      *
-     * @param \callback $callback
+     * @param callable $callback
      * @return Collection
      */
     public function sortByCallback($callback);

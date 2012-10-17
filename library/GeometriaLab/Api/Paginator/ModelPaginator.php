@@ -50,6 +50,7 @@ class ModelPaginator implements \Countable
      * Set query
      *
      * @param QueryInterface $query
+     * @return ModelPaginator
      */
     public function setQuery(QueryInterface $query)
     {
@@ -60,6 +61,7 @@ class ModelPaginator implements \Countable
 
     /**
      * @param integer $limit
+     * @return ModelPaginator
      */
     public function setLimit($limit)
     {

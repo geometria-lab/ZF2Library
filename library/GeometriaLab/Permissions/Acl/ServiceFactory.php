@@ -5,16 +5,12 @@ namespace GeometriaLab\Permissions\Acl;
 use GeometriaLab\Api\Mvc\Router\Http\Api;
 
 use Zend\Stdlib\Glob as ZendGlob,
-    Zend\Mvc\MvcEvent as ZendMvcEvent,
 
     Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\ServiceManager\ServiceLocatorInterface as ZendServiceLocatorInterface,
 
     Zend\Permissions\Acl\Acl as ZendAcl,
-    Zend\Permissions\Acl\Role\GenericRole as ZendGenericRole,
-    Zend\Permissions\Acl\Resource\GenericResource as ZendGenericResource,
-    Zend\Permissions\Acl\Resource\ResourceInterface as ZendResource,
-    Zend\Permissions\Acl\Exception\InvalidArgumentException as ZendAclInvalidArgumentException;
+    Zend\Permissions\Acl\Role\GenericRole as ZendGenericRole;
 
 class ServiceFactory implements ZendFactoryInterface
 {

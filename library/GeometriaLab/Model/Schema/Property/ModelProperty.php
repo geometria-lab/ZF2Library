@@ -60,5 +60,6 @@ class ModelProperty extends AbstractProperty
 
         $validator = new Validator\Model($this);
         $this->getValidatorChain()->addValidator($validator);
+        $this->addNotEmptyValidator('object');
     }
 }

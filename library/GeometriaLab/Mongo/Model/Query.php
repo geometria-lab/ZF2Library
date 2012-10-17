@@ -4,11 +4,11 @@ namespace GeometriaLab\Mongo\Model;
 
 use GeometriaLab\Model\Persistent\Mapper\Query as AbstractQuery,
     GeometriaLab\Model\Persistent\Mapper\QueryInterface,
-    GeometriaLab\Model\Persistent\Mapper\MapperInterface,
     GeometriaLab\Model\Schema\Schema as ModelSchema,
     GeometriaLab\Model\Schema\Manager as SchemaManager,
     GeometriaLab\Model\Schema\Property\ArrayProperty,
-    GeometriaLab\Model\Schema\Property\ModelProperty;
+    GeometriaLab\Model\Schema\Property\ModelProperty,
+    GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException;
 
 class Query extends AbstractQuery
 {
@@ -125,6 +125,7 @@ class Query extends AbstractQuery
     protected function prepareModelFieldValue(ModelSchema $modelSchema, $fullField, $field, $value)
     {
         $hasDotNotation = strpos($field, '.') !== false;
+        $subFields = '';
 
         if ($hasDotNotation) {
             list($field, $subFields) = explode('.', $field, 2);
@@ -160,7 +161,7 @@ class Query extends AbstractQuery
                 } else {
                     throw new \InvalidArgumentException("Invalid field '$fullField' not present in model!");
                 }
-            } else if ($property instanceof ModelProperty) {
+            } elseif ($property instanceof ModelProperty) {
                 $className = $property->getModelClass();
                 $schema = $className::getSchema();
 
@@ -172,19 +173,18 @@ class Query extends AbstractQuery
             if ($property->getItemProperty() === null) {
                 return $value;
             }
-
             $property = $property->getItemProperty();
         }
 
+        // @todo Validate or not?
+        /*
         try {
             $value = $property->getFilterChain()->filter($value);
-
-            if (!$property->getValidatorChain()->isValid($value)) {
-                throw new \InvalidArgumentException("Invalid property '$field' value: " . implode("\r\n", $property->getValidatorChain()->getMessages()));
-            }
-        } catch (\InvalidArgumentException $e) {
+            $value = $property->validate($value);
+        } catch (InvalidValueException $e) {
             throw new \InvalidArgumentException("Invalid value for field '$field': " . $e->getMessage());
         }
+        */
 
         return $value;
     }

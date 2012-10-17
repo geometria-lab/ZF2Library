@@ -9,11 +9,7 @@
 
 namespace GeometriaLab\Api\Stdlib\Extractor;
 
-use Zend\Stdlib\Hydrator\HydratorInterface as ZendHydratorInterface,
-    Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
-
-use GeometriaLab\Api\Stdlib\Extractor\Schema,
-    GeometriaLab\Api\Exception\InvalidFieldsException;
+use GeometriaLab\Api\Stdlib\Extractor\Schema;
 
 abstract class Extractor
 {
@@ -62,8 +58,6 @@ abstract class Extractor
      * @param  object $object
      * @param  array $fields
      * @return array
-     * @throws InvalidFieldsException
-     * @throws ZendBadMethodCallException
      */
     public function extract($object, $fields = array())
     {

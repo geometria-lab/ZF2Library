@@ -6,7 +6,9 @@ class IntegerProperty extends AbstractProperty
 {
     protected function setup()
     {
-        $this->addTypeValidator('integer');
+        $type = 'integer';
+        $this->addTypeValidator($type);
+        $this->addNotEmptyValidator($type);
 
         $this->getFilterChain()->attach(function ($value) {
             $filteredValue = (int)$value;

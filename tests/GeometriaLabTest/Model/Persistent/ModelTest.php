@@ -36,14 +36,14 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetNotExists()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Property \'bar\' not present in model');
+        $this->setExpectedException('\InvalidArgumentException', 'Property \'bar\' does not exists');
         $model = new TestModels\Model();
         $model->set('bar', 'baz');
     }
 
     public function testSetInvalidProperty()
     {
-        $this->setExpectedException('\InvalidArgumentException', "Invalid property 'id':\r\nValue must be a integer, string is present");
+        $this->setExpectedException('GeometriaLab\Model\Schema\Property\Validator\Exception\InvalidValueException');
         $model = new TestModels\Model();
         $model->set('id', 'foo');
     }

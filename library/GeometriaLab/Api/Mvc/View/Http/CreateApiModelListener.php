@@ -4,16 +4,19 @@ namespace GeometriaLab\Api\Mvc\View\Http;
 
 use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Model\CollectionInterface,
+    GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Api\Mvc\View\Model\ApiModel,
     GeometriaLab\Api\Paginator\ModelPaginator,
     GeometriaLab\Api\Exception\InvalidFieldsException,
-    GeometriaLab\Api\Mvc\Controller\Action\Params\Params,
+    GeometriaLab\Api\Mvc\Controller\Action\Params\AbstractParams,
     GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\IntegerProperty as ParamsIntegerProperty;
 
 use Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Mvc\View\Http\InjectViewModelListener as ZendInjectViewModelListener,
     Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
-    Zend\EventManager\EventManagerInterface as ZendEvents;
+    Zend\EventManager\EventManagerInterface as ZendEvents,
+    Zend\Validator\LessThan as ZendLessThanValidator,
+    Zend\Validator\GreaterThan as ZendGreaterThanValidator;
 
 class CreateApiModelListener implements ZendListenerAggregateInterface
 {
@@ -116,6 +119,7 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
      *
      * @param ZendMvcEvent $e
      * @throws \RuntimeException
+     * @throws InvalidFieldsException
      */
     public function extractData(ZendMvcEvent $e)
     {
@@ -224,21 +228,35 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
 
     /**
      * @param ModelPaginator $paginator
-     * @param Params $params
+     * @param AbstractParams $params
      * @throws \RuntimeException
      */
-    protected function populatePaginatorFromParams(ModelPaginator $paginator, Params $params)
+    protected function populatePaginatorFromParams(ModelPaginator $paginator, AbstractParams $params)
     {
         $paramsSchema = $params::getSchema();
 
-        // Validate limit
-        if ($paramsSchema->hasProperty('limit')) {
+        $this->checkLimitProperty($paramsSchema);
+        $this->checkOffsetProperty($paramsSchema);
+
+        $paginator->setLimit($params->get('limit'));
+        $paginator->setOffset($params->get('offset'));
+    }
+
+    /**
+     * Check limit property
+     *
+     * @param SchemaInterface $paramsSchema
+     * @throws \RuntimeException
+     */
+    protected function checkLimitProperty(SchemaInterface $paramsSchema)
+    {
+        if (!$paramsSchema->hasProperty('limit')) {
             throw new \RuntimeException('Limit must be present in params');
         }
 
         $limitProperty = $paramsSchema->getProperty('limit');
 
-        if ($limitProperty instanceof ParamsIntegerProperty) {
+        if (!$limitProperty instanceof ParamsIntegerProperty) {
             throw new \RuntimeException('Limit property must be integer');
         }
 
@@ -246,18 +264,64 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             throw new \RuntimeException('Limit property must have default value');
         }
 
-        // @todo Check validator 1 >= n >= 100
+        $max = 0;
+        $min = 0;
+        $hasLessThanValidator = false;
+        $hasGreaterThanValidator = false;
+        $validators = $limitProperty->getValidatorChain()->getValidators();
 
-        // Validate offset
-        if ($paramsSchema->hasProperty('offset')) {
+        foreach ($validators as $validator) {
+            $validatorInstance = $validator['instance'];
+            if ($validatorInstance instanceof ZendLessThanValidator) {
+                /* @var ZendLessThanValidator $validatorInstance */
+                $hasLessThanValidator = true;
+                $max = $validatorInstance->getMax();
+
+                if (!$validatorInstance->getInclusive()) {
+                    $max--;
+                }
+            } elseif ($validatorInstance instanceof ZendGreaterThanValidator) {
+                /* @var ZendGreaterThanValidator $validatorInstance */
+                $hasGreaterThanValidator = true;
+                $min = $validatorInstance->getMin();
+
+                if (!$validatorInstance->getInclusive()) {
+                    $min++;
+                }
+            }
+        }
+
+        if (!$hasLessThanValidator) {
+            throw new \RuntimeException("Limit property must have 'LessThan' validator");
+        }
+
+        if (!$hasGreaterThanValidator) {
+            throw new \RuntimeException("Limit property must have 'GreaterThan' validator");
+        }
+
+        if ($limitProperty->getDefaultValue() < 1 || $min < 1) {
+            throw new \RuntimeException("Limit property must be greater or equal then 1");
+        }
+
+        if ($limitProperty->getDefaultValue() > 100 || $max > 100) {
+            throw new \RuntimeException("Limit property must be less or equal then 100");
+        }
+    }
+
+    /**
+     * Check offset property
+     *
+     * @param SchemaInterface $paramsSchema
+     * @throws \RuntimeException
+     */
+    protected function checkOffsetProperty(SchemaInterface $paramsSchema)
+    {
+        if (!$paramsSchema->hasProperty('offset')) {
             throw new \RuntimeException('Offset must be present in params');
         }
 
-        if ($paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
+        if (!$paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
             throw new \RuntimeException('Offset must be integer');
         }
-
-        $paginator->setLimit($params->get('limit'));
-        $paginator->setOffset($params->get('offset'));
     }
 }

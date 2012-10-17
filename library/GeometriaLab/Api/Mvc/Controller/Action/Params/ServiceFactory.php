@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: max
- * Date: 30.07.12
- * Time: 16:15
- * To change this template use File | Settings | File Templates.
- */
 
 namespace GeometriaLab\Api\Mvc\Controller\Action\Params;
 
@@ -22,7 +15,7 @@ class ServiceFactory implements ZendFactoryInterface
 
     /**
      * @param ZendServiceLocatorInterface $serviceLocator
-     * @return Params
+     * @return AbstractParams
      * @throws \InvalidArgumentException
      */
     public function createService(ZendServiceLocatorInterface $serviceLocator)
@@ -56,7 +49,7 @@ class ServiceFactory implements ZendFactoryInterface
 
     /**
      * @param ZendRouteMatch $routeMatch
-     * @return Params
+     * @return AbstractParams
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */

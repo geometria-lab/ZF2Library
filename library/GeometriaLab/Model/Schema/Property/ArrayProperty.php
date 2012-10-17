@@ -49,5 +49,7 @@ class ArrayProperty extends AbstractProperty
 
         $validator = new Validator\ArrayItem($this);
         $this->getValidatorChain()->addValidator($validator);
+
+        $this->addNotEmptyValidator('array');
     }
 }

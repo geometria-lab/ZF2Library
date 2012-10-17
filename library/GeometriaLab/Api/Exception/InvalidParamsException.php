@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Api\Exception;
 
-use GeometriaLab\Api\Mvc\Controller\Action\Params\Params;
+use GeometriaLab\Api\Mvc\Controller\Action\Params\AbstractParams;
 
 /**
  *
@@ -23,7 +23,7 @@ class InvalidParamsException extends AbstractException
     protected $httpCode = 400;
 
     /**
-     * @var Params
+     * @var AbstractParams
      */
     protected $params;
 
@@ -58,10 +58,10 @@ class InvalidParamsException extends AbstractException
     /**
      * Set params object
      *
-     * @param Params $params
+     * @param AbstractParams $params
      * @return InvalidParamsException
      */
-    public function setParams(Params $params)
+    public function setParams(AbstractParams $params)
     {
         $this->params = $params;
         return $this;
@@ -70,7 +70,7 @@ class InvalidParamsException extends AbstractException
     /**
      * Get params object
      *
-     * @return Params|null
+     * @return AbstractParams|null
      */
     public function getParams()
     {
