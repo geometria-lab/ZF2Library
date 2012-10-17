@@ -109,7 +109,7 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
      * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
-    public function setWithNoValidation($name, $value)
+    public function setWithoutValidation($name, $value)
     {
         if ($this->hasRelation($name)) {
             $relation = $this->getRelation($name);
@@ -120,7 +120,7 @@ abstract class AbstractModel extends \GeometriaLab\Model\AbstractModel implement
                 $relation->setTargetModels($value);
             }
         } else {
-            parent::setWithNoValidation($name, $value);
+            parent::setWithoutValidation($name, $value);
 
             foreach ($this->getRelations() as $relation) {
                 // @todo If changed referenced key?

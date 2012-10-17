@@ -28,7 +28,7 @@ interface ModelInterface extends Schemaless\ModelInterface
      * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
-    public function setWithNoValidation($name, $value);
+    public function setWithoutValidation($name, $value);
 
     /**
      * Populate model from array or iterable object and doesn't validate it
@@ -37,7 +37,7 @@ interface ModelInterface extends Schemaless\ModelInterface
      * @return AbstractModel
      * @throws \InvalidArgumentException
      */
-    public function populateWithNoValidation($data);
+    public function populateWithoutValidation($data);
 
     /**
      * Create model schema

@@ -56,14 +56,14 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      * @return AbstractModel
      * @throws \InvalidArgumentException
      */
-    public function populateWithNoValidation($data)
+    public function populateWithoutValidation($data)
     {
         if (!is_array($data) && !$data instanceof \Traversable && !$data instanceof \stdClass) {
             throw new \InvalidArgumentException("Can't populate data. Must be array or iterated object.");
         }
 
         foreach ($data as $key => $value) {
-            $this->setWithNoValidation($key, $value);
+            $this->setWithoutValidation($key, $value);
         }
 
         return $this;
@@ -97,7 +97,7 @@ abstract class AbstractModel extends Schemaless\Model implements ModelInterface
      * @return AbstractModel|ModelInterface
      * @throws \InvalidArgumentException
      */
-    public function setWithNoValidation($name, $value)
+    public function setWithoutValidation($name, $value)
     {
         if ($value !== null) {
             $value = static::getSchema()->getProperty($name)->getFilterChain()->filter($value);

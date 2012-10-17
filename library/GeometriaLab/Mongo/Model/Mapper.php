@@ -189,7 +189,7 @@ class Mapper extends AbstractMapper
             if ($this->getValidateOnFetch()) {
                 $model->populate($data);
             } else {
-                $model->populateWithNoValidation($data);
+                $model->populateWithoutValidation($data);
             }
 
             $model->markClean();
