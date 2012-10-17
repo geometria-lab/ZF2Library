@@ -2,9 +2,6 @@
 
 namespace GeometriaLab\Model\Persistent\Mapper;
 
-use \GeometriaLab\Model\ModelInterface,
-    \GeometriaLab\Api\Paginator\ModelPaginator;
-
 abstract class AbstractMapper implements MapperInterface
 {
     /**
