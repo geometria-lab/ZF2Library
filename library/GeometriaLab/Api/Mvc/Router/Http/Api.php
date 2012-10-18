@@ -95,6 +95,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $routeMatch = new ZendRouteMatch(array());
 
         $method = $request->getQuery('_method', $request->getMethod());
+        // @TODO And get method from X-Http-Method-Override
 
         $uri  = $request->getUri();
         $path = trim($uri->getPath(), '/');
