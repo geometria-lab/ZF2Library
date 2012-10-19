@@ -51,6 +51,7 @@ class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwar
     public function attach(ZendEventManagerInterface $events)
     {
         // Detach default listeners
+        /* @var \Zend\EventManager\EventManager $eventManager */
         $eventManager = $this->serviceManager->get('Application')->getEventManager();
         /* @var \Zend\Mvc\View\Http\ViewManager $viewManager */
         $viewManager = $this->serviceManager->get('ViewManager');
@@ -65,7 +66,6 @@ class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwar
             $this->defaultListeners[$event] = $sharedEvents->getListeners('Zend\Stdlib\DispatchableInterface', $event);
         }
         $sharedEvents->clearListeners('Zend\Stdlib\DispatchableInterface');
-
 
         // Attach Mvc listeners
         $this->listeners[] = new ZendModuleRouteListener();
