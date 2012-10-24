@@ -82,19 +82,20 @@ class Listener implements ZendListenerAggregateInterface
      */
     protected function getParamsFromRequest(ZendRequest $request)
     {
-        $queryParams = $request->getQuery()->toArray();
+        $params = array_merge(
+            $request->getQuery()->toArray(),
+            $request->getPost()->toArray()
+        );
 
-        unset($queryParams['q']);
-
-        foreach ($queryParams as $key => $value) {
+        foreach ($params as $key => $value) {
             if ($key[0] == '_') {
-                unset($queryParams[$key]);
+                unset($params[$key]);
             }
         }
 
-        $postParams = $request->getPost()->toArray();
+        unset($params['access_token']);
 
-        return array_merge($postParams, $queryParams);
+        return $params;
     }
 
     /**
