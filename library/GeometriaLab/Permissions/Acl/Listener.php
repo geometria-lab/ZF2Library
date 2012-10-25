@@ -2,6 +2,8 @@
 
 namespace GeometriaLab\Permissions\Acl;
 
+use Application\Model\Guest;
+
 use Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
     Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
@@ -52,6 +54,7 @@ class Listener implements ZendListenerAggregateInterface
         /* @var \Application\Service\UserService $userService */
         $userService = $serviceManager->get('UserService');
         $currentUser = $userService->getCurrent();
+
         // @TODO Get current user's role
         if (!$acl->isAllowed('moderator', $controller, $action)) {
             //throw new AccessDeniedException();
