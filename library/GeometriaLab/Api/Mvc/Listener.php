@@ -71,7 +71,7 @@ class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwar
         // Attach Mvc listeners
         $this->listeners[] = new ZendModuleRouteListener();
         $this->listeners[] = new RenderStrategy($this->serviceManager);
-        $this->listeners[] = new AclListener($this->serviceManager);
+        $this->listeners[] = new AclListener();
         $this->listeners[] = new ParamsListener();
         $this->listeners[] = new CreateApiModelListener();
         $this->listeners[] = new HandleExceptionStrategy();

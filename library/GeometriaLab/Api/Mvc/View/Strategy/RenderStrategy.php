@@ -91,7 +91,7 @@ class RenderStrategy implements ZendListenerAggregateInterface, ZendServiceManag
      */
     public function validateFormat(ZendMvcEvent $e)
     {
-        $config = $this->serviceManager->get('Config');
+        $config = $e->getApplication()->getServiceManager()->get('Config');
 
         if (!isset($config['view_render_strategy'])) {
             throw new \InvalidArgumentException('Need "view_render_strategy" param in config');

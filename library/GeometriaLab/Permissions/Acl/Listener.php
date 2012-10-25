@@ -4,33 +4,17 @@ namespace GeometriaLab\Permissions\Acl;
 
 use Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
-    Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
-    Zend\ServiceManager\ServiceManager as ZendServiceManager,
-    Zend\ServiceManager\ServiceManagerAwareInterface as ZendServiceManagerAwareInterface;
+    Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface;
 
-class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwareInterface
+class Listener implements ZendListenerAggregateInterface
 {
     /**
      * @var \Zend\Stdlib\CallbackHandler[]
      */
     protected $listeners = array();
-    /**
-     * Service Manager
-     *
-     * @var ZendServiceManager
-     */
-    protected $serviceManager;
 
     /**
-     * @param ZendServiceManager $serviceManager
-     */
-    public function __construct(ZendServiceManager $serviceManager)
-    {
-        $this->setServiceManager($serviceManager);
-    }
-
-    /**
-     * @param \Zend\EventManager\EventManagerInterface $events
+     * @param ZendEventManagerInterface $events
      * @param int $priority
      */
     public function attach(ZendEventManagerInterface $events, $priority = 1)
@@ -49,16 +33,6 @@ class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwar
                 unset($this->listeners[$index]);
             }
         }
-    }
-
-    /**
-     * Set serviceManager
-     *
-     * @param \Zend\ServiceManager\ServiceManager $serviceManager
-     */
-    public function setServiceManager(ZendServiceManager $serviceManager)
-    {
-        $this->serviceManager = $serviceManager;
     }
 
     /**
