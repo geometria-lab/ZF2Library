@@ -19,5 +19,5 @@ class UnauthorizedException extends \GeometriaLab\Api\Exception\AbstractExceptio
     /**
      * @var array
      */
-    protected $data = array('error' => 'invalid_grant');
+    protected $data = 'invalid_grant';
 }

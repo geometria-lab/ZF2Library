@@ -19,5 +19,5 @@ class UnauthenticatedException extends \GeometriaLab\Api\Exception\AbstractExcep
     /**
      * @var array
      */
-    protected $data = array('error' => 'invalid_scope');
+    protected $data = 'invalid_scope';
 }
