@@ -26,9 +26,9 @@ class Query implements QueryInterface
     /**
      * Where
      *
-     * @var array|null
+     * @var array
      */
-    protected $where;
+    protected $where = array();
 
     /**
      * Sort
@@ -150,7 +150,7 @@ class Query implements QueryInterface
                 $conditions[$field] = $this->prepareFieldValue($field, $value);
             }
 
-            if ($this->where === null) {
+            if (empty($this->where)) {
                 $this->where = $conditions;
             } else {
                 $this->where = array_merge($this->where, $conditions);
@@ -163,7 +163,7 @@ class Query implements QueryInterface
     /**
      * Get where
      *
-     * @return array|null
+     * @return array
      */
     public function getWhere()
     {
@@ -177,7 +177,7 @@ class Query implements QueryInterface
      */
     public function hasWhere()
     {
-        return $this->where !== null;
+        return !empty($this->where);
     }
 
     /**
@@ -187,7 +187,7 @@ class Query implements QueryInterface
      */
     public function resetWhere()
     {
-        $this->where = null;
+        $this->where = array();
 
         return $this;
     }
