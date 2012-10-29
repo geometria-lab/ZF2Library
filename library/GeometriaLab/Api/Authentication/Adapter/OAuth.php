@@ -27,15 +27,6 @@ class OAuth implements ZendAdapterInterface
      * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-06#section-2.3
      */
     const TOKEN_PARAM_NAME = 'access_token';
-    /**
-     * The request is missing a required parameter, includes an unsupported
-     * parameter or parameter value, or is otherwise malformed.
-     *
-     * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-20#section-4.1.2.1
-     * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-20#section-4.2.2.1
-     * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-20#section-5.2
-     */
-    const ERROR_INVALID_REQUEST = 'invalid_request';
 
     /**
      * Access token
@@ -164,10 +155,6 @@ class OAuth implements ZendAdapterInterface
         if ($token !== null) {
             $tokens[] = $token;
         }
-
-        /*if (count($tokens) > 1) {
-            throw new OAuth2AuthenticateException(self::HTTP_BAD_REQUEST, 'bearer', 'Service', self::ERROR_INVALID_REQUEST, 'Only one method may be used to authenticate at a time (Auth header, GET or POST).');
-        }*/
 
         if (count($tokens) < 1) {
             return null;
