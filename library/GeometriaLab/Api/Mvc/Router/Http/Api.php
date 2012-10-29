@@ -86,6 +86,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      */
     public function match(ZendRequestInterface $request, $pathOffset = null)
     {
+        /* @var \Zend\Http\PhpEnvironment\Request $request */
         if (!method_exists($request, 'getUri')) {
             return null;
         }
@@ -94,7 +95,11 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
         $subResource = null;
         $routeMatch = new ZendRouteMatch(array());
 
-        $method = $request->getQuery('_method', $request->getMethod());
+        if ($request->getHeaders()->has('X-HTTP-METHOD-OVERRIDE')) {
+            $method = $request->getHeaders()->get('X-HTTP-METHOD-OVERRIDE')->getFieldValue();
+        } else {
+            $method = $request->getQuery('_method', $request->getMethod());
+        }
 
         $uri  = $request->getUri();
         $path = trim($uri->getPath(), '/');
