@@ -25,8 +25,24 @@ class User extends Extractor
                     }
                 )
             ),
+            'about' => array(
+                'source' => 'about',
+                'filters' => array(
+                    array(
+                        'name' => 'StringTrim',
+                        'options' => array(
+                            'charlist' => 'Futurama',
+                        ),
+                    ),
+                )
+            ),
             'order' => array(
                 'source' => 'order',
+            ),
+            'callable' => array(
+                'source' => function($object) {
+                    return 'Foo';
+                },
             ),
         ));
     }
