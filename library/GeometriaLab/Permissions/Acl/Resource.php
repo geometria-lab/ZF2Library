@@ -11,15 +11,23 @@ use Zend\Permissions\Acl\Acl as ZendAcl,
 abstract class Resource extends ZendResource implements ZendAssertionInterface
 {
     /**
+     * Define roles hear
+     *
      * @param ZendAcl $acl
      */
-    public function createRoles(ZendAcl $acl) { }
+    abstract public function createRoles(ZendAcl $acl);
+
     /**
+     * Define rules hear
+     *
      * @abstract
      * @param ZendAcl $acl
      */
     abstract public function createRules(ZendAcl $acl);
+
     /**
+     * Dynamic assertion
+     *
      * @param ZendAcl $acl
      * @param ZendRoleInterface $role
      * @param ZendResourceInterface $resource
@@ -33,7 +41,7 @@ abstract class Resource extends ZendResource implements ZendAssertionInterface
             return false;
         }
 
-        $methodName = "assert{$privilege}";
+        $methodName = 'assert' . ucfirst($privilege);
         if (!method_exists($this, $methodName)) {
             throw new \InvalidArgumentException('Invalid dynamic assert - need declare ' . get_class($this) . '->' . $methodName);
         }
