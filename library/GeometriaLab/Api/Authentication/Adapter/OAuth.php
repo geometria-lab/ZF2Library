@@ -139,28 +139,22 @@ class OAuth implements ZendAdapterInterface
      */
     public static function getBearerToken(ZendRequest $request)
     {
-        $tokens = array();
-
         $token = self::getBearerTokenFromHeaders($request);
         if ($token !== null) {
-            $tokens[] = $token;
+            return $token;
         }
 
         $token = self::getBearerTokenFromPost($request);
         if ($token !== null) {
-            $tokens[] = $token;
+            return $token;
         }
 
         $token = self::getBearerTokenFromQuery($request);
         if ($token !== null) {
-            $tokens[] = $token;
+            return $token;
         }
 
-        if (count($tokens) < 1) {
-            return null;
-        }
-
-        return reset($tokens);
+        return null;
     }
 
     /**
