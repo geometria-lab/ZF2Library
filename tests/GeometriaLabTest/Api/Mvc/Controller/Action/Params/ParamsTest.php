@@ -2,6 +2,8 @@
 
 namespace GeometriaLabTest\Api\Mvc\Controller\Action\Params;
 
+use GeometriaLabTest\Api\Mvc\Controller\Action\Params\TestModel\TestModel;
+
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\ArrayProperty as ParamsArrayProperty,
     GeometriaLab\Api\Mvc\Controller\Action\Params\Listener as ParamsListener,
     GeometriaLab\Model\Schema\Property\ModelProperty;
@@ -17,6 +19,10 @@ use Zend\Config\Config as ZendConfig,
 class ParamsTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var TestModel
+     */
+    static $model;
+    /**
      * @var ZendServiceManager
      */
     static private $sm;
@@ -24,6 +30,15 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
      * @var ZendMvcEvent
      */
     static private $event;
+
+    static public function setUpBeforeClass()
+    {
+        static::$model = new TestModel(array(
+            'id'                => '1',
+            'stringProperty'    => 'Foo',
+        ));
+        static::$model->save();
+    }
 
     public function setUp()
     {
@@ -44,16 +59,16 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
                     'HttpRouter'              => 'Zend\Mvc\Service\RouterFactory',
                     'Params'                  => 'GeometriaLab\Api\Mvc\Controller\Action\Params\ServiceFactory',
                     'Config'                  => function($sm) {
-                        return new ZendConfig(array(
+                        return array(
                             'params' => array(
                                 '__NAMESPACE__' => '\GeometriaLabTest\Api\Mvc\Controller\Action\Params',
                             ),
-                        ));
+                        );
                     },
                 ),
                 'aliases' => array(
-                    'Router'                 => 'HttpRouter',
-                    'Configuration'          => 'Config',
+                    'Router'        => 'HttpRouter',
+                    'Configuration' => 'Config',
                 ),
             ))
         );
@@ -77,17 +92,21 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         $application->getMvcEvent()->setRouteMatch($routeMatch);
     }
 
+    static public function tearDownAfterClass()
+    {
+        TestModel::getMapper()->deleteByQuery(TestModel::getMapper()->createQuery());
+    }
+
     public function testCreateParams()
     {
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => 'Phillip',
             'email' => 'fry@example.com',
             'float' => '12.3',
             'array' => array('foo', '123'),
             'bool' => true
         )));
-
         
         $params = new ParamsListener();
         $params->createParams(static::$event);
@@ -100,12 +119,14 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\GeometriaLabTest\Api\Mvc\Controller\Action\Params\Sample\Test', $params);
 
         $this->assertEquals(array(
-                'id' => 1,
+                'id' => '1',
                 'array' => array('foo', '123'),
                 'float' => '12.3',
                 'bool' => true,
                 'name' => 'Phillip',
                 'email' => 'fry@example.com',
+                'defaultProperty' => 'Bar',
+                'relationModel' => static::$model,
             ),
             $params->toArray()
         );
@@ -113,8 +134,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testNotFilterProperty()
     {
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => ' Phillip ',
             'email' => 'Fry@Example.com',
             'float' => '12.3',
@@ -129,12 +150,14 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         $params = static::$event->getrouteMatch()->getParam('params');
 
         $this->assertEquals(array(
-                'id' => 1,
+                'id' => '1',
                 'array' => array('foo', '123'),
                 'float' => '12.3',
                 'bool' => true,
                 'name' => 'Phillip',
                 'email' => 'fry@example.com',
+                'defaultProperty' => 'Bar',
+                'relationModel' => static::$model,
             ),
             $params->toArray()
         );
@@ -144,8 +167,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
 
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => 'Phillip',
             'email' => 'Fry@example.com',
             'float' => '12.3',
@@ -161,8 +184,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
 
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => 'Phillip',
             'email' => 'Fry@example.com',
             'float' => '12.3',
@@ -179,8 +202,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
 
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => 'Phillip',
             'email' => 'Fry@example.com',
             'float' => '12.3',
@@ -196,10 +219,59 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('GeometriaLab\Api\Exception\InvalidParamsException');
 
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => 'Phillip',
             'email' => 'Bad email',
+            'float' => '12.3',
+            'array' => array('foo', '123'),
+            'bool' => true,
+        )));
+
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
+    }
+
+    public function testUnsetSpecialParams()
+    {
+        static::$event->getRouteMatch()->setParam('id', '1');
+        static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
+            'name' => ' Phillip ',
+            'email' => 'Fry@Example.com',
+            'float' => '12.3',
+            'array' => array('foo', '123'),
+            'bool' => true,
+            '_method' => 'get',
+        )));
+
+        $params = new ParamsListener();
+        $params->createParams(static::$event);
+
+        /* @var Sample\Test $params */
+        $params = static::$event->getrouteMatch()->getParam('params');
+
+        $this->assertEquals(array(
+                'id' => '1',
+                'array' => array('foo', '123'),
+                'float' => '12.3',
+                'bool' => true,
+                'name' => 'Phillip',
+                'email' => 'fry@example.com',
+                'defaultProperty' => 'Bar',
+                'relationModel' => static::$model,
+            ),
+            $params->toArray()
+        );
+    }
+
+    public function testBadId()
+    {
+        $this->setExpectedException('GeometriaLab\Api\Exception\ObjectNotFoundException');
+
+        static::$event->getRouteMatch()->setParam('id', '2');
+        static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
+            'name' => ' Phillip ',
+            'email' => 'Fry@Example.com',
             'float' => '12.3',
             'array' => array('foo', '123'),
             'bool' => true,
@@ -213,8 +285,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\RuntimeException', "Property 'modelProperty' must implement 'GeometriaLab\\Api\\Mvc\\Controller\\Action\\Params\\Schema\\Property\\PropertyInterface' interface, but 'GeometriaLab\\Model\\Schema\\Property\\PropertyInterface");
 
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => ' Phillip ',
             'email' => 'Fry@Example.com',
             'float' => '12.3',
@@ -236,8 +308,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\RuntimeException', "Item of array property must be an instance of \\GeometriaLab\\Api\\Mvc\\Controller\\Action\\Params\\Schema\\Property\\PropertyInterface");
 
+        static::$event->getRouteMatch()->setParam('id', '1');
         static::$event->getRequest()->setQuery(new \Zend\Stdlib\Parameters(array(
-            'id' => 1,
             'name' => ' Phillip ',
             'email' => 'Fry@Example.com',
             'float' => '12.3',
@@ -257,6 +329,5 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
         ));
 
         $params->getSchema()->addProperty($arrayProperty);
-
     }
 }
