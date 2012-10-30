@@ -5,8 +5,7 @@ namespace GeometriaLab\Api\Mvc;
 use GeometriaLab\Api\Mvc\Controller\Action\Params\Listener as ParamsListener,
     GeometriaLab\Api\Mvc\View\Http\CreateApiModelListener,
     GeometriaLab\Api\Mvc\View\Http\HandleExceptionStrategy,
-    GeometriaLab\Api\Mvc\View\Strategy\RenderStrategy,
-    GeometriaLab\Permissions\Acl\Listener as AclListener;
+    GeometriaLab\Api\Mvc\View\Strategy\RenderStrategy;
 
 use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEventManagerInterface,
@@ -71,7 +70,6 @@ class Listener implements ZendListenerAggregateInterface, ZendServiceManagerAwar
         // Attach Mvc listeners
         $this->listeners[] = new ZendModuleRouteListener();
         $this->listeners[] = new RenderStrategy($this->serviceManager);
-        $this->listeners[] = new AclListener();
         $this->listeners[] = new ParamsListener();
         $this->listeners[] = new CreateApiModelListener();
         $this->listeners[] = new HandleExceptionStrategy();
