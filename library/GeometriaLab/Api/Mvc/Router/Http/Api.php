@@ -5,14 +5,15 @@ namespace GeometriaLab\Api\Mvc\Router\Http;
 use Zend\Stdlib\ArrayUtils as ZendArrayUtils,
     Zend\Stdlib\RequestInterface as ZendRequestInterface,
     Zend\Mvc\Router\Exception as ZendRouterException,
-    Zend\Mvc\Router\Http\RouteMatch as ZendRouteMatch,
     Zend\Mvc\Router\Exception\RuntimeException as ZendRuntimeException,
+    Zend\Mvc\Router\Http\RouteMatch as ZendRouteMatch,
+    Zend\Mvc\Router\Http\RouteInterface as ZendRouteInterface,
     Zend\Mvc\Exception\DomainException as ZendDomainException;
 
 /**
  *
  */
-class Api implements \Zend\Mvc\Router\Http\RouteInterface
+class Api implements ZendRouteInterface
 {
     const API_MODULE_DIR = 'Api';
 
