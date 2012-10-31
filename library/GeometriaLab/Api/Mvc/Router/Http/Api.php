@@ -2,17 +2,19 @@
 
 namespace GeometriaLab\Api\Mvc\Router\Http;
 
+use GeometriaLab\Api\Exception\BadRequestException;
+
 use Zend\Stdlib\ArrayUtils as ZendArrayUtils,
     Zend\Stdlib\RequestInterface as ZendRequestInterface,
     Zend\Mvc\Router\Exception as ZendRouterException,
-    Zend\Mvc\Router\Http\RouteMatch as ZendRouteMatch,
     Zend\Mvc\Router\Exception\RuntimeException as ZendRuntimeException,
-    Zend\Mvc\Exception\DomainException as ZendDomainException;
+    Zend\Mvc\Router\Http\RouteMatch as ZendRouteMatch,
+    Zend\Mvc\Router\Http\RouteInterface as ZendRouteInterface;
 
 /**
  *
  */
-class Api implements \Zend\Mvc\Router\Http\RouteInterface
+class Api implements ZendRouteInterface
 {
     const API_MODULE_DIR = 'Api';
 
@@ -190,12 +192,12 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      *
      * @param $subResource
      * @return string
-     * @throws ZendDomainException
+     * @throws BadRequestException
      */
     protected function prepareSubResource($subResource)
     {
         if (!preg_match('/^[\w][\w-]+$/', $subResource)) {
-            throw new ZendDomainException('Invalid sub resource name');
+            throw new BadRequestException('Invalid sub resource name');
         }
 
         return str_replace(' ' , '', ucwords(str_replace('-', ' ', $subResource)));
@@ -232,9 +234,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
      * @param $method
      * @param $subResource
      * @return string
-     * @throws ZendDomainException
-     *
-     * @todo Must throws bad request
+     * @throws BadRequestException
      */
     protected function getAction($id, $method, $subResource)
     {
@@ -257,7 +257,7 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
             case 'post':
                 if (null === $subResource) {
                     if (null !== $id) {
-                        throw new ZendDomainException('Post is allowed on resources only');
+                        throw new BadRequestException('Post is allowed on resources only');
                     }
                     $action = 'create';
                 } else {
@@ -266,24 +266,24 @@ class Api implements \Zend\Mvc\Router\Http\RouteInterface
                 break;
             case 'put':
                 if (null === $id) {
-                    throw new ZendDomainException('Missing identifier');
+                    throw new BadRequestException('Missing identifier');
                 }
                 if (null !== $subResource) {
-                    throw new ZendDomainException('Put is allowed on root resource object only');
+                    throw new BadRequestException('Put is allowed on root resource object only');
                 }
                 $action = 'update';
                 break;
             case 'delete':
                 if (null === $id) {
-                    throw new ZendDomainException('Missing identifier');
+                    throw new BadRequestException('Missing identifier');
                 }
                 if (null !== $subResource) {
-                    throw new ZendDomainException('Delete is allowed on root resource object only');
+                    throw new BadRequestException('Delete is allowed on root resource object only');
                 }
                 $action = 'delete';
                 break;
             default:
-                throw new ZendDomainException('Invalid HTTP method!');
+                throw new BadRequestException('Invalid HTTP method!');
         }
         
         return $action;

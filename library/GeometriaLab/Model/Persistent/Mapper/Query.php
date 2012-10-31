@@ -163,7 +163,7 @@ class Query implements QueryInterface
     /**
      * Get where
      *
-     * @return array|null
+     * @return array
      */
     public function getWhere()
     {
