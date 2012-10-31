@@ -3,9 +3,12 @@
 namespace GeometriaLabTest\Api\Stdlib\Extractor;
 
 use GeometriaLab\Model\Collection,
-    GeometriaLab\Api\Stdlib\Extractor\Service,
-    GeometriaLabTest\Api\Stdlib\Extractor\TestModels\User,
-    GeometriaLabTest\Api\Stdlib\Extractor\TestModels\Order;
+    GeometriaLab\Api\Paginator\ModelPaginator,
+    GeometriaLab\Api\Stdlib\Extractor\Service;
+
+use GeometriaLabTest\Api\Stdlib\Extractor\TestModels\User,
+    GeometriaLabTest\Api\Stdlib\Extractor\TestModels\Order,
+    GeometriaLabTest\Api\Stdlib\Extractor\TestModels\PersistentModel;
 
 class ServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +34,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         self::$user = new User();
         self::$user->id = 1;
         self::$user->name = 'Bender';
+        self::$user->about = 'I am a fictional robot character in the animated television series Futurama';
         self::$user->order = self::$order;
 
         self::$extractorService = new Service();
@@ -41,7 +45,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     {
         $data = self::$extractorService->extract(self::$order);
 
-        $actual = array(
+        $expected = array(
             'item' => array(
                 'id' => 2,
                 'transactionId' => 123,
@@ -49,7 +53,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             'type' => 'Order',
         );
 
-        $this->assertEquals($data, $actual);
+        $this->assertEquals($expected, $data);
     }
 
     public function testExtractCollection()
@@ -59,7 +63,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
         $data = self::$extractorService->extract($collection);
 
-        $actual = array(
+        $expected = array(
             'items' => array(
                 array(
                     'id' => 2,
@@ -68,10 +72,62 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             ),
             'type' => 'Order',
         );
-        $this->assertEquals($data, $actual);
+        $this->assertEquals($expected, $data);
     }
 
-    public function testFilters()
+    public function testExtractModelPaginator()
+    {
+        $model = new PersistentModel(array('name' => 'one'));
+        $model->save();
+
+        $model = new PersistentModel(array('name' => 'two'));
+        $model->save();
+
+        $model = new PersistentModel(array('name' => 'three'));
+        $model->save();
+
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
+        $paginator->setLimit(1);
+
+        $data = self::$extractorService->extract($paginator);
+
+        $expected = array(
+            'items' => array(
+                array(
+                    'id'    => 1,
+                    'name'  => 'one',
+                ),
+            ),
+            'totalCount'    => 3,
+            'limit'         => 1,
+            'offset'        => null,
+            'type'          => 'PersistentModel',
+        );
+
+        $this->assertEquals($expected, $data);
+    }
+
+    public function testExtractEmptyModelPaginator()
+    {
+        PersistentModel::getMapper()->deleteByQuery(PersistentModel::getMapper()->createQuery());
+
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
+        $paginator->setLimit(1);
+
+        $data = self::$extractorService->extract($paginator);
+
+        $expected = array(
+            'items' => array(
+            ),
+            'totalCount'    => 0,
+            'limit'         => 1,
+            'offset'        => null,
+        );
+
+        $this->assertEquals($expected, $data);
+    }
+
+    public function testCallableFilters()
     {
         $data = self::$extractorService->extract(self::$user);
 
@@ -80,13 +136,30 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data['item']['name'], self::$user->name . ' Rodriguez');
     }
 
+    public function testArrayFilters()
+    {
+        $data = self::$extractorService->extract(self::$user);
+
+        $this->assertTrue(isset($data['item']['about']));
+        $this->assertEquals($data['item']['about'], 'I am a fictional robot character in the animated television series ');
+    }
+
+    public function testExtractCallable()
+    {
+        $data = self::$extractorService->extract(self::$user);
+
+        $this->assertTrue(isset($data['item']['callable']));
+
+        $this->assertEquals('Foo', $data['item']['callable']);
+    }
+
     public function testExtractRecursive()
     {
         $data = self::$extractorService->extract(self::$user);
 
         $this->assertTrue(isset($data['item']['order']));
 
-        $actual = array(
+        $expected = array(
             'item' => array(
                 'id' => 2,
                 'transactionId' => 123,
@@ -94,7 +167,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             'type' => 'Order',
         );
 
-        $this->assertEquals($data['item']['order'], $actual);
+        $this->assertEquals($expected, $data['item']['order']);
     }
 
     public function testExtractAllFields()
@@ -102,7 +175,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $fields = array('*' => true);
         $data = self::$extractorService->extract(self::$order, $fields);
 
-        $actual = array(
+        $expected = array(
             'item' => array(
                 'id' => 2,
                 'transactionId' => 123,
@@ -110,7 +183,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             'type' => 'Order',
         );
 
-        $this->assertEquals($data, $actual);
+        $this->assertEquals($expected, $data);
     }
 
     public function testExtractOneFieldsAndOneNestedFields()
@@ -123,7 +196,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         );
         $data = self::$extractorService->extract(self::$user, $fields);
 
-        $actual = array(
+        $expected = array(
             'item' => array(
                 'id' => 1,
                 'order' =>  array(
@@ -136,7 +209,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             'type' => 'User',
         );
 
-        $this->assertEquals($data, $actual);
+        $this->assertEquals($expected, $data);
     }
 
     public function testExtractAllNestedFields()
@@ -144,10 +217,11 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $fields = array('*' => true);
         $data = self::$extractorService->extract(self::$user, $fields);
 
-        $actual = array(
+        $expected = array(
             'item' => array(
                 'id' => 1,
                 'name' => 'Bender Rodriguez',
+                'about' => 'I am a fictional robot character in the animated television series ',
                 'order' => array(
                     'item' => array(
                         'id' => 2,
@@ -155,11 +229,12 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                     ),
                     'type' => 'Order',
                 ),
+                'callable' => 'Foo',
             ),
             'type' => 'User',
         );
 
-        $this->assertEquals($data, $actual);
+        $this->assertEquals($expected, $data);
     }
 
     public function testExtractWrongField()
