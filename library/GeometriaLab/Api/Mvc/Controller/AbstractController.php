@@ -9,7 +9,6 @@
 namespace GeometriaLab\Api\Mvc\Controller;
 
 use Zend\Mvc\Controller\AbstractController as ZendAbstractController;
-use Zend\Http\PhpEnvironment\Response as ZendHttpResponse;
 use Zend\Http\Request as ZendHttpRequest;
 use Zend\Mvc\Exception as ZendMvcException;
 use Zend\Mvc\MvcEvent as ZendMvcEvent;
