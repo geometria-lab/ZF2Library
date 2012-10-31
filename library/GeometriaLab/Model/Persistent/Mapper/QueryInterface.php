@@ -41,7 +41,7 @@ interface QueryInterface
 
     /**
      * @abstract
-     * @return array|null
+     * @return array
      */
     public function getWhere();
 
