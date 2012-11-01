@@ -34,12 +34,6 @@ class OAuth implements ZendAdapterInterface
      * @var OAuthTokenInterface
      */
     protected $accessToken;
-    /**
-     * A space-separated string of required scope(s), if you want to check for scope.
-     *
-     * @var string
-     */
-    protected $scope;
 
     /**
      * Set token
@@ -51,28 +45,6 @@ class OAuth implements ZendAdapterInterface
     {
         $this->accessToken = $accessToken;
         return $this;
-    }
-
-    /**
-     * Set scope
-     *
-     * @param string $scope
-     * @return OAuth
-     */
-    public function setScope($scope)
-    {
-        $this->scope = $scope;
-        return $this;
-    }
-
-    /**
-     * Get scope
-     *
-     * @return string
-     */
-    public function getScope()
-    {
-        return $this->scope;
     }
 
     /**
@@ -109,16 +81,6 @@ class OAuth implements ZendAdapterInterface
             );
         }
 
-        // Check scope, if provided
-        // If token doesn't have a scope, it's NULL/empty, or it's insufficient, then throw an error
-        if ($this->getScope() && (!$this->getAccessToken()->getScope() || !$this->checkScope($this->getScope(), $this->getAccessToken()->getScope()))) {
-            return new ZendAuthenticationResult(
-                ZendAuthenticationResult::FAILURE,
-                null,
-                array('The request requires higher privileges than provided by the access token.')
-            );
-        }
-
         return new ZendAuthenticationResult(
             ZendAuthenticationResult::SUCCESS,
             $this->getAccessToken()->getData()
@@ -144,39 +106,17 @@ class OAuth implements ZendAdapterInterface
             return $token;
         }
 
-        $token = self::getBearerTokenFromPost($request);
+        $token = $request->getPost(self::TOKEN_PARAM_NAME);
         if ($token !== null) {
             return $token;
         }
 
-        $token = self::getBearerTokenFromQuery($request);
+        $token = $request->getQuery(self::TOKEN_PARAM_NAME);
         if ($token !== null) {
             return $token;
         }
 
         return null;
-    }
-
-    /**
-     * Check if everything in required scope is contained in available scope.
-     *
-     * @param string $required_scope Required scope to be check with.
-     * @param string $available_scope
-     * @return bool True if everything in required scope is contained in available scope, and False if it isn't.
-     * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-20#section-7
-     */
-    protected function checkScope($required_scope, $available_scope)
-    {
-        // The required scope should match or be a subset of the available scope
-        if (!is_array($required_scope)) {
-            $required_scope = explode(' ', trim($required_scope));
-        }
-
-        if (!is_array($available_scope)) {
-            $available_scope = explode(' ', trim($available_scope));
-        }
-
-        return (count(array_diff($required_scope, $available_scope)) == 0);
     }
 
     /**
@@ -189,7 +129,7 @@ class OAuth implements ZendAdapterInterface
     {
         $bearer = null;
         $requestHeaders = $request->getHeaders();
-        if (!$requestHeaders->has('AUTHORIZATION')) {
+        if (!$requestHeaders->has('Authorization')) {
             // The Authorization header may not be passed to PHP by Apache;
             // Trying to obtain it through apache_request_headers()
             if (function_exists('apache_request_headers')) {
@@ -201,59 +141,23 @@ class OAuth implements ZendAdapterInterface
                 }
             }
         } else {
-            $bearer = $requestHeaders->get('AUTHORIZATION')->getFieldValue();
+            $bearer = $requestHeaders->get('Authorization')->getFieldValue();
         }
 
         if (!$bearer) {
             return null;
         }
 
-        if (!preg_match('/' . preg_quote(self::TOKEN_BEARER_HEADER_NAME, '/') . '\s(\S+)/', $bearer, $matches)) {
+        $parts = explode(' ', $bearer);
+
+        if (count($parts) != 2) {
             return null;
         }
 
-        $token = $matches[1];
-
-        return $token;
-    }
-
-    /**
-     * Get the token from POST data
-     *
-     * @param ZendRequest $request
-     * @return string|null
-     */
-    protected static function getBearerTokenFromPost(ZendRequest $request)
-    {
-        if ($request->isPost()) {
+        if ($parts[0] != self::TOKEN_BEARER_HEADER_NAME) {
             return null;
         }
 
-        $contentType = $request->getHeaders()->get('Content-Type');
-
-        if ($contentType && $contentType->getFieldValue() != 'application/x-www-form-urlencoded') {
-            return null;
-        }
-
-        if (!$token = $request->getPost(self::TOKEN_PARAM_NAME)) {
-            return null;
-        }
-
-        return $token;
-    }
-
-    /**
-     * Get the token from the query string
-     *
-     * @param ZendRequest $request
-     * @return string|null
-     */
-    protected static function getBearerTokenFromQuery(ZendRequest $request)
-    {
-        if (!$token = $request->getQuery(self::TOKEN_PARAM_NAME)) {
-            return null;
-        }
-
-        return $token;
+        return $parts[1];
     }
 }

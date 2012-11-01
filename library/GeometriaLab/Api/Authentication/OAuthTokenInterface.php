@@ -17,10 +17,5 @@ interface OAuthTokenInterface
     /**
      * @return string
      */
-    public function getScope();
-
-    /**
-     * @return string
-     */
     public function getData();
 }

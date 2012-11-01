@@ -41,7 +41,10 @@ class ServiceFactory implements ZendFactoryInterface
 
         return $this->getAcl();
     }
+
     /**
+     * Set config
+     *
      * @param array $config
      * @return ServiceFactory
      */
@@ -50,7 +53,10 @@ class ServiceFactory implements ZendFactoryInterface
         $this->config = $config;
         return $this;
     }
+
     /**
+     * Get Acl object
+     *
      * @return ZendAcl
      */
     public function getAcl()
@@ -60,19 +66,37 @@ class ServiceFactory implements ZendFactoryInterface
         }
         return $this->acl;
     }
+
     /**
+     * Add all roles
+     *
      * @return ServiceFactory
      */
     private function addRoles()
     {
         if (isset($this->config['roles']) && is_array($this->config['roles'])) {
             foreach ($this->config['roles'] as $role) {
-                $this->getAcl()->addRole(new ZendGenericRole($role));
+                if (is_array($role)) {
+                    if (!isset($role['name'])) {
+                        throw new \InvalidArgumentException('Need name');
+                    }
+
+                    $roleId = $role['name'];
+                    $parent = isset($role['parent']) ? $role['parent'] : null;
+                } else {
+                    $roleId = $role;
+                    $parent = null;
+                }
+
+                $this->getAcl()->addRole(new ZendGenericRole($roleId), $parent);
             }
         }
         return $this;
     }
+
     /**
+     * Add all resources
+     *
      * @param string $controllerNamespace
      * @return ServiceFactory
      */
@@ -96,6 +120,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Get Acls' namespace
+     *
      * @return string
      * @throws \InvalidArgumentException
      */
@@ -108,6 +134,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Get path to the resources
+     *
      * @return string
      * @throws \InvalidArgumentException
      */
