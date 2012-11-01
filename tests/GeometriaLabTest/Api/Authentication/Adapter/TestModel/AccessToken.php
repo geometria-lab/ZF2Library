@@ -9,7 +9,6 @@ use GeometriaLab\Api\Authentication\OAuthTokenInterface,
  * @property string     $id
  * @property string     $clientId
  * @property integer    $expiresAt
- * @property string     $scope
  * @property string     $data
  */
 class AccessToken extends AbstractModel implements OAuthTokenInterface
@@ -28,18 +27,6 @@ class AccessToken extends AbstractModel implements OAuthTokenInterface
     public function getToken()
     {
         return $this->id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getScope()
-    {
-        if (isset($this->propertyValues['scope'])) {
-            return $this->propertyValues['scope'];
-        }
-
-        return null;
     }
 
     /**
