@@ -43,6 +43,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Set config
+     *
      * @param array $config
      * @return ServiceFactory
      */
@@ -53,6 +55,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Get Acl object
+     *
      * @return ZendAcl
      */
     public function getAcl()
@@ -64,6 +68,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Add all roles
+     *
      * @return ServiceFactory
      * @throws \InvalidArgumentException
      */
@@ -90,6 +96,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Add all resources
+     *
      * @param string $controllerNamespace
      * @return ServiceFactory
      */
@@ -113,6 +121,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Get Acls' namespace
+     *
      * @return string
      * @throws \InvalidArgumentException
      */
@@ -125,6 +135,8 @@ class ServiceFactory implements ZendFactoryInterface
     }
 
     /**
+     * Get path to the resources
+     *
      * @return string
      * @throws \InvalidArgumentException
      */
