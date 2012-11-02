@@ -8,7 +8,7 @@ use Zend\Validator\AbstractValidator as ZendAbstractValidator,
     Zend\Validator\Exception\RuntimeException as ZendRuntimeException,
     Zend\Validator\Exception\InvalidArgumentException as ZendInvalidArgumentException;
 
-class Unique extends ZendAbstractValidator
+class UniqueField extends ZendAbstractValidator
 {
     const EXISTS = 'exists';
 
@@ -37,7 +37,7 @@ class Unique extends ZendAbstractValidator
      * Set model class name
      *
      * @param string $class
-     * @return Unique
+     * @return UniqueField
      * @throws ZendInvalidArgumentException
      */
     public function setClass($class)
@@ -55,7 +55,7 @@ class Unique extends ZendAbstractValidator
      * Set field name
      *
      * @param string $field
-     * @return Unique
+     * @return UniqueField
      */
     public function setField($field)
     {
@@ -78,22 +78,22 @@ class Unique extends ZendAbstractValidator
             throw new ZendRuntimeException("Field not configured");
         }
 
-        $uniqueValidator = null;
+        $UniqueFieldValidator = null;
         /* @var AbstractModel $modelClass */
         $modelClass = $this->class;
         $validatorChain = $modelClass::getSchema()->getProperty($this->field)->getValidatorChain();
 
         foreach ($validatorChain->getValidators() as $index => $validatorData) {
-            if ($validatorData['instance'] instanceof Unique) {
-                $uniqueValidator = $validatorData;
-                $uniqueValidator['index'] = $index;
+            if ($validatorData['instance'] instanceof UniqueField) {
+                $UniqueFieldValidator = $validatorData;
+                $UniqueFieldValidator['index'] = $index;
                 $validatorChain->removeValidatorByIndex($index);
             }
         }
 
         $matchedCount = $modelClass::getMapper()->count(array($this->field => $value));
 
-        $validatorChain->addValidatorByIndex($uniqueValidator['index'], $uniqueValidator['instance'], $uniqueValidator['breakChainOnFailure']);
+        $validatorChain->addValidatorByIndex($UniqueFieldValidator['index'], $UniqueFieldValidator['instance'], $UniqueFieldValidator['breakChainOnFailure']);
 
         if ($matchedCount) {
             $this->error(self::EXISTS, $value);
