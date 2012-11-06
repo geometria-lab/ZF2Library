@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Validator;
+namespace GeometriaLab\Validator\Model;
 
 use GeometriaLab\Model\Persistent\AbstractModel;
 
@@ -8,7 +8,7 @@ use Zend\Validator\AbstractValidator as ZendAbstractValidator,
     Zend\Validator\Exception\RuntimeException as ZendRuntimeException,
     Zend\Validator\Exception\InvalidArgumentException as ZendInvalidArgumentException;
 
-class UniqueField extends ZendAbstractValidator
+class UniqueProperty extends ZendAbstractValidator
 {
     const EXISTS = 'exists';
 
@@ -37,7 +37,7 @@ class UniqueField extends ZendAbstractValidator
      * Set model class name
      *
      * @param string $class
-     * @return UniqueField
+     * @return UniqueProperty
      * @throws ZendInvalidArgumentException
      */
     public function setClass($class)
@@ -55,7 +55,7 @@ class UniqueField extends ZendAbstractValidator
      * Set field name
      *
      * @param string $field
-     * @return UniqueField
+     * @return UniqueProperty
      */
     public function setField($field)
     {
@@ -78,22 +78,22 @@ class UniqueField extends ZendAbstractValidator
             throw new ZendRuntimeException("Field not configured");
         }
 
-        $UniqueFieldValidator = null;
+        $UniquePropertyValidator = null;
         /* @var AbstractModel $modelClass */
         $modelClass = $this->class;
         $validatorChain = $modelClass::getSchema()->getProperty($this->field)->getValidatorChain();
 
         foreach ($validatorChain->getValidators() as $index => $validatorData) {
-            if ($validatorData['instance'] instanceof UniqueField) {
-                $UniqueFieldValidator = $validatorData;
-                $UniqueFieldValidator['index'] = $index;
+            if ($validatorData['instance'] instanceof UniqueProperty) {
+                $UniquePropertyValidator = $validatorData;
+                $UniquePropertyValidator['index'] = $index;
                 $validatorChain->removeValidatorByIndex($index);
             }
         }
 
         $matchedCount = $modelClass::getMapper()->count(array($this->field => $value));
 
-        $validatorChain->addValidatorByIndex($UniqueFieldValidator['index'], $UniqueFieldValidator['instance'], $UniqueFieldValidator['breakChainOnFailure']);
+        $validatorChain->addValidatorByIndex($UniquePropertyValidator['index'], $UniquePropertyValidator['instance'], $UniquePropertyValidator['breakChainOnFailure']);
 
         if ($matchedCount) {
             $this->error(self::EXISTS, $value);

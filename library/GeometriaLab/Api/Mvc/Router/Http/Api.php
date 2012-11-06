@@ -234,9 +234,7 @@ class Api implements ZendRouteInterface
      * @param $method
      * @param $subResource
      * @return string
-     * @throws ZendDomainException
-     *
-     * @todo Must throws bad request
+     * @throws BadRequestException
      */
     protected function getAction($id, $method, $subResource)
     {
