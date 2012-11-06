@@ -58,6 +58,19 @@ class OAuthTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('123456qwerty', $token);
     }
 
+    public function testGetTokenFromHeadersWithDoubleSpace()
+    {
+        $headers = new ZendHeaders();
+        $headers->addHeaderLine('Authorization', 'Bearer  123456qwerty');
+
+        $request = new ZendRequest();
+        $request->setHeaders($headers);
+
+        $token = AuthenticationAdapter::getBearerToken($request);
+
+        $this->assertEquals('123456qwerty', $token);
+    }
+
     public function testGetTokenFromHeaderFirst()
     {
         $headers = new ZendHeaders();

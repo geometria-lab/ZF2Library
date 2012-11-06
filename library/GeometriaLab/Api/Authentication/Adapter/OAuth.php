@@ -148,6 +148,7 @@ class OAuth implements ZendAdapterInterface
             return null;
         }
 
+        $bearer = str_replace('  ', ' ', $bearer);
         $parts = explode(' ', $bearer);
 
         if (count($parts) != 2) {
