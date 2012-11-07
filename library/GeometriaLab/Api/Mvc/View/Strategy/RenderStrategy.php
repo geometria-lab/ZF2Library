@@ -52,11 +52,11 @@ class RenderStrategy implements ZendListenerAggregateInterface, ZendServiceManag
     public function attach(ZendEventManagerInterface $events, $priority = 1)
     {
         $view = $this->serviceManager->get('Zend\View\View');
-        $events = $view->getEventManager();
+        $viewEvents = $view->getEventManager();
 
         $this->listeners[] = $events->attach(ZendMvcEvent::EVENT_ROUTE, array($this, 'validateFormat'), -1);
-        $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RENDERER, array($this, 'selectRenderer'), 100);
-        $this->listeners[] = $events->attach(ZendViewEvent::EVENT_RESPONSE, array($this, 'injectResponse'), 100);
+        $this->listeners[] = $viewEvents->attach(ZendViewEvent::EVENT_RENDERER, array($this, 'selectRenderer'), 100);
+        $this->listeners[] = $viewEvents->attach(ZendViewEvent::EVENT_RESPONSE, array($this, 'injectResponse'), 100);
     }
 
     /**

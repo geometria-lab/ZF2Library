@@ -92,7 +92,7 @@ class Listener implements ZendListenerAggregateInterface
                 unset($params[$key]);
             }
         }
-
+        // @TODO It's possible to remove the access_token param only here and nowhere else
         unset($params['access_token']);
 
         return $params;
