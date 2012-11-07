@@ -2,12 +2,11 @@ language: php
 php:
   - 5.3
   - 5.4
+services:
+  - mongodb
 before_script:
   # Composer
   - composer install
   # Mongo
-  - wget http://pecl.php.net/get/mongo-1.2.10.tgz
-  - tar -xzf mongo-1.2.10.tgz
-  - sh -c "cd mongo-1.2.10 && phpize && ./configure && sudo make install"
-  - echo "extension=mongo.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+  - pecl -q install mongo-1.2.10 && echo "extension=mongo.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 script: cd ./tests && phpunit
