@@ -132,12 +132,6 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         $data = $result->getVariable(ApiModel::FIELD_DATA);
 
         if ($this->isDataPaginatorOrModelOrCollection($data)) {
-            // Set params to paginator
-            if ($data instanceof ModelPaginator) {
-                $params = $e->getRouteMatch()->getParam('params');
-                $this->populatePaginatorFromParams($data, $params);
-            }
-
             $fields = $e->getRequest()->getQuery()->get('_fields');
             $fieldsData = self::createFieldsFromString($fields);
 
@@ -224,104 +218,5 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
         return $data instanceof ModelPaginator ||
                $data instanceof ModelInterface ||
                $data instanceof CollectionInterface;
-    }
-
-    /**
-     * @param ModelPaginator $paginator
-     * @param AbstractParams $params
-     * @throws \RuntimeException
-     */
-    protected function populatePaginatorFromParams(ModelPaginator $paginator, AbstractParams $params)
-    {
-        $paramsSchema = $params::getSchema();
-
-        $this->checkLimitProperty($paramsSchema);
-        $this->checkOffsetProperty($paramsSchema);
-
-        $paginator->setLimit($params->get('limit'));
-        $paginator->setOffset($params->get('offset'));
-    }
-
-    /**
-     * Check limit property
-     *
-     * @param SchemaInterface $paramsSchema
-     * @throws \RuntimeException
-     */
-    protected function checkLimitProperty(SchemaInterface $paramsSchema)
-    {
-        if (!$paramsSchema->hasProperty('limit')) {
-            throw new \RuntimeException('Limit must be present in params');
-        }
-
-        $limitProperty = $paramsSchema->getProperty('limit');
-
-        if (!$limitProperty instanceof ParamsIntegerProperty) {
-            throw new \RuntimeException('Limit property must be integer');
-        }
-
-        if ($limitProperty->getDefaultValue() === null) {
-            throw new \RuntimeException('Limit property must have default value');
-        }
-
-        $max = 0;
-        $min = 0;
-        $hasLessThanValidator = false;
-        $hasGreaterThanValidator = false;
-        $validators = $limitProperty->getValidatorChain()->getValidators();
-
-        foreach ($validators as $validator) {
-            $validatorInstance = $validator['instance'];
-            if ($validatorInstance instanceof ZendLessThanValidator) {
-                /* @var ZendLessThanValidator $validatorInstance */
-                $hasLessThanValidator = true;
-                $max = $validatorInstance->getMax();
-
-                if (!$validatorInstance->getInclusive()) {
-                    $max--;
-                }
-            } elseif ($validatorInstance instanceof ZendGreaterThanValidator) {
-                /* @var ZendGreaterThanValidator $validatorInstance */
-                $hasGreaterThanValidator = true;
-                $min = $validatorInstance->getMin();
-
-                if (!$validatorInstance->getInclusive()) {
-                    $min++;
-                }
-            }
-        }
-
-        if (!$hasLessThanValidator) {
-            throw new \RuntimeException("Limit property must have 'LessThan' validator");
-        }
-
-        if (!$hasGreaterThanValidator) {
-            throw new \RuntimeException("Limit property must have 'GreaterThan' validator");
-        }
-
-        if ($limitProperty->getDefaultValue() < 1 || $min < 1) {
-            throw new \RuntimeException("Limit property must be greater or equal then 1");
-        }
-
-        if ($limitProperty->getDefaultValue() > 100 || $max > 100) {
-            throw new \RuntimeException("Limit property must be less or equal then 100");
-        }
-    }
-
-    /**
-     * Check offset property
-     *
-     * @param SchemaInterface $paramsSchema
-     * @throws \RuntimeException
-     */
-    protected function checkOffsetProperty(SchemaInterface $paramsSchema)
-    {
-        if (!$paramsSchema->hasProperty('offset')) {
-            throw new \RuntimeException('Offset must be present in params');
-        }
-
-        if (!$paramsSchema->getProperty('offset') instanceof ParamsIntegerProperty) {
-            throw new \RuntimeException('Offset must be integer');
-        }
     }
 }

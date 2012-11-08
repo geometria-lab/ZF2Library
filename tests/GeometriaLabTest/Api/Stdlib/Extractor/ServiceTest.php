@@ -86,8 +86,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $model = new PersistentModel(array('name' => 'three'));
         $model->save();
 
-        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
-        $paginator->setLimit(1);
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery(), 1);
 
         $data = self::$extractorService->extract($paginator);
 
@@ -111,8 +110,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     {
         PersistentModel::getMapper()->deleteByQuery(PersistentModel::getMapper()->createQuery());
 
-        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
-        $paginator->setLimit(1);
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery(), 1);
 
         $data = self::$extractorService->extract($paginator);
 
