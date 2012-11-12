@@ -14,22 +14,11 @@ class ModelPaginatorTest extends \PHPUnit_Framework_TestCase
         PersistentModel::getMapper()->deleteByQuery(PersistentModel::getMapper()->createQuery());
     }
 
-    public function testGetItemWithEmptyLimit()
-    {
-        $this->setExpectedException('\RuntimeException', 'Limit must be positive integer');
-
-        $model = new PersistentModel(array('name' => 'one'));
-        $model->save();
-
-        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
-        $paginator->getItems();
-    }
-
     public function testGetItemsCount()
     {
         $models = $this->createModels();
 
-        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery(), 3);
 
         $this->assertEquals(3, $paginator->count());
     }
@@ -38,8 +27,7 @@ class ModelPaginatorTest extends \PHPUnit_Framework_TestCase
     {
         $models = $this->createModels();
 
-        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
-        $paginator->setLimit(1);
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery(), 1);
 
         $items = $paginator->getItems();
 
@@ -54,8 +42,7 @@ class ModelPaginatorTest extends \PHPUnit_Framework_TestCase
     {
         $models = $this->createModels();
 
-        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
-        $paginator->setLimit(2);
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery(), 2);
 
         $items = $paginator->getItems();
 
@@ -70,9 +57,7 @@ class ModelPaginatorTest extends \PHPUnit_Framework_TestCase
     {
         $models = $this->createModels();
 
-        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery());
-        $paginator->setLimit(2)
-                  ->setOffset(1);
+        $paginator = new ModelPaginator(PersistentModel::getMapper()->createQuery(), 2, 1);
 
         $items = $paginator->getItems();
 

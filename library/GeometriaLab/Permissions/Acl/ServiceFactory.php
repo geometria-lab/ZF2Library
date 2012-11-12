@@ -71,6 +71,7 @@ class ServiceFactory implements ZendFactoryInterface
      * Add all roles
      *
      * @return ServiceFactory
+     * @throws \InvalidArgumentException
      */
     private function addRoles()
     {

@@ -30,10 +30,14 @@ class ModelPaginator implements \Countable
      * Constructor
      *
      * @param QueryInterface $query
+     * @param int $limit
+     * @param int $offset
      */
-    public function __construct(QueryInterface $query)
+    public function __construct(QueryInterface $query, $limit, $offset = 0)
     {
-        $this->setQuery($query);
+        $this->setQuery($query)
+             ->setLimit($limit)
+             ->setOffset($offset);
     }
 
     /**

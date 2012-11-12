@@ -15,7 +15,7 @@ abstract class Resource extends ZendResource implements ZendAssertionInterface
      *
      * @param ZendAcl $acl
      */
-    abstract public function createRoles(ZendAcl $acl);
+    public function createRoles(ZendAcl $acl) {}
 
     /**
      * Define rules hear
