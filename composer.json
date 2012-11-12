@@ -8,20 +8,13 @@
     ],
     "homepage": "http://geometria-lab.net/",
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "zendframework/zendframework" : "2.0.*"
     },
     "autoload": {
         "psr-0": {
             "GeometriaLab": "library/",
             "GeometriaLabTest" : "tests/"
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "master"
-        }
-    },
-    "require" : {
-        "zendframework/zendframework" : "2.0.*"
     }
 }
