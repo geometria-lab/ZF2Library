@@ -16,5 +16,10 @@
             "GeometriaLab": "library/",
             "GeometriaLabTest" : "tests/"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }
