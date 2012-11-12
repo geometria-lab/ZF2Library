@@ -83,13 +83,13 @@ class ServiceFactory implements ZendFactoryInterface
                     }
 
                     $roleId = $role['name'];
-                    $parent = isset($role['parent']) ? $role['parent'] : null;
+                    $parents = isset($role['parents']) ? $role['parents'] : null;
                 } else {
                     $roleId = $role;
-                    $parent = null;
+                    $parents = null;
                 }
 
-                $this->getAcl()->addRole(new ZendGenericRole($roleId), $parent);
+                $this->getAcl()->addRole(new ZendGenericRole($roleId), $parents);
             }
         }
         return $this;
