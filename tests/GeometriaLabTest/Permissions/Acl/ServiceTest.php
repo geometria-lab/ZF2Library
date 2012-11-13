@@ -44,7 +44,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                                     'guest',
                                     array(
                                         'name' => 'user',
-                                        'parent' => 'guest',
+                                        'parents' => 'guest',
                                     ),
                                 ),
                                 'base_dir'      => __DIR__ . '/Sample',
