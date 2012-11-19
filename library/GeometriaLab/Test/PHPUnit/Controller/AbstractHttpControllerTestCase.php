@@ -6,6 +6,18 @@ use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as ZendAbstractH
 
 class AbstractHttpControllerTestCase extends ZendAbstractHttpControllerTestCase
 {
+    public function setUp()
+    {
+        $this->setApplicationConfig(
+            include 'config/application.config.php'// Use relative path
+        );
+
+        // @TODO Hack
+        $this->getApplication();
+
+        parent::setUp();
+    }
+
     /**
      * Assert that JSON piece by path $path and $expected are equals
      *
