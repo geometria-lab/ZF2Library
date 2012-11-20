@@ -4,6 +4,9 @@ namespace GeometriaLab\Test\PHPUnit\Controller;
 
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as ZendAbstractHttpControllerTestCase;
 
+/**
+ * @method \Zend\Http\PhpEnvironment\Request getRequest()
+ */
 class AbstractHttpControllerTestCase extends ZendAbstractHttpControllerTestCase
 {
     public function setUp()
