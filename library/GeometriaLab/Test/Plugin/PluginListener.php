@@ -1,22 +1,26 @@
 <?php
 
-namespace GeometriaLab\Test\Helper;
+namespace GeometriaLab\Test\Plugin;
 
 use GeometriaLab\Test\TestCaseInterface;
 
-class HelperListener implements \PHPUnit_Framework_TestListener
+use Zend\ServiceManager\Config as ZendConfig;
+
+class PluginListener implements \PHPUnit_Framework_TestListener
 {
     /**
-     * @var HelperBroker
+     * @var PluginManager
      */
-    protected $helperBroker;
+    protected $pluginManager;
 
     /**
-     * @param array $helpers Helpers map
+     * @param array $plugins Plugins map
      */
-    public function __construct(array $helpers = array())
+    public function __construct(array $plugins = array())
     {
-        $this->helperBroker = new HelperBroker($helpers);
+        $this->pluginManager = new PluginManager(new ZendConfig(array(
+            'invokables' => $plugins,
+        )));
     }
 
     /**
@@ -98,8 +102,7 @@ class HelperListener implements \PHPUnit_Framework_TestListener
     public function startTest(\PHPUnit_Framework_Test $test)
     {
         if ($test instanceof TestCaseInterface) {
-            $this->helperBroker->setTest($test);
-            $test->setHelperBroker($this->helperBroker);
+            $test->setPluginManager($this->pluginManager);
         }
     }
 
