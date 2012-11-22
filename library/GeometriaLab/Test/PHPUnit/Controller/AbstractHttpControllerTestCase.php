@@ -4,12 +4,20 @@ namespace GeometriaLab\Test\PHPUnit\Controller;
 
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase as ZendAbstractHttpControllerTestCase;
 
+use GeometriaLab\Test\TestCaseInterface,
+    GeometriaLab\Test\Helper\HelperBroker;
+
 /**
  * @method \Zend\Http\PhpEnvironment\Request getRequest()
  * @method \Zend\Http\PhpEnvironment\Response getResponse()
  */
-class AbstractHttpControllerTestCase extends ZendAbstractHttpControllerTestCase
+abstract class AbstractHttpControllerTestCase extends ZendAbstractHttpControllerTestCase implements TestCaseInterface
 {
+    /**
+     * @var HelperBroker
+     */
+    protected $helperBroker;
+
     public function setUp()
     {
         $this->setApplicationConfig(
@@ -20,6 +28,25 @@ class AbstractHttpControllerTestCase extends ZendAbstractHttpControllerTestCase
         $this->getApplication();
 
         parent::setUp();
+    }
+
+    /**
+     * @param $helperBroker
+     * @return AbstractHttpControllerTestCase
+     */
+    public function setHelperBroker($helperBroker)
+    {
+        $this->helperBroker = $helperBroker;
+
+        return $this;
+    }
+
+    /**
+     * @return HelperBroker
+     */
+    public function getHelperBroker()
+    {
+        return $this->helperBroker;
     }
 
     /**
