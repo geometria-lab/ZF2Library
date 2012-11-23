@@ -59,16 +59,21 @@ abstract class AbstractHttpControllerTestCase extends AbstractControllerTestCase
      * @throws \PHPUnit_Framework_AssertionFailedError
      * @return mixed
      */
-    protected function getJsonValueByPath($path)
+    protected function getJsonValueByPath($path = '')
     {
-        $path = trim($path, '/');
-        $sections = explode('/', $path);
-
         $json = $this->getJsonFromResponse();
 
         if (!is_array($json)) {
             throw new \PHPUnit_Framework_AssertionFailedError('Path not found in JSON');
         }
+
+        $path = trim($path, '/');
+
+        if ($path === '') {
+            return $json;
+        }
+
+        $sections = explode('/', $path);
 
         foreach ($sections as $section) {
             if (array_key_exists($section, $json)) {
