@@ -20,4 +20,9 @@ interface PluginInterface
      * @return TestCaseInterface
      */
     public function getTest();
+
+    /**
+     * It will call when a test ended
+     */
+    public function tearDown();
 }

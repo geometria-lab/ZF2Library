@@ -33,4 +33,12 @@ abstract class AbstractPlugin implements PluginInterface
     {
         return $this->test;
     }
+
+    /**
+     * It will call when a test ended
+     */
+    public function tearDown()
+    {
+
+    }
 }

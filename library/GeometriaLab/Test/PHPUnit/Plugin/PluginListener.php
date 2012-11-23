@@ -114,6 +114,18 @@ class PluginListener implements \PHPUnit_Framework_TestListener
      */
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-
+        if ($test instanceof TestCaseInterface) {
+            foreach ($test->getPluginManager()->getRegisteredServices() as $serviceName => $plugins) {
+                if ($serviceName === 'instances') {
+                    continue;
+                }
+                foreach ($plugins as $pluginName) {
+                    $plugin = $test->getPluginManager()->get($pluginName);
+                    if (method_exists($plugin, 'tearDown')) {
+                        $plugin->tearDown();
+                    }
+                }
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ interface TestCaseInterface
     public function setPluginManager(PluginManager $pluginManager);
 
     /**
-     * @return \GeometriaLab\Test\Plugin\PluginManager
+     * @return \GeometriaLab\Test\PHPUnit\Plugin\PluginManager
      */
     public function getPluginManager();
 
