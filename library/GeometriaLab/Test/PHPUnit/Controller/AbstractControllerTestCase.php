@@ -4,8 +4,8 @@ namespace GeometriaLab\Test\PHPUnit\Controller;
 
 use Zend\Test\PHPUnit\Controller\AbstractControllerTestCase as ZendAbstractControllerTestCase;
 
-use GeometriaLab\Test\TestCaseInterface,
-    GeometriaLab\Test\Plugin\PluginManager;
+use GeometriaLab\Test\PHPUnit\TestCaseInterface,
+    GeometriaLab\Test\PHPUnit\Plugin\PluginManager;
 
 abstract class AbstractControllerTestCase extends ZendAbstractControllerTestCase implements TestCaseInterface
 {
@@ -43,7 +43,7 @@ abstract class AbstractControllerTestCase extends ZendAbstractControllerTestCase
      */
     public function getPluginManager()
     {
-        if (!$this->plugins) {
+        if ($this->plugins === null) {
             $this->setPluginManager(new PluginManager());
         }
 

@@ -23,9 +23,7 @@ abstract class AbstractHttpControllerTestCase extends AbstractControllerTestCase
      */
     public function assertJsonEquals($path, $expected, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
     {
-        $message = ($message) ?: sprintf('Failed asserting that JSON path "%s" value equals "%s"', $path, $expected);
-
-        $this->assertContentType('application/json');
+        $message = ($message === '') ?: sprintf('Failed asserting that JSON path "%s" value equals "%s"', $path, $expected);
 
         $actual = $this->getJsonValueByPath($path);
 
@@ -87,9 +85,20 @@ abstract class AbstractHttpControllerTestCase extends AbstractControllerTestCase
      * Get JSON from Response
      *
      * @return array
+     * @throws \PHPUnit_Framework_AssertionFailedError
      */
     protected function getJsonFromResponse()
     {
+        $contentType = $this->getResponse()->getHeaders()->get('content-type');
+
+        if ($contentType === false) {
+            throw new \PHPUnit_Framework_AssertionFailedError('Content-type not found in Headers');
+        }
+
+        if ($contentType->getFieldValue() !== 'application/json') {
+            throw new \PHPUnit_Framework_AssertionFailedError('Content-type not equals "application/json"');
+        }
+
         return json_decode($this->getResponse()->getContent(), true);
     }
 }

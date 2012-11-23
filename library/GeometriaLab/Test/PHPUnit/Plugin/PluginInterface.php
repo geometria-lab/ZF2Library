@@ -1,8 +1,8 @@
 <?php
 
-namespace GeometriaLab\Test\Plugin;
+namespace GeometriaLab\Test\PHPUnit\Plugin;
 
-use GeometriaLab\Test\TestCaseInterface;
+use GeometriaLab\Test\PHPUnit\TestCaseInterface;
 
 interface PluginInterface
 {
