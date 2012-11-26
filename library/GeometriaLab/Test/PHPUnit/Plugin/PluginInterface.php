@@ -24,5 +24,5 @@ interface PluginInterface
     /**
      * It will call when a test ended
      */
-    public function tearDown();
+    public function endTest();
 }
