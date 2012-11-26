@@ -121,8 +121,8 @@ class PluginListener implements \PHPUnit_Framework_TestListener
                 }
                 foreach ($plugins as $pluginName) {
                     $plugin = $test->getPluginManager()->get($pluginName);
-                    if (method_exists($plugin, 'tearDown')) {
-                        $plugin->tearDown();
+                    if (method_exists($plugin, 'endTest')) {
+                        $plugin->endTest();
                     }
                 }
             }
