@@ -4,15 +4,13 @@ namespace GeometriaLab\Api\Mvc\View\Http;
 
 use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Model\CollectionInterface,
-    GeometriaLab\Model\Schema\SchemaInterface,
     GeometriaLab\Api\Mvc\View\Model\ApiModel,
     GeometriaLab\Api\Paginator\ModelPaginator,
-    GeometriaLab\Api\Exception\InvalidFieldsException,
-    GeometriaLab\Api\Mvc\Controller\Action\Params\AbstractParams,
-    GeometriaLab\Api\Mvc\Controller\Action\Params\Schema\Property\IntegerProperty as ParamsIntegerProperty;
+    GeometriaLab\Api\Exception\InvalidFieldsException;
 
 use Zend\Mvc\MvcEvent as ZendMvcEvent,
     Zend\Mvc\View\Http\InjectViewModelListener as ZendInjectViewModelListener,
+    Zend\Http\PhpEnvironment\Response,
     Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterface,
     Zend\EventManager\EventManagerInterface as ZendEvents,
     Zend\Validator\LessThan as ZendLessThanValidator,
@@ -78,8 +76,18 @@ class CreateApiModelListener implements ZendListenerAggregateInterface
             $apiModel->setVariable(ApiModel::FIELD_DATA, null);
         }
 
+        /* @var Response $response */
         $response = $e->getResponse();
         $apiException = $e->getParam('apiException', false);
+
+        if ($response->getStatusCode() === Response::STATUS_CODE_200) {
+            if ($apiModel->getVariable(ApiModel::FIELD_DATA) === null) {
+                $response->setStatusCode(Response::STATUS_CODE_204);
+            }
+            if ($e->getRouteMatch()->getParam('action') === 'create') {
+                $response->setStatusCode(Response::STATUS_CODE_201);
+            }
+        }
 
         // set http code
         $httpCode = $response->getStatusCode();

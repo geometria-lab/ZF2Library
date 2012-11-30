@@ -514,6 +514,16 @@ class Mapper extends AbstractMapper
     }
 
     /**
+     * Get MongoCollection
+     *
+     * @return \MongoCollection
+     */
+    public function getMongoCollection()
+    {
+        return $this->getMongo()->selectCollection($this->getCollectionName());
+    }
+
+    /**
      * Set Service Manager
      *
      * @param ZendServiceManager $serviceManager
@@ -564,15 +574,5 @@ class Mapper extends AbstractMapper
     protected function getMongo()
     {
         return self::$serviceManager->get('MongoManager')->get($this->getMongoInstanceName());
-    }
-
-    /**
-     * Get MongoCollection
-     *
-     * @return \MongoCollection
-     */
-    protected function getMongoCollection()
-    {
-        return $this->getMongo()->selectCollection($this->getCollectionName());
     }
 }

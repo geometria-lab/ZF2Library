@@ -9,7 +9,8 @@ use Zend\EventManager\ListenerAggregateInterface as ZendListenerAggregateInterfa
     Zend\Http\Request as ZendRequest;
 
 use GeometriaLab\Api\Exception\InvalidParamsException,
-    GeometriaLab\Api\Exception\ObjectNotFoundException;
+    GeometriaLab\Api\Exception\ObjectNotFoundException,
+    GeometriaLab\Api\Authentication\Adapter\OAuth as OAuthAuthenticationAdapter;
 
 class Listener implements ZendListenerAggregateInterface
 {
@@ -93,7 +94,9 @@ class Listener implements ZendListenerAggregateInterface
             }
         }
         // @TODO It's possible to remove the access_token param only here and nowhere else
-        unset($params['access_token']);
+        if (isset($params[OAuthAuthenticationAdapter::TOKEN_PARAM_NAME])) {
+            unset($params[OAuthAuthenticationAdapter::TOKEN_PARAM_NAME]);
+        }
 
         return $params;
     }
