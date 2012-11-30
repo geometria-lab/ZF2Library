@@ -10,8 +10,6 @@ use Zend\Stdlib\Glob as ZendGlob,
 
 class ServiceFactory implements ZendFactoryInterface
 {
-
-
     /**
      * @var Assertion
      */
