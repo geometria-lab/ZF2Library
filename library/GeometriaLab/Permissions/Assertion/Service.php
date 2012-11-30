@@ -8,7 +8,7 @@ use Zend\Stdlib\Glob as ZendGlob,
     Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\ServiceManager\ServiceLocatorInterface as ZendServiceLocatorInterface;
 
-class ServiceFactory implements ZendFactoryInterface
+class Service implements ZendFactoryInterface
 {
     /**
      * @var Assertion
@@ -38,9 +38,7 @@ class ServiceFactory implements ZendFactoryInterface
             $this->setConfig($config['assertion']);
         }
 
-        $controllerNameSpace = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch()->getParam('__NAMESPACE__');
-
-        $this->addResources($controllerNameSpace);
+        $this->addResources();
 
         return $this->getAssertion();
     }
@@ -69,7 +67,7 @@ class ServiceFactory implements ZendFactoryInterface
      * Set config
      *
      * @param array $config
-     * @return ServiceFactory
+     * @return Service
      */
     public function setConfig($config)
     {
@@ -93,23 +91,21 @@ class ServiceFactory implements ZendFactoryInterface
     /**
      * Add all resources
      *
-     * @param string $controllerNamespace
-     * @return ServiceFactory
+     * @return Service
      */
-    private function addResources($controllerNamespace)
+    private function addResources()
     {
         $namespace = $this->getNamespace();
         $pathPattern = $this->getResourcesPath() . '*';
 
         foreach (ZendGlob::glob($pathPattern, ZendGlob::GLOB_BRACE) as $file) {
-            /* @var \GeometriaLab\Permissions\Assertion\Resource $resource */
+            /* @var \GeometriaLab\Permissions\Assertion\ResourceInterface $resource */
             $resourceName = ucfirst(pathinfo($file, PATHINFO_FILENAME));
             $resourceClassName = $namespace . '\\' . $resourceName;
 
-            $resource = new $resourceClassName($resourceName);
-            $resource->setServiceManager($this->getServiceLocator()->get('Application')->getServiceManager());
-
-            $this->getAssertion()->addResource($resource);
+            $this->getAssertion()->addResource(
+                new $resourceClassName($resourceName)
+            );
         }
 
         return $this;

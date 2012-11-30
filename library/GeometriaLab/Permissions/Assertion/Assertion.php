@@ -6,6 +6,8 @@ use GeometriaLab\Model\AbstractModel;
 
 class Assertion
 {
+    const DYNAMIC_ASSERT_PREFIX = 'can';
+
     /**
      * Resource tree
      *
@@ -53,7 +55,11 @@ class Assertion
      */
     public function hasResource($resource)
     {
-        $resourceId = (string) $resource;
+        if ($resource instanceof Resource) {
+            $resourceId = $resource->getName();
+        } else {
+            $resourceId = (string) $resource;
+        }
 
         return isset($this->resources[$resourceId]);
     }
@@ -69,13 +75,17 @@ class Assertion
      */
     public function getResource($resource)
     {
-        $resourceId = (string) $resource;
-
-        if (!$this->hasResource($resource)) {
-            throw new Exception\InvalidArgumentException("Resource '$resourceId' not found");
+        if ($resource instanceof Resource) {
+            $resourceName = $resource->getName();
+        } else {
+            $resourceName = $resource;
         }
 
-        return $this->resources[$resourceId];
+        if (!$this->hasResource($resource)) {
+            throw new Exception\InvalidArgumentException("Resource '$resourceName' not found");
+        }
+
+        return $this->resources[$resourceName];
     }
 
     /**
@@ -90,13 +100,17 @@ class Assertion
     public function removeResource($resource)
     {
         if (!$this->hasResource($resource)) {
-            $resourceId = (string) $resource;
-            throw new Exception\InvalidArgumentException("Resource '$resourceId' not found");
+            if ($resource instanceof Resource) {
+                $resourceName = $resource->getName();
+            } else {
+                $resourceName = $resource;
+            }
+            throw new Exception\InvalidArgumentException("Resource '$resourceName' not found");
         }
 
-        $resourceId = $this->getResource($resource)->getName();
+        $resourceName = $this->getResource($resource)->getName();
 
-        unset($this->resources[$resourceId]);
+        unset($this->resources[$resourceName]);
 
         return $this;
     }
@@ -106,21 +120,31 @@ class Assertion
      *
      * @param ResourceInterface|string $resource
      * @param string $privilege
-     * @param AbstractModel $params
+     * @param mixed $arg1 [optional]
+     * @param mixed $arg2 [optional]
+     * @param mixed $argN [optional]
      * @return bool
+     * @throws Exception\InvalidArgumentException
      */
-    public function assert($resource, $privilege, AbstractModel $params = null)
+    public function assert($resource, $privilege, $arg1 = null, $arg2 = null, $argN = null)
     {
         if (!$this->hasResource($resource)) {
-            return true;
+            return false;
         }
 
         $resource = $this->getResource($resource);
+        $methodName = self::DYNAMIC_ASSERT_PREFIX . ucfirst($privilege);
 
-        if (!$resource->hasPrivilege($privilege)) {
-            return true;
+        if (!method_exists($resource, $methodName)) {
+            throw new Exception\InvalidArgumentException('Need declare ' . get_class($resource) . '->' . $methodName);
         }
 
-        return $resource->assert($this, $privilege, $params);
+        $funcArgs = func_get_args();
+        // Remove $resource and $privilege from array
+        unset($funcArgs[0], $funcArgs[1]);
+        // Assertion must be a first
+        array_unshift($funcArgs, $this);
+
+        return call_user_func_array(array($resource, $methodName), $funcArgs);
     }
 }
