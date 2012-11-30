@@ -14,7 +14,7 @@ abstract class Resource implements ResourceInterface, ZendServiceManagerAwareInt
     /**
      * @var string
      */
-    protected $id;
+    protected $name;
     /**
      * @var array
      */
@@ -25,11 +25,11 @@ abstract class Resource implements ResourceInterface, ZendServiceManagerAwareInt
     protected $serviceManager;
 
     /**
-     * @param string $id
+     * @param string $name
      */
-    public function __construct($id)
+    public function __construct($name)
     {
-        $this->id = (string) $id;
+        $this->name = (string) $name;
 
         $prefixLength = strlen(self::DYNAMIC_ASSERT_PREFIX);
         $allMethods = get_class_methods($this);
@@ -44,13 +44,13 @@ abstract class Resource implements ResourceInterface, ZendServiceManagerAwareInt
 
     /**
      * Defined by ResourceInterface; returns the Resource identifier
-     * Proxies to getId()
+     * Proxies to getName()
      *
      * @return string
      */
     public function __toString()
     {
-        return $this->getId();
+        return $this->getName();
     }
 
     /**
@@ -58,9 +58,9 @@ abstract class Resource implements ResourceInterface, ZendServiceManagerAwareInt
      *
      * @return string
      */
-    public function getId()
+    public function getName()
     {
-        return $this->id;
+        return $this->name;
     }
 
     /**

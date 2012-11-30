@@ -11,7 +11,7 @@ interface ResourceInterface
      *
      * @return string
      */
-    public function getId();
+    public function getName();
 
     /**
      * Returns true if and only if the Privilege exists in the Resource

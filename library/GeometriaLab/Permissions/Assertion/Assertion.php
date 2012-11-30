@@ -32,13 +32,13 @@ class Assertion
      */
     public function addResource(ResourceInterface $resource)
     {
-        $resourceId = $resource->getId();
+        $resourceName = $resource->getName();
 
-        if ($this->hasResource($resourceId)) {
-            throw new Exception\InvalidArgumentException("Resource id '$resourceId' already exists in the Assertion");
+        if ($this->hasResource($resourceName)) {
+            throw new Exception\InvalidArgumentException("Resource id '$resourceName' already exists in the Assertion");
         }
 
-        $this->resources[$resourceId] = $resource;
+        $this->resources[$resourceName] = $resource;
 
         return $this;
     }
@@ -94,7 +94,7 @@ class Assertion
             throw new Exception\InvalidArgumentException("Resource '$resourceId' not found");
         }
 
-        $resourceId = $this->getResource($resource)->getId();
+        $resourceId = $this->getResource($resource)->getName();
 
         unset($this->resources[$resourceId]);
 
