@@ -103,10 +103,10 @@ class ServiceFactory implements ZendFactoryInterface
 
         foreach (ZendGlob::glob($pathPattern, ZendGlob::GLOB_BRACE) as $file) {
             /* @var \GeometriaLab\Permissions\Assertion\Resource $resource */
-            $resourceName = $namespace . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
-            $resourceId = $controllerNamespace . '\\' . ucfirst(pathinfo($file, PATHINFO_FILENAME));
+            $resourceName = ucfirst(pathinfo($file, PATHINFO_FILENAME));
+            $resourceClassName = $namespace . '\\' . $resourceName;
 
-            $resource = new $resourceName($resourceId);
+            $resource = new $resourceClassName($resourceName);
             $resource->setServiceManager($this->getServiceLocator()->get('Application')->getServiceManager());
 
             $this->getAssertion()->addResource($resource);
