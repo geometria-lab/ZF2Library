@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Permissions\Assertion;
 
-use GeometriaLab\Model\AbstractModel;
+use GeometriaLab\Model\Schemaless\Model;
 
 interface ResourceInterface
 {
@@ -26,8 +26,8 @@ interface ResourceInterface
      *
      * @param Assertion $assertion
      * @param string $privilege
-     * @param AbstractModel $params
+     * @param Model $model
      * @return bool
      */
-    public function assert(Assertion $assertion, $privilege, AbstractModel $params = null);
+    public function assert(Assertion $assertion, $privilege, Model $model = null);
 }

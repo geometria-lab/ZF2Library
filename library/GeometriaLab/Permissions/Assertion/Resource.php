@@ -2,7 +2,7 @@
 
 namespace GeometriaLab\Permissions\Assertion;
 
-use GeometriaLab\Model\AbstractModel;
+use GeometriaLab\Model\Schemaless\Model;
 
 use Zend\ServiceManager\ServiceManager as ZendServiceManager,
     Zend\ServiceManager\ServiceManagerAwareInterface as ZendServiceManagerAwareInterface;
@@ -127,17 +127,17 @@ abstract class Resource implements ResourceInterface, ZendServiceManagerAwareInt
      *
      * @param Assertion $assertion
      * @param string $privilege
-     * @param AbstractModel $params
+     * @param Model $model
      * @return bool
      * @throws \InvalidArgumentException
      */
-    public final function assert(Assertion $assertion, $privilege, AbstractModel $params = null)
+    public final function assert(Assertion $assertion, $privilege, Model $model = null)
     {
         $methodName = self::DYNAMIC_ASSERT_PREFIX . ucfirst($privilege);
         if (!method_exists($this, $methodName)) {
             throw new \InvalidArgumentException('Invalid dynamic assert - need declare ' . get_class($this) . '->' . $methodName);
         }
 
-        return call_user_func(array($this, $methodName), $assertion, $params);
+        return call_user_func(array($this, $methodName), $assertion, $model);
     }
 }
