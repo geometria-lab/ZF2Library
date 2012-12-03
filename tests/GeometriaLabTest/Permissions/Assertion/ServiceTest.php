@@ -1,8 +1,9 @@
 <?php
 
-namespace GeometriaLabTest\Permissions\Acl;
+namespace GeometriaLabTest\Permissions\Assertion;
 
-use GeometriaLab\Permissions\Acl\ServiceFactory as AclServiceFactory;
+use GeometriaLab\Permissions\Assertion\Assertion,
+    GeometriaLab\Permissions\Assertion\Service;
 
 use Zend\ServiceManager\ServiceManager as ZendServiceManager,
     Zend\Mvc\Service\ServiceManagerConfig as ZendServiceManagerConfig,
@@ -16,9 +17,9 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     static private $serviceManager;
 
     /**
-     * @var \Zend\Permissions\Acl\Acl
+     * @var Assertion
      */
-    static private $acl;
+    static private $assertion;
 
     static public function setUpBeforeClass()
     {
@@ -39,16 +40,9 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                     'HttpRouter'                => 'Zend\Mvc\Service\RouterFactory',
                     'Config'                    => function($e){
                         return array(
-                            'acl' => array(
-                                'roles' => array(
-                                    'guest',
-                                    array(
-                                        'name' => 'user',
-                                        'parent' => 'guest',
-                                    ),
-                                ),
+                            'assertion' => array(
                                 'base_dir'      => __DIR__ . '/Sample',
-                                '__NAMESPACE__' => 'GeometriaLabTest\Permissions\Acl\Sample',
+                                '__NAMESPACE__' => 'GeometriaLabTest\Permissions\Assertion\Sample',
                             ),
                         );
                     },
@@ -65,53 +59,22 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             '__NAMESPACE__' => 'Sample',
         )));
 
-        $serviceFactory = new AclServiceFactory();
-        static::$acl = $serviceFactory->createService(static::$serviceManager);
+        $serviceFactory = new Service();
+        static::$assertion = $serviceFactory->createService(static::$serviceManager);
     }
 
-    public function testStaticRoles()
+    public function testCreateService()
     {
-        $this->assertTrue(static::$acl->hasRole('guest'));
-        $this->assertTrue(static::$acl->hasRole('user'));
+        $this->assertInstanceOf('\\GeometriaLab\\Permissions\\Assertion\\Assertion', static::$assertion);
     }
 
-    public function testInheritStaticRole()
+    public function testAddResources()
     {
-        $this->assertTrue(static::$acl->inheritsRole('user', 'guest'));
-    }
+        $expected = array(
+            'Foo' => new Sample\Foo('Foo'),
+            'Bar' => new Sample\Bar('Bar'),
+        );
 
-    public function testDynamicRoles()
-    {
-        $this->assertTrue(static::$acl->hasRole('moderator'));
-        $this->assertTrue(static::$acl->hasRole('cityManager'));
-    }
-
-    public function testResources()
-    {
-        $this->assertTrue(static::$acl->hasResource('Sample\Users'));
-        $this->assertTrue(static::$acl->hasResource('Sample\Cities'));
-    }
-
-    public function testStaticAssert()
-    {
-        $this->assertTrue(static::$acl->isAllowed('moderator', 'Sample\Users', 'assert'));
-        $this->assertFalse(static::$acl->isAllowed('moderator', 'Sample\Users', 'foo'));
-    }
-
-    public function testDynamicAssert()
-    {
-        $this->assertTrue(static::$acl->isAllowed('moderator', 'Sample\Users', 'dynamic'));
-    }
-
-    public function testDynamicAssertWithoutPrivilege()
-    {
-        $this->assertFalse(static::$acl->isAllowed('moderator', 'Sample\Users'));
-    }
-
-    public function testBadDynamicAssert()
-    {
-        $this->setExpectedException('\InvalidArgumentException');
-
-        static::$acl->isAllowed('moderator', 'Sample\Users', 'notDynamic');
+        $this->assertEquals($expected, static::$assertion->getResources());
     }
 }
