@@ -2,8 +2,6 @@
 
 namespace GeometriaLab\Permissions\Assertion;
 
-use GeometriaLab\Api\Mvc\Router\Http\Api;
-
 use Zend\Stdlib\Glob as ZendGlob,
     Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\ServiceManager\ServiceLocatorInterface as ZendServiceLocatorInterface;

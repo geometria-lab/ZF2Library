@@ -53,13 +53,9 @@ class Assertion
      */
     public function hasResource($resource)
     {
-        if ($resource instanceof ResourceInterface) {
-            $resourceId = $resource->getName();
-        } else {
-            $resourceId = (string) $resource;
-        }
+        $resourceName = self::getResourceName($resource);
 
-        return isset($this->resources[$resourceId]);
+        return isset($this->resources[$resourceName]);
     }
 
     /**
@@ -73,11 +69,7 @@ class Assertion
      */
     public function getResource($resource)
     {
-        if ($resource instanceof ResourceInterface) {
-            $resourceName = $resource->getName();
-        } else {
-            $resourceName = $resource;
-        }
+        $resourceName = self::getResourceName($resource);
 
         if (!$this->hasResource($resource)) {
             throw new Exception\InvalidArgumentException("Resource '$resourceName' not found");
@@ -97,7 +89,11 @@ class Assertion
      */
     public function removeResource($resource)
     {
-        $resourceName = $this->getResource($resource)->getName();
+        $resourceName = self::getResourceName($resource);
+
+        if (!$this->hasResource($resource)) {
+            throw new Exception\InvalidArgumentException("Resource '$resourceName' not found");
+        }
 
         unset($this->resources[$resourceName]);
 
@@ -119,10 +115,6 @@ class Assertion
     {
         $resource = $this->getResource($resource);
 
-        if (in_array($privilege, $resource->getAllowedPrivileges())) {
-            return true;
-        }
-
         $methodName = self::DYNAMIC_ASSERT_PREFIX . ucfirst($privilege);
         if (!method_exists($resource, $methodName)) {
             throw new Exception\RuntimeException("No rules for privilege '{$privilege}'");
@@ -135,5 +127,21 @@ class Assertion
         array_unshift($funcArgs, $this);
 
         return call_user_func_array(array($resource, $methodName), $funcArgs);
+    }
+
+    /**
+     * Get Resource name
+     * The $resource parameter can either be a Resource or a Resource identifier.
+     *
+     * @param ResourceInterface|string $resource
+     * @return string
+     */
+    protected static function getResourceName($resource)
+    {
+        if ($resource instanceof ResourceInterface) {
+            return $resource->getName();
+        }
+
+        return (string) $resource;
     }
 }

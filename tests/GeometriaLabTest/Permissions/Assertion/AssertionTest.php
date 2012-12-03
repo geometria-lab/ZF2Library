@@ -131,15 +131,6 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
         $assertion->assert('Bar', 'privilege');
     }
 
-    public function testAssertWithAllowedPrivilege()
-    {
-        $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
-        $assertion->addResource($fooResource);
-
-        $this->assertTrue($assertion->assert('Foo', 'allowedForAll'));
-    }
-
     public function testWithDynamicAssert()
     {
         $assertion = new Assertion();

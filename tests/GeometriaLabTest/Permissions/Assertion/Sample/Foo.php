@@ -7,10 +7,6 @@ use GeometriaLab\Permissions\Assertion\Assertion,
 
 class Foo extends AbstractResource
 {
-    protected $allowedPrivileges = array(
-        'allowedForAll',
-    );
-
     public function canDynamicAssert(Assertion $assertion, \stdClass $obj, array $array)
     {
         return !empty($obj) && !empty($array);

@@ -11,6 +11,5 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $resource = new Sample\Foo('Foo');
 
         $this->assertEquals('Foo', $resource->getName());
-        $this->assertEquals(array('allowedForAll'), $resource->getAllowedPrivileges());
     }
 }
