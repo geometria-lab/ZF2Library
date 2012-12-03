@@ -133,10 +133,14 @@ class Assertion
         }
 
         $resource = $this->getResource($resource);
-        $methodName = self::DYNAMIC_ASSERT_PREFIX . ucfirst($privilege);
 
+        if (in_array($privilege, $resource->getAllowedPrivileges())) {
+            return true;
+        }
+
+        $methodName = self::DYNAMIC_ASSERT_PREFIX . ucfirst($privilege);
         if (!method_exists($resource, $methodName)) {
-            throw new Exception\InvalidArgumentException('Need declare ' . get_class($resource) . '->' . $methodName);
+            throw new Exception\InvalidArgumentException("No rules for privilege '{$privilege}'");
         }
 
         $funcArgs = func_get_args();

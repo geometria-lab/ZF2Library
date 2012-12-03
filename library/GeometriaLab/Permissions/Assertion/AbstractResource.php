@@ -2,14 +2,20 @@
 
 namespace GeometriaLab\Permissions\Assertion;
 
-use Zend\ServiceManager\ServiceManager as ZendServiceManager;
-
 abstract class AbstractResource implements ResourceInterface
 {
     /**
+     * Resource unique identifier
+     *
      * @var string
      */
     protected $name;
+    /**
+     * Array of privileges which always allowed for all
+     *
+     * @var array
+     */
+    protected $allowedPrivileges = array();
 
     /**
      * @param string $name
@@ -20,12 +26,22 @@ abstract class AbstractResource implements ResourceInterface
     }
 
     /**
-     * Defined by ResourceInterface; returns the Resource identifier
+     * Get unique identifier
      *
      * @return string
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Get array of privileges which always allowed for all
+     *
+     * @return array
+     */
+    public function getAllowedPrivileges()
+    {
+        return $this->allowedPrivileges;
     }
 }
