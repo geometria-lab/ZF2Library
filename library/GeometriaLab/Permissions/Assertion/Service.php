@@ -76,7 +76,7 @@ class Service implements ZendFactoryInterface
     }
 
     /**
-     * Get Acl object
+     * Get Assertion object
      *
      * @return Assertion
      */

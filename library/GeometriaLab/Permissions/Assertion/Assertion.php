@@ -2,8 +2,6 @@
 
 namespace GeometriaLab\Permissions\Assertion;
 
-use GeometriaLab\Model\AbstractModel;
-
 class Assertion
 {
     const DYNAMIC_ASSERT_PREFIX = 'can';
@@ -99,15 +97,6 @@ class Assertion
      */
     public function removeResource($resource)
     {
-        if (!$this->hasResource($resource)) {
-            if ($resource instanceof ResourceInterface) {
-                $resourceName = $resource->getName();
-            } else {
-                $resourceName = $resource;
-            }
-            throw new Exception\InvalidArgumentException("Resource '$resourceName' not found");
-        }
-
         $resourceName = $this->getResource($resource)->getName();
 
         unset($this->resources[$resourceName]);
@@ -124,14 +113,10 @@ class Assertion
      * @param mixed $arg2 [optional]
      * @param mixed $argN [optional]
      * @return bool
-     * @throws Exception\InvalidArgumentException
+     * @throws Exception\RuntimeException
      */
     public function assert($resource, $privilege, $arg1 = null, $arg2 = null, $argN = null)
     {
-        if (!$this->hasResource($resource)) {
-            return false;
-        }
-
         $resource = $this->getResource($resource);
 
         if (in_array($privilege, $resource->getAllowedPrivileges())) {
@@ -140,7 +125,7 @@ class Assertion
 
         $methodName = self::DYNAMIC_ASSERT_PREFIX . ucfirst($privilege);
         if (!method_exists($resource, $methodName)) {
-            throw new Exception\InvalidArgumentException("No rules for privilege '{$privilege}'");
+            throw new Exception\RuntimeException("No rules for privilege '{$privilege}'");
         }
 
         $funcArgs = func_get_args();
