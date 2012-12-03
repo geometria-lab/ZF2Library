@@ -55,7 +55,7 @@ class Assertion
      */
     public function hasResource($resource)
     {
-        if ($resource instanceof Resource) {
+        if ($resource instanceof ResourceInterface) {
             $resourceId = $resource->getName();
         } else {
             $resourceId = (string) $resource;
@@ -75,7 +75,7 @@ class Assertion
      */
     public function getResource($resource)
     {
-        if ($resource instanceof Resource) {
+        if ($resource instanceof ResourceInterface) {
             $resourceName = $resource->getName();
         } else {
             $resourceName = $resource;
@@ -100,7 +100,7 @@ class Assertion
     public function removeResource($resource)
     {
         if (!$this->hasResource($resource)) {
-            if ($resource instanceof Resource) {
+            if ($resource instanceof ResourceInterface) {
                 $resourceName = $resource->getName();
             } else {
                 $resourceName = $resource;
