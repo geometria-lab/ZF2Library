@@ -96,6 +96,6 @@ class Singularize implements ZendFilterInterface
             }
         }
 
-        return $word;
+        return static::$cachedWords[$word] = $word;
     }
 }
