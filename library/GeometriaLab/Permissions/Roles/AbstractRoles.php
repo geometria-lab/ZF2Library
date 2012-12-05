@@ -1,16 +1,13 @@
 <?php
 
-namespace GeometriaLab\Permissions\Assertion\Roles;
-
-use GeometriaLab\Permissions\Assertion\Exception\RuntimeException,
-    GeometriaLab\Permissions\Assertion\Exception\InvalidArgumentException;
+namespace GeometriaLab\Permissions\Roles;
 
 use GeometriaLab\Model\AbstractModel,
     GeometriaLab\Model\Persistent\AbstractModel as PersistentAbstractModel,
     GeometriaLab\Permissions\Assertion\Resource\ResourceInterface;
 
 /**
- * @property \GeometriaLab\Permissions\Assertion\Roles\ResourceRoles[]  $resourceRoles
+ * @property \GeometriaLab\Permissions\Roles\ResourceRoles[]  $resourceRoles
  */
 abstract class AbstractRoles extends PersistentAbstractModel
 {
@@ -27,13 +24,13 @@ abstract class AbstractRoles extends PersistentAbstractModel
      * @param string $role
      * @param AbstractModel $model
      * @return bool
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function hasRole($role, AbstractModel $model)
     {
         if (!isset($model->id)) {
             $modelClassName = get_class($model);
-            throw new RuntimeException("Need 'id' property in model '{$modelClassName}'");
+            throw new \RuntimeException("Need 'id' property in model '{$modelClassName}'");
         }
 
         $parts = explode('\\', get_class($model));
@@ -59,14 +56,13 @@ abstract class AbstractRoles extends PersistentAbstractModel
      *
      * @param string $property
      * @param string $role
-     * @param ResourceInterface|string $resource
+     * @param string $resourceName
      * @param string $objectId
      * @return bool
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
-    protected function hasRoleForProperty($property, $role, $resource, $objectId)
+    protected function hasRoleForProperty($property, $role, $resourceName, $objectId)
     {
-        $resourceName = ($resource instanceof ResourceInterface) ? $resource->getName() : (string) $resource;
         $permission = $this->getPermissionByResourceName($resourceName);
 
         if ($permission === null) {
@@ -74,7 +70,7 @@ abstract class AbstractRoles extends PersistentAbstractModel
         }
 
         if (!isset($permission->{$property})) {
-            throw new InvalidArgumentException("Property '{$property}' doesn't exist");
+            throw new \InvalidArgumentException("Property '{$property}' doesn't exist");
         }
 
         // @TODO Hack for super manager
@@ -94,7 +90,7 @@ abstract class AbstractRoles extends PersistentAbstractModel
      *
      * @param string $resourceName
      * @return ResourceRoles|null
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     protected function getPermissionByResourceName($resourceName)
     {
@@ -112,7 +108,7 @@ abstract class AbstractRoles extends PersistentAbstractModel
         if (isset($this->resourceRolesMap[$resourceName])) {
             $index = $this->resourceRolesMap[$resourceName];
             if (!isset($this->resourceRoles[$index])) {
-                throw new RuntimeException("Can't find '{$resourceName}' resourceRoles. ResourceRolesMap is broken.");
+                throw new \RuntimeException("Can't find '{$resourceName}' resourceRoles. ResourceRolesMap is broken.");
             }
 
             return $this->resourceRoles[$index];

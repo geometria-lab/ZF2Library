@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Permissions\Assertion\Roles\SampleModel;
+namespace GeometriaLabTest\Permissions\Roles\SampleModel;
 
 /**
  * @property integer $id

@@ -1,10 +1,8 @@
 <?php
 
-namespace GeometriaLabTest\Permissions\Assertion\Roles;
+namespace GeometriaLabTest\Permissions\Roles;
 
-use GeometriaLabTest\Permissions\Assertion\SampleResource\Bar as BarResource;
-
-use GeometriaLab\Permissions\Assertion\Roles\ResourceRoles;
+use GeometriaLab\Permissions\Roles\ResourceRoles;
 
 class RolesTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,7 +73,7 @@ class RolesTest extends \PHPUnit_Framework_TestCase
 
     public function testHasRoleForBadResource()
     {
-        $this->setExpectedException('\\GeometriaLab\\Permissions\\Assertion\\Exception\\RuntimeException');
+        $this->setExpectedException('\\RuntimeException');
 
         $badModel = new SampleModel\ModelWithoutId();
 
@@ -93,12 +91,6 @@ class RolesTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(static::$roles->hasRoleInCity('manager', 1, 'Bar'));
         $this->assertTrue(static::$roles->hasRoleInCity('admin', 2, 'Bar'));
-    }
-
-    public function testHasRolesForResourceInterfaceInCity()
-    {
-        $bar = new BarResource('Bar');
-        $this->assertTrue(static::$roles->hasRoleInCity('manager', 1, $bar));
     }
 
     public function testHasNonExistentRoleForResourceInCity()

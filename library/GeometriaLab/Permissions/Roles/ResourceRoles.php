@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Permissions\Assertion\Roles;
+namespace GeometriaLab\Permissions\Roles;
 
 use GeometriaLab\Model\AbstractModel;
 
