@@ -12,7 +12,7 @@ use GeometriaLab\Model\AbstractModel,
 /**
  * @property \GeometriaLab\Permissions\Assertion\Roles\ResourceRoles[]  $resourceRoles
  */
-class Roles extends PersistentAbstractModel
+abstract class AbstractRoles extends PersistentAbstractModel
 {
     /**
      * Resource roles map
@@ -32,7 +32,8 @@ class Roles extends PersistentAbstractModel
     public function hasRole($role, AbstractModel $model)
     {
         if (!isset($model->id)) {
-            throw new RuntimeException("Need 'id' property in model '{$model}'");
+            $modelClassName = get_class($model);
+            throw new RuntimeException("Need 'id' property in model '{$modelClassName}'");
         }
 
         $parts = explode('\\', get_class($model));
@@ -77,7 +78,7 @@ class Roles extends PersistentAbstractModel
         }
 
         // @TODO Hack for super manager
-        if (isset($permission->{$property}[0]) && $permission->{$property}[$objectId] === $role) {
+        if (isset($permission->{$property}[0]) && $permission->{$property}[0] === $role) {
             return true;
         }
 

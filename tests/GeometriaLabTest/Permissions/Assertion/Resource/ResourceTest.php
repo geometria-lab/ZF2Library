@@ -1,14 +1,14 @@
 <?php
 
-namespace GeometriaLabTest\Permissions\Assertion;
+namespace GeometriaLabTest\Permissions\Assertion\Resource;
 
-use GeometriaLab\Permissions\Assertion\Assertion;
+use GeometriaLabTest\Permissions\Assertion\Sample\Foo;
 
 class ResourceTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreate()
     {
-        $resource = new Sample\Foo('Foo');
+        $resource = new Foo('Foo');
 
         $this->assertEquals('Foo', $resource->getName());
     }

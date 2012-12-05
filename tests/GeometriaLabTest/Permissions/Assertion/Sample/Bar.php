@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Permissions\Assertion\Sample;
 
-use GeometriaLab\Permissions\Assertion\AbstractResource;
+use GeometriaLab\Permissions\Assertion\Resource\AbstractResource;
 
 class Bar extends AbstractResource
 {

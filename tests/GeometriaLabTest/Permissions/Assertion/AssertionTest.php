@@ -12,7 +12,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
         $fooResource = new Sample\Foo('Foo');
         $assertion->addResource($fooResource);
 
-        $this->assertInstanceOf('\\GeometriaLab\\Permissions\\Assertion\\ResourceInterface', $assertion->getResource('Foo'));
+        $this->assertInstanceOf('\\GeometriaLab\\Permissions\\Assertion\\Resource\\ResourceInterface', $assertion->getResource('Foo'));
         $this->assertEquals($fooResource, $assertion->getResource('Foo'));
     }
 

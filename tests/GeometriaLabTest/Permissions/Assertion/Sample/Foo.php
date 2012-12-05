@@ -3,7 +3,7 @@
 namespace GeometriaLabTest\Permissions\Assertion\Sample;
 
 use GeometriaLab\Permissions\Assertion\Assertion,
-    GeometriaLab\Permissions\Assertion\AbstractResource;
+    GeometriaLab\Permissions\Assertion\Resource\AbstractResource;
 
 class Foo extends AbstractResource
 {

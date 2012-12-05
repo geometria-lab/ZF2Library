@@ -97,7 +97,7 @@ class Service implements ZendFactoryInterface
         $pathPattern = $this->getResourcesPath() . '*';
 
         foreach (ZendGlob::glob($pathPattern, ZendGlob::GLOB_BRACE) as $file) {
-            /* @var \GeometriaLab\Permissions\Assertion\ResourceInterface $resource */
+            /* @var \GeometriaLab\Permissions\Assertion\Resource\ResourceInterface $resource */
             $resourceName = ucfirst(pathinfo($file, PATHINFO_FILENAME));
             $resourceClassName = $namespace . '\\' . $resourceName;
 
