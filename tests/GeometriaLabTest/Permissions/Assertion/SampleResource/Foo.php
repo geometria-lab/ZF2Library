@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Permissions\Assertion\Sample;
+namespace GeometriaLabTest\Permissions\Assertion\SampleResource;
 
 use GeometriaLab\Permissions\Assertion\Assertion,
     GeometriaLab\Permissions\Assertion\Resource\AbstractResource;

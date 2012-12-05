@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLabTest\Permissions\Assertion\Roles\SampleResource;
+namespace GeometriaLabTest\Permissions\Assertion\Roles\SampleModel;
 
 /**
  *

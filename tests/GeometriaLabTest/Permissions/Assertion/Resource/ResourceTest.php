@@ -2,7 +2,7 @@
 
 namespace GeometriaLabTest\Permissions\Assertion\Resource;
 
-use GeometriaLabTest\Permissions\Assertion\Sample\Foo;
+use GeometriaLabTest\Permissions\Assertion\SampleResource\Foo;
 
 class ResourceTest extends \PHPUnit_Framework_TestCase
 {
