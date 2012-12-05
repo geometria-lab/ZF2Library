@@ -89,10 +89,6 @@ class RolesTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(static::$roles->hasRole('admin', $bar));
     }
 
-
-
-
-
     public function testHasRolesForResourceInCity()
     {
         $this->assertTrue(static::$roles->hasRoleInCity('manager', 1, 'Bar'));
