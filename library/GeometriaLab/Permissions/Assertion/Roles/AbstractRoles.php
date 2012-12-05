@@ -98,6 +98,10 @@ abstract class AbstractRoles extends PersistentAbstractModel
      */
     protected function getPermissionByResourceName($resourceName)
     {
+        if ($this->resourceRoles === null) {
+            return null;
+        }
+
         if ($this->resourceRolesMap === null) {
             // @TODO Add feature getting Model from array by id
             foreach ($this->resourceRoles as $index => $resourceRole) {
