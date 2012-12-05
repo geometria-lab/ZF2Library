@@ -9,20 +9,20 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testAddResource()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
-        $this->assertInstanceOf('\\GeometriaLab\\Permissions\\Assertion\\ResourceInterface', $assertion->getResource('Foo'));
+        $this->assertInstanceOf('\\GeometriaLab\\Permissions\\Assertion\\Resource\\ResourceInterface', $assertion->getResource('Foo'));
         $this->assertEquals($fooResource, $assertion->getResource('Foo'));
     }
 
     public function testAddResources()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
-        $barResource = new Sample\Bar('Bar');
+        $barResource = new SampleResource\Bar('Bar');
         $assertion->addResource($barResource);
 
         $expected = array(
@@ -37,7 +37,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('\\GeometriaLab\\Permissions\\Assertion\\Exception\\InvalidArgumentException');
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
         $assertion->addResource($fooResource);
     }
@@ -45,7 +45,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testHasResourceByName()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $this->assertTrue($assertion->hasResource('Foo'));
@@ -54,7 +54,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testHasResourceByObject()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $this->assertTrue($assertion->hasResource($fooResource));
@@ -63,7 +63,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testHasNotExistingResource()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $this->assertFalse($assertion->hasResource('Bar'));
@@ -72,7 +72,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testGetResourceByName()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $this->assertEquals($fooResource, $assertion->getResource('Foo'));
@@ -81,7 +81,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testGetResourceByObject()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $this->assertEquals($fooResource, $assertion->getResource($fooResource));
@@ -92,7 +92,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\\GeometriaLab\\Permissions\\Assertion\\Exception\\InvalidArgumentException');
 
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $assertion->getResource('Bar');
@@ -101,7 +101,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testRemoveResourceByName()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $this->assertEquals($fooResource, $assertion->getResource('Foo'));
@@ -125,7 +125,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\\GeometriaLab\\Permissions\\Assertion\\Exception\\RuntimeException');
 
         $assertion = new Assertion();
-        $barResource = new Sample\Bar('Bar');
+        $barResource = new SampleResource\Bar('Bar');
         $assertion->addResource($barResource);
 
         $assertion->assert('Bar', 'privilege');
@@ -134,7 +134,7 @@ class AssertionTest extends \PHPUnit_Framework_TestCase
     public function testWithDynamicAssert()
     {
         $assertion = new Assertion();
-        $fooResource = new Sample\Foo('Foo');
+        $fooResource = new SampleResource\Foo('Foo');
         $assertion->addResource($fooResource);
 
         $obj = new \stdClass();

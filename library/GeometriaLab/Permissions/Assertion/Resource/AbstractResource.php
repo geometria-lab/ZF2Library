@@ -1,6 +1,6 @@
 <?php
 
-namespace GeometriaLab\Permissions\Assertion;
+namespace GeometriaLab\Permissions\Assertion\Resource;
 
 abstract class AbstractResource implements ResourceInterface
 {

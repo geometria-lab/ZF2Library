@@ -41,8 +41,8 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                     'Config'                    => function($e){
                         return array(
                             'assertion' => array(
-                                'base_dir'      => __DIR__ . '/Sample',
-                                '__NAMESPACE__' => 'GeometriaLabTest\Permissions\Assertion\Sample',
+                                'base_dir'      => __DIR__ . '/SampleResource',
+                                '__NAMESPACE__' => 'GeometriaLabTest\Permissions\Assertion\SampleResource',
                             ),
                         );
                     },
@@ -71,8 +71,8 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     public function testAddResources()
     {
         $expected = array(
-            'Foo' => new Sample\Foo('Foo'),
-            'Bar' => new Sample\Bar('Bar'),
+            'Foo' => new SampleResource\Foo('Foo'),
+            'Bar' => new SampleResource\Bar('Bar'),
         );
 
         $this->assertEquals($expected, static::$assertion->getResources());

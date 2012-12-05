@@ -9,14 +9,14 @@ class Assertion
     /**
      * Resource tree
      *
-     * @var ResourceInterface[]
+     * @var Resource\ResourceInterface[]
      */
     protected $resources = array();
 
     /**
      * Get all resources
      *
-     * @return ResourceInterface[]
+     * @return Resource\ResourceInterface[]
      */
     public function getResources()
     {
@@ -26,11 +26,11 @@ class Assertion
     /**
      * Adds a Resource having an identifier unique to the Assertion
      *
-     * @param ResourceInterface $resource
+     * @param Resource\ResourceInterface $resource
      * @throws Exception\InvalidArgumentException
      * @return Assertion
      */
-    public function addResource(ResourceInterface $resource)
+    public function addResource(Resource\ResourceInterface $resource)
     {
         $resourceName = $resource->getName();
 
@@ -48,7 +48,7 @@ class Assertion
      *
      * The $resource parameter can either be a Resource or a Resource identifier.
      *
-     * @param ResourceInterface|string $resource
+     * @param Resource\ResourceInterface|string $resource
      * @return boolean
      */
     public function hasResource($resource)
@@ -63,9 +63,9 @@ class Assertion
      *
      * The $resource parameter can either be a Resource or a Resource identifier.
      *
-     * @param ResourceInterface|string $resource
+     * @param Resource\ResourceInterface|string $resource
      * @throws Exception\InvalidArgumentException
-     * @return ResourceInterface
+     * @return Resource\ResourceInterface
      */
     public function getResource($resource)
     {
@@ -83,7 +83,7 @@ class Assertion
      *
      * The $resource parameter can either be a Resource or a Resource identifier.
      *
-     * @param ResourceInterface|string $resource
+     * @param Resource\ResourceInterface|string $resource
      * @throws Exception\InvalidArgumentException
      * @return Assertion
      */
@@ -103,7 +103,7 @@ class Assertion
     /**
      * Returns false if and only if the Resource has deny to the $privilege
      *
-     * @param ResourceInterface|string $resource
+     * @param Resource\ResourceInterface|string $resource
      * @param string $privilege
      * @param mixed $arg1 [optional]
      * @param mixed $arg2 [optional]
@@ -133,12 +133,12 @@ class Assertion
      * Get Resource name
      * The $resource parameter can either be a Resource or a Resource identifier.
      *
-     * @param ResourceInterface|string $resource
+     * @param Resource\ResourceInterface|string $resource
      * @return string
      */
     protected static function getResourceName($resource)
     {
-        if ($resource instanceof ResourceInterface) {
+        if ($resource instanceof Resource\ResourceInterface) {
             return $resource->getName();
         }
 
