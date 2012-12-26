@@ -4,7 +4,8 @@ namespace GeometriaLab\Model\Persistent\Relation;
 
 use GeometriaLab\Model\ModelInterface,
     GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty,
-    GeometriaLab\Model\Persistent\Collection;
+    GeometriaLab\Model\Persistent\Collection,
+    GeometriaLab\Model\Persistent\Mapper\MapperInterface;
 
 abstract class AbstractRelation
 {
@@ -64,6 +65,16 @@ abstract class AbstractRelation
     public function getOriginModel()
     {
         return $this->originModel;
+    }
+
+    /**
+     * Get target mapper object
+     *
+     * @return MapperInterface
+     */
+    public function getTargetMapper()
+    {
+        return call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
     }
 
     /**

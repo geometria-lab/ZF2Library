@@ -20,8 +20,7 @@ class HasMany extends AbstractRelation
     public function getTargetModels($refresh = false)
     {
         if ($refresh || $this->targetModels === false) {
-            $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
-
+            $targetMapper = $this->getTargetMapper();
             $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
             if ($originPropertyValue === null) {
@@ -124,7 +123,7 @@ class HasMany extends AbstractRelation
 
         $condition = array(
             $this->getProperty()->getTargetProperty() => array(
-                '$in' => array_values(array_unique($localModels))
+                '$in' => array_values(array_unique($fetchValues))
             )
         );
 

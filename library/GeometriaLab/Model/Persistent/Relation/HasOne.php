@@ -23,11 +23,7 @@ class HasOne extends AbstractRelation
             $originPropertyValue = $this->getOriginModel()->get($this->getProperty()->getOriginProperty());
 
             if ($originPropertyValue !== null) {
-                /**
-                 * @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper
-                 */
-                $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
-
+                $targetMapper = $this->getTargetMapper();
                 $condition = array($this->getProperty()->getTargetProperty() => $originPropertyValue);
                 $query = $targetMapper->createQuery()->where($condition);
 
@@ -96,6 +92,11 @@ class HasOne extends AbstractRelation
         }
 
         return 1;
+    }
+
+    public function get()
+    {
+
     }
 
     /**
