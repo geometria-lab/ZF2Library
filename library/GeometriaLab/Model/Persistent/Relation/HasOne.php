@@ -3,7 +3,8 @@
 namespace GeometriaLab\Model\Persistent\Relation;
 
 use GeometriaLab\Model\Persistent\ModelInterface,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne as HasOneProperty;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasOne as HasOneProperty,
+    GeometriaLab\Model\Persistent\Collection;
 
 class HasOne extends AbstractRelation
 {
@@ -51,6 +52,26 @@ class HasOne extends AbstractRelation
     }
 
     /**
+     * @return HasOne
+     */
+    public function resetTargetModel()
+    {
+        $this->targetModel = false;
+
+        return $this;
+    }
+
+    /**
+     * Doe's it have target model?
+     *
+     * @return bool
+     */
+    public function hasTargetModel()
+    {
+        return $this->targetModel !== false;
+    }
+
+    /**
      * @return int
      */
     public function removeTargetRelation()
@@ -75,5 +96,55 @@ class HasOne extends AbstractRelation
         }
 
         return 1;
+    }
+
+    /**
+     * Set target objects to collection
+     *
+     * @param Collection $collection
+     * @param bool $refresh
+     * @param string $childRelations
+     */
+    public function setTargetObjectsToCollection(Collection $collection, $refresh = false, $childRelations = null)
+    {
+        $localModels = array();
+        foreach ($collection as $model) {
+            /* @var $model \GeometriaLab\Model\Persistent\AbstractModel */
+            $relation = $model->getRelation($this->getProperty()->getName());
+            if ($refresh || !$relation->hasTargetModel()) {
+                // TODO '0' value will not pass check, should it?
+                $value = $model->get($this->getProperty()->getOriginProperty());
+                if ($value) {
+                    $localModels[$value][] = $model;
+                }
+                $relation->resetTargetModel();
+            }
+        }
+
+        if (count($localModels) == 0) {
+            return;
+        }
+
+        $condition = array(
+            $this->getProperty()->getTargetProperty() => array(
+                '$in' => array_keys($localModels)
+            )
+        );
+
+        /* @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper */
+        $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
+        $query = $targetMapper->createQuery()->where($condition);
+        $targetModels = $targetMapper->getAll($query);
+
+        if ($childRelations !== null) {
+            $targetModels->fetchRelations($childRelations);
+        }
+
+        foreach ($targetModels as $targetModel) {
+            /* @var $targetModel ModelInterface */
+            foreach ($localModels[$targetModel->{$this->getProperty()->getTargetProperty()}] as $localModel) {
+                $localModel->{$this->getProperty()->getName()} = $targetModel;
+            }
+        }
     }
 }

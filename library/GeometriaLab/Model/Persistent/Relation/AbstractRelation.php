@@ -3,7 +3,8 @@
 namespace GeometriaLab\Model\Persistent\Relation;
 
 use GeometriaLab\Model\ModelInterface,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty,
+    GeometriaLab\Model\Persistent\Collection;
 
 abstract class AbstractRelation
 {
@@ -64,4 +65,14 @@ abstract class AbstractRelation
     {
         return $this->originModel;
     }
+
+    /**
+     * Set target objects to collection
+     *
+     * @param Collection $collection
+     * @param bool $refresh
+     * @param string $childRelations
+     * @return void
+     */
+    abstract public function setTargetObjectsToCollection(Collection $collection, $refresh = false, $childRelations = null);
 }

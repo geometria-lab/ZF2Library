@@ -2,7 +2,8 @@
 
 namespace GeometriaLab\Model\Persistent\Relation;
 
-use GeometriaLab\Model\Persistent\ModelInterface;
+use GeometriaLab\Model\Persistent\ModelInterface,
+    GeometriaLab\Model\Persistent\Collection;
 
 class BelongsTo extends AbstractRelation
 {
@@ -67,10 +68,66 @@ class BelongsTo extends AbstractRelation
         return $this;
     }
 
+    /**
+     * @return BelongsTo
+     */
     public function resetTargetModel()
     {
         $this->targetModel = false;
 
         return $this;
+    }
+
+    /**
+     * Doe's it have target model?
+     *
+     * @return bool
+     */
+    public function hasTargetModel()
+    {
+        return $this->targetModel !== false;
+    }
+
+    public function setTargetObjectsToCollection(Collection $collection, $refresh = false, $childRelations = null)
+    {
+        $localModels = array();
+        foreach ($collection as $model) {
+            /* @var $model \GeometriaLab\Model\Persistent\AbstractModel */
+            $relation = $model->getRelation($this->getProperty()->getName());
+            if ($refresh || !$relation->hasTargetModel()) {
+                // TODO '0' value will not pass check, should it?
+                $value = $model->get($this->getProperty()->getOriginProperty());
+                if ($value) {
+                    $localModels[$value][] = $model;
+                }
+                $relation->targetModel = false;
+            }
+        }
+
+        if (count($localModels) == 0) {
+            return;
+        }
+
+        $condition = array(
+            $this->getProperty()->getTargetProperty() => array(
+                '$in' => array_keys($localModels)
+            )
+        );
+
+        /* @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper */
+        $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
+        $query = $targetMapper->createQuery()->where($condition);
+        $targetModels = $targetMapper->getAll($query);
+
+        if ($childRelations !== null) {
+            $targetModels->fetchRelations($childRelations);
+        }
+
+        foreach ($targetModels as $targetModel) {
+            /* @var $targetModel ModelInterface */
+            foreach ($localModels[$targetModel->{$this->getProperty()->getTargetProperty()}] as $localModel) {
+                $localModel->{$this->getProperty()->getName()} = $targetModel;
+            }
+        }
     }
 }
