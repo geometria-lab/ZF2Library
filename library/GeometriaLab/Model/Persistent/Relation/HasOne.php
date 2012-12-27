@@ -94,21 +94,18 @@ class HasOne extends AbstractRelation
         return 1;
     }
 
-    public function get()
-    {
-
-    }
-
     /**
-     * Set target objects to collection
+     * Set target objects to collection models
      *
      * @param Collection $collection
      * @param bool $refresh
      * @param string $childRelations
+     * @return void
      */
     public function setTargetObjectsToCollection(Collection $collection, $refresh = false, $childRelations = null)
     {
         $localModels = array();
+
         foreach ($collection as $model) {
             /* @var $model \GeometriaLab\Model\Persistent\AbstractModel */
             $relation = $model->getRelation($this->getProperty()->getName());
@@ -132,8 +129,7 @@ class HasOne extends AbstractRelation
             )
         );
 
-        /* @var \GeometriaLab\Model\Persistent\Mapper\MapperInterface $targetMapper */
-        $targetMapper = call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
+        $targetMapper = $this->getTargetMapper();
         $query = $targetMapper->createQuery()->where($condition);
         $targetModels = $targetMapper->getAll($query);
 

@@ -78,7 +78,7 @@ abstract class AbstractRelation
     }
 
     /**
-     * Set target objects to collection
+     * Set target objects to collection models
      *
      * @param Collection $collection
      * @param bool $refresh

@@ -34,6 +34,7 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
     protected function parseRelationNames($relationNames = null)
     {
         $relations = array();
+
         foreach ((array) $relationNames as $relationName => $childRelations) {
             if (is_numeric($relationName)) {
                 if (!is_string($childRelations)) {
@@ -44,6 +45,7 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
             }
             $relations[$relationName] = $childRelations;
         }
+
         return $relations;
     }
 
