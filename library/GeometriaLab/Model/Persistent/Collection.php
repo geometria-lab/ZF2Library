@@ -13,9 +13,18 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
      */
     public function fetchRelations($relationNames = null, $refresh = false)
     {
-        foreach ($this->parseRelationNames($relationNames) as $relationName => $childRelations) {
+        if ($relationNames === null) {
+            foreach ($this->getRelations() as $relation) {
+                /* @var \GeometriaLab\Model\Persistent\Relation\AbstractRelation $relation */
+                $relationNames[$relation->getProperty()->getName()] = null;
+            }
+        } else {
+            $relationNames = $this->parseRelationNames($relationNames);
+        }
+
+        foreach ($relationNames as $relationName => $childRelations) {
             $relation = $this->getRelation($relationName);
-            if ($relation instanceof Relation\AbstractRelation) {
+            if ($relation !== null) {
                 $relation->setTargetObjectsToCollection($this, $refresh, $childRelations);
             }
         }
@@ -55,14 +64,32 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
      *
      * @param string $name Relation name
      * @return Relation\AbstractRelation|null
+     * @throws \InvalidArgumentException
      */
     protected function getRelation($name)
     {
         $model = $this->getFirst();
-        if ($model instanceof AbstractModel && $model->hasRelation($name)) {
+        if ($model instanceof AbstractModel) {
+            if (!$model->hasRelation($name)) {
+                throw new \InvalidArgumentException("Model doesn't have '{$name}' relation");
+            }
             return $model->getRelation($name);
+        }
+        return null;
+    }
+
+    /**
+     * Get all relations
+     *
+     * @return Relation\AbstractRelation|null
+     */
+    protected function getRelations()
+    {
+        $model = $this->getFirst();
+        if ($model instanceof AbstractModel) {
+            return $model->getRelations();
         } else {
-            return null;
+            return array();
         }
     }
 }
