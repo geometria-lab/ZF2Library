@@ -30,6 +30,7 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
      *
      * @param array|string|null $relationNames
      * @return array
+     * @throws \InvalidArgumentException
      */
     protected function parseRelationNames($relationNames = null)
     {
@@ -38,7 +39,7 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
         foreach ((array) $relationNames as $relationName => $childRelations) {
             if (is_numeric($relationName)) {
                 if (!is_string($childRelations)) {
-                    continue;
+                    throw new \InvalidArgumentException("Child relation must be a string but " . gettype($childRelations) . " is given.");
                 }
                 $relationName = $childRelations;
                 $childRelations = null;
