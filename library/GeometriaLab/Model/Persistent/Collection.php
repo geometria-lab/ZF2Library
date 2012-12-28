@@ -58,7 +58,7 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
      */
     protected function getRelation($name)
     {
-        $model = $this->offsetGet(0);
+        $model = $this->getFirst();
         if ($model instanceof AbstractModel && $model->hasRelation($name)) {
             return $model->getRelation($name);
         } else {
