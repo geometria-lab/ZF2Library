@@ -114,13 +114,18 @@ class HasMany extends AbstractRelation
         foreach ($collection as $model) {
             /* @var $model \GeometriaLab\Model\Persistent\AbstractModel */
             // TODO 0 value will not pass check, should it ?
-            $values = $model->get($this->getProperty()->getOriginProperty());
+            $values = (array) $model->get($this->getProperty()->getOriginProperty());
             if ($values) {
                 $relation = $model->getRelation($this->getProperty()->getName());
-                if ($refresh || !$relation->hasTargetModel()) {
+                if ($relation instanceof HasMany) {
+                    $hasTargetModel = $relation->hasTargetModels();
+                } else {
+                    $hasTargetModel = $relation->hasTargetModel();
+                }
+                if ($refresh || !$hasTargetModel) {
                     $localModels[] = array(
                         'model'  => $model,
-                        'values' => (array) $values,
+                        'values' => $values,
                     );
                     $fetchValues = array_merge($fetchValues, $values);
                 }

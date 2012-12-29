@@ -22,7 +22,7 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
             $relationNames = $this->parseRelationNames($relationNames);
         }
 
-        foreach ($relationNames as $relationName => $childRelations) {
+        foreach ((array) $relationNames as $relationName => $childRelations) {
             $relation = $this->getRelation($relationName);
             if ($relation !== null) {
                 $relation->setTargetObjectsToCollection($this, $refresh, $childRelations);

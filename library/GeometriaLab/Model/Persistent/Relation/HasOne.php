@@ -109,7 +109,12 @@ class HasOne extends AbstractRelation
         foreach ($collection as $model) {
             /* @var $model \GeometriaLab\Model\Persistent\AbstractModel */
             $relation = $model->getRelation($this->getProperty()->getName());
-            if ($refresh || !$relation->hasTargetModel()) {
+            if ($relation instanceof HasMany) {
+                $hasTargetModel = $relation->hasTargetModels();
+            } else {
+                $hasTargetModel = $relation->hasTargetModel();
+            }
+            if ($refresh || !$hasTargetModel) {
                 // TODO '0' value will not pass check, should it?
                 $value = $model->get($this->getProperty()->getOriginProperty());
                 if ($value) {
