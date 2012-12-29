@@ -149,12 +149,14 @@ class HasMany extends AbstractRelation
         foreach ($localModels as $localModel) {
             /* @var CollectionInterface $targetCollection */
             $targetCollection = new $targetCollectionClass();
+            $targetProperty = $this->getProperty()->getTargetProperty();
             foreach ($targetModels as $targetModel) {
-                if (in_array($targetModel->{$this->getProperty()->getTargetProperty()}, $localModel['values'])) {
+                if (in_array($targetModel->{$targetProperty}, $localModel['values'])) {
                     $targetCollection->push($targetModel);
                 }
             }
-            $localModel['model']->{$this->getProperty()->getName()} = $targetCollection;
+            $relationName = $this->getProperty()->getName();
+            $localModel['model']->{$relationName} = $targetCollection;
         }
     }
 }
