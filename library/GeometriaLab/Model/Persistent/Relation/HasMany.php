@@ -4,7 +4,8 @@ namespace GeometriaLab\Model\Persistent\Relation;
 
 use GeometriaLab\Model\Persistent\CollectionInterface,
     GeometriaLab\Model\Persistent\Collection,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany as HasManyProperty;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\HasMany as HasManyProperty,
+    GeometriaLab\Model\Persistent\ModelInterface;
 
 class HasMany extends AbstractRelation
 {
@@ -151,12 +152,13 @@ class HasMany extends AbstractRelation
             $targetCollection = new $targetCollectionClass();
             $targetProperty = $this->getProperty()->getTargetProperty();
             foreach ($targetModels as $targetModel) {
-                if (in_array($targetModel->{$targetProperty}, $localModel['values'])) {
+                /* @var ModelInterface $targetModel */
+                if (in_array($targetModel->get($targetProperty), $localModel['values'])) {
                     $targetCollection->push($targetModel);
                 }
             }
             $relationName = $this->getProperty()->getName();
-            $localModel['model']->{$relationName} = $targetCollection;
+            $localModel['model']->set($relationName, $targetCollection);
         }
     }
 }

@@ -130,11 +130,12 @@ class BelongsTo extends AbstractRelation
         }
 
         foreach ($targetModels as $targetModel) {
-            /* @var $targetModel ModelInterface */
+            /* @var ModelInterface $targetModel */
             $targetProperty = $this->getProperty()->getTargetProperty();
             $relationName = $this->getProperty()->getName();
-            foreach ($localModels[$targetModel->{$targetProperty}] as $localModel) {
-                $localModel->{$relationName} = $targetModel;
+            foreach ($localModels[$targetModel->get($targetProperty)] as $localModel) {
+                /* @var ModelInterface $localModel */
+                $localModel->set($relationName, $targetModel);
             }
         }
     }
