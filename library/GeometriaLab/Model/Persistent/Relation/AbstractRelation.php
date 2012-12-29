@@ -3,7 +3,9 @@
 namespace GeometriaLab\Model\Persistent\Relation;
 
 use GeometriaLab\Model\ModelInterface,
-    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty;
+    GeometriaLab\Model\Persistent\Schema\Property\Relation\AbstractRelation as AbstractRelationProperty,
+    GeometriaLab\Model\Persistent\Collection,
+    GeometriaLab\Model\Persistent\Mapper\MapperInterface;
 
 abstract class AbstractRelation
 {
@@ -64,4 +66,24 @@ abstract class AbstractRelation
     {
         return $this->originModel;
     }
+
+    /**
+     * Get target mapper object
+     *
+     * @return MapperInterface
+     */
+    public function getTargetMapper()
+    {
+        return call_user_func(array($this->getProperty()->getTargetModelClass(), 'getMapper'));
+    }
+
+    /**
+     * Set target objects to collection models
+     *
+     * @param Collection $collection
+     * @param bool $refresh
+     * @param string $childRelations
+     * @return void
+     */
+    abstract public function setTargetObjectsToCollection(Collection $collection, $refresh = false, $childRelations = null);
 }

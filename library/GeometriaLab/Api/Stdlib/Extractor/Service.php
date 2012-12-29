@@ -7,7 +7,10 @@ use Zend\ServiceManager\FactoryInterface as ZendFactoryInterface,
     Zend\Stdlib\Exception\BadMethodCallException as ZendBadMethodCallException;
 
 use GeometriaLab\Model\ModelInterface,
+    GeometriaLab\Model\Persistent\ModelInterface as PersistentModelInterface,
     GeometriaLab\Model\CollectionInterface,
+    GeometriaLab\Model\Collection,
+    GeometriaLab\Model\Persistent\Collection as PersistentCollection,
     GeometriaLab\Api\Paginator\ModelPaginator,
     GeometriaLab\Api\Stdlib\Extractor\Extractor,
     GeometriaLab\Api\Exception\InvalidFieldsException;
@@ -81,10 +84,13 @@ class Service implements ZendFactoryInterface
 
         if ($data instanceof ModelPaginator) {
             $collection = $data->getItems();
-        } else if ($data instanceof CollectionInterface) {
+        } elseif ($data instanceof CollectionInterface) {
             $collection = $data;
-        } else if ($data instanceof ModelInterface) {
-            $collection = new \GeometriaLab\Model\Collection();
+        } elseif ($data instanceof PersistentModelInterface) {
+            $collection = new PersistentCollection();
+            $collection->push($data);
+        } elseif ($data instanceof ModelInterface) {
+            $collection = new Collection();
             $collection->push($data);
         } else {
             throw new \InvalidArgumentException('Data must be CollectionInterface, ModelInterface or ModelPaginator');
@@ -107,6 +113,10 @@ class Service implements ZendFactoryInterface
             $extractor = static::$extractorInstances[$extractorName];
             $dataCollection = array();
             $invalidFields = array();
+
+            if ($collection instanceof PersistentCollection) {
+                $collection->fetchRelations();
+            }
 
             foreach ($collection as $model) {
                 $fieldsData = $extractor->extract($model, $extractFields);

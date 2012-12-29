@@ -542,10 +542,24 @@ class Mapper extends AbstractMapper
     protected function transformModelDataForStorage(array $data)
     {
         if (isset($data['id'])) {
-            $data['_id'] = new \MongoId($data['id']);
-            if ((string)$data['_id'] != $data['id']) {
+            if (is_array($data['id'])) {
+                foreach ($data['id'] as &$value) {
+                    if (is_array($value)) {
+                        foreach ($value as &$val) {
+                            $val = new \MongoId($val);
+                        }
+                    } else {
+                        $value = new \MongoId($value);
+                    }
+                }
                 $data['_id'] = $data['id'];
+            } else {
+                $data['_id'] = new \MongoId($data['id']);
+                if ((string)$data['_id'] != $data['id']) {
+                    $data['_id'] = $data['id'];
+                }
             }
+
             unset($data['id']);
         }
 
