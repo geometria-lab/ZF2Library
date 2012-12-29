@@ -19,13 +19,12 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
                 return $this;
             }
 
-            foreach ($relations as $relation) {
-                /* @var \GeometriaLab\Model\Persistent\Relation\AbstractRelation $relation */
-                $relationNames[$relation->getProperty()->getName()] = null;
-            }
-        } else {
-            $relationNames = $this->parseRelationNames($relationNames);
+            $relationNames = array_map(function($relation) {
+                return null;
+            }, $relations);
         }
+
+        $relationNames = $this->parseRelationNames($relationNames);
 
         foreach ($relationNames as $relationName => $childRelations) {
             $relation = $this->getRelation($relationName);
