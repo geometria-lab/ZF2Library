@@ -109,36 +109,32 @@ class HasMany extends AbstractRelation
     public function setTargetObjectsToCollection(Collection $collection, $refresh = false, $childRelations = null)
     {
         $localModels = array();
-        $fetchValues = array();
 
         foreach ($collection as $model) {
             /* @var $model \GeometriaLab\Model\Persistent\AbstractModel */
-            // TODO 0 value will not pass check, should it ?
-            $values = (array) $model->get($this->getProperty()->getOriginProperty());
-            if ($values) {
-                $relation = $model->getRelation($this->getProperty()->getName());
-                if ($relation instanceof HasMany) {
-                    $hasTargetModel = $relation->hasTargetModels();
-                } else {
-                    $hasTargetModel = $relation->hasTargetModel();
+            $relation = $model->getRelation($this->getProperty()->getName());
+            if ($relation instanceof HasMany) {
+                $hasTargetModel = $relation->hasTargetModels();
+            } else {
+                $hasTargetModel = $relation->hasTargetModel();
+            }
+            if ($refresh || !$hasTargetModel) {
+                // TODO '0' value will not pass check, should it?
+                $value = $model->get($this->getProperty()->getOriginProperty());
+                if ($value) {
+                    $localModels[$value][] = $model;
                 }
-                if ($refresh || !$hasTargetModel) {
-                    $localModels[] = array(
-                        'model'  => $model,
-                        'values' => $values,
-                    );
-                    $fetchValues = array_merge($fetchValues, $values);
-                }
+                $relation->resetTargetModel();
             }
         }
 
-        if (0 == count($fetchValues)) {
+        if (count($localModels) == 0) {
             return;
         }
 
         $condition = array(
             $this->getProperty()->getTargetProperty() => array(
-                '$in' => array_values(array_unique($fetchValues))
+                '$in' => array_keys($localModels)
             )
         );
 
@@ -152,18 +148,20 @@ class HasMany extends AbstractRelation
 
         $targetCollectionClass = get_class($targetModels);
 
-        foreach ($localModels as $localModel) {
+        foreach ($localModels as $value => $models) {
             /* @var CollectionInterface $targetCollection */
             $targetCollection = new $targetCollectionClass();
             $targetProperty = $this->getProperty()->getTargetProperty();
             foreach ($targetModels as $targetModel) {
                 /* @var ModelInterface $targetModel */
-                if (in_array($targetModel->get($targetProperty), $localModel['values'])) {
+                if ($targetModel->get($targetProperty) === $value) {
                     $targetCollection->push($targetModel);
                 }
             }
             $relationName = $this->getProperty()->getName();
-            $localModel['model']->set($relationName, $targetCollection);
+            foreach ($models as $model) {
+                $model->set($relationName, $targetCollection);
+            }
         }
     }
 }
