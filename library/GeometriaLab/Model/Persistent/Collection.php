@@ -14,7 +14,12 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
     public function fetchRelations($relationNames = null, $refresh = false)
     {
         if ($relationNames === null) {
-            foreach ($this->getRelations() as $relation) {
+            $relations = $this->getRelations();
+            if (empty($relations)) {
+                return $this;
+            }
+
+            foreach ($relations as $relation) {
                 /* @var \GeometriaLab\Model\Persistent\Relation\AbstractRelation $relation */
                 $relationNames[$relation->getProperty()->getName()] = null;
             }
@@ -22,7 +27,7 @@ class Collection extends \GeometriaLab\Model\Collection implements CollectionInt
             $relationNames = $this->parseRelationNames($relationNames);
         }
 
-        foreach ((array) $relationNames as $relationName => $childRelations) {
+        foreach ($relationNames as $relationName => $childRelations) {
             $relation = $this->getRelation($relationName);
             if ($relation !== null) {
                 $relation->setTargetObjectsToCollection($this, $refresh, $childRelations);

@@ -22,9 +22,7 @@ class CollectionTest extends AbstractTestCase
             $this->assertFalse($model->getRelation('women')->hasTargetModels());
         }
 
-        $collection->fetchRelations(
-            null
-        );
+        $collection->fetchRelations();
 
         foreach ($collection as $model) {
             /* @var Man $model */
